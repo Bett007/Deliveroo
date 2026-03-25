@@ -1,0 +1,8 @@
+def test_health_check_returns_ok(client):
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "message": "Deliveroo backend is running",
+        "status": "ok",
+    }
