@@ -32,6 +32,7 @@ cp .env.example .env
 
 Main variables used right now:
 
+- `APP_ENV` sets the app config (`development` or `production`)
 - `SECRET_KEY` for Flask config
 - `DATABASE_URL` for the PostgreSQL connection string
 - `CLIENT_ORIGIN` for frontend CORS access
@@ -48,6 +49,8 @@ postgresql://username:password@localhost:5432/deliveroo_dev
 
 The starter backend is ready to point at PostgreSQL through that variable, but it does not create application tables yet because schema work is outside this setup task.
 
+If you use Supabase or another hosted PostgreSQL service, make sure the connection string includes the provider's required SSL settings.
+
 ## Run The Backend
 
 ```bash
@@ -55,6 +58,23 @@ python run.py
 ```
 
 The starter health endpoint is available at `GET /api/health`.
+
+## Render Notes
+
+If you deploy this backend on Render as a web service, use:
+
+```text
+Root Directory: backend
+Build Command: pip install -r requirements.txt
+Start Command: gunicorn run:app
+```
+
+Recommended Render environment variables:
+
+- `APP_ENV=production`
+- `SECRET_KEY=<your secret>`
+- `DATABASE_URL=<your hosted postgres url>`
+- `CLIENT_ORIGIN=<your frontend url>`
 
 ## Run Tests
 
