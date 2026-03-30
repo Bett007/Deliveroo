@@ -14,14 +14,25 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CLIENT_ORIGIN = os.getenv("CLIENT_ORIGIN", "http://localhost:5173")
     TESTING = False
+    DEBUG = False
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    DEBUG = True
+
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+
+
+class ProductionConfig(Config):
+    DEBUG = False
 
 
 config_by_name = {
-    "development": Config,
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
     "testing": TestingConfig,
 }
