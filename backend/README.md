@@ -34,6 +34,8 @@ Main variables used right now:
 
 - `APP_ENV` sets the app config (`development` or `production`)
 - `SECRET_KEY` for Flask config
+- `JWT_SECRET_KEY` for signing JWT access tokens
+- `JWT_ACCESS_TOKEN_EXPIRES_MINUTES` for auth token lifetime
 - `DATABASE_URL` for the PostgreSQL connection string
 - `CLIENT_ORIGIN` for frontend CORS access
 
@@ -57,7 +59,14 @@ If you use Supabase or another hosted PostgreSQL service, make sure the connecti
 python run.py
 ```
 
-The starter health endpoint is available at `GET /api/health`.
+Current implemented endpoints:
+
+- `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/auth/admin-check`
+- `GET /api/docs/swagger.json`
 
 ## Render Notes
 
@@ -106,4 +115,93 @@ The backend currently includes:
 - one health-check route
 - one basic pytest test
 
-Authentication, parcel logic, and other application features are still intentionally out of scope.
+## Auth API Reference
+
+### Register
+
+`POST /api/auth/register`
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123",
+  "role": "customer"
+}
+```
+
+Success response:
+
+```json
+{
+  "success": true,
+  "message": "User registered successfully.",
+  "data": {
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "role": "customer",
+      "created_at": "2026-03-30T12:00:00+00:00"
+    }
+  }
+}
+```
+
+### Login
+
+`POST /api/auth/login`
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123"
+}
+```
+
+Success response:
+
+```json
+{
+  "success": true,
+  "message": "Login successful.",
+  "data": {
+    "access_token": "<jwt>",
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "role": "customer",
+      "created_at": "2026-03-30T12:00:00+00:00"
+    }
+  }
+}
+```
+
+### Protected Routes
+
+Use the access token in the `Authorization` header:
+
+```text
+Authorization: Bearer <jwt>
+```
+
+- `GET /api/auth/me` returns the authenticated user.
+- `GET /api/auth/admin-check` verifies admin-only access.
+
+### Error Format
+
+Validation and auth errors return predictable JSON:
+
+```json
+{
+  "success": false,
+  "message": "Validation failed.",
+  "errors": {
+    "email": ["A user with this email already exists."]
+  }
+}
+```
+
+Swagger-compatible documentation for the implemented endpoints is available at `GET /api/docs/swagger.json`.
