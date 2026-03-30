@@ -7,6 +7,10 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ACCESS_TOKEN_EXPIRES_MINUTES = int(
+        os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "60")
+    )
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
         "postgresql://postgres:postgres@localhost:5432/deliveroo_dev",
