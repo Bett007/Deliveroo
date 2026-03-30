@@ -1,15 +1,16 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 
 import jwt
 from flask import current_app, g, request
 
 from app.errors.exceptions import AuthenticationError, AuthorizationError
+from app.extensions import db
 from app.models import User
 
 
 def generate_access_token(user: User) -> str:
-    expires_at = datetime.now(UTC) + timedelta(
+    expires_at = datetime.now(timezone.utc) + timedelta(
         minutes=current_app.config["JWT_ACCESS_TOKEN_EXPIRES_MINUTES"]
     )
     payload = {
@@ -17,7 +18,7 @@ def generate_access_token(user: User) -> str:
         "email": user.email,
         "role": user.role,
         "exp": expires_at,
-        "iat": datetime.now(UTC),
+        "iat": datetime.now(timezone.utc),
     }
     return jwt.encode(payload, current_app.config["JWT_SECRET_KEY"], algorithm="HS256")
 
@@ -49,7 +50,7 @@ def auth_required(view_func):
     @wraps(view_func)
     def wrapped(*args, **kwargs):
         payload = decode_access_token(get_bearer_token())
-        user = User.query.get(int(payload["sub"]))
+        user = db.session.get(User, int(payload["sub"]))
 
         if user is None:
             raise AuthenticationError("Authenticated user no longer exists.")
