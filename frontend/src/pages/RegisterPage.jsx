@@ -1,8 +1,39 @@
+import { Link } from "react-router-dom";
+
 export function RegisterPage() {
   return (
-    <section className="page-card">
-      <h1>Register</h1>
-      <p>User registration will be added in a later setup step.</p>
+    <section className="auth-page">
+      <div className="auth-card glass-card">
+        <div className="auth-header">
+          <h1>Create Account</h1>
+          <p>Join the Deliveroo operations platform and manage deliveries.</p>
+        </div>
+
+        <form className="auth-form">
+          <div className="form-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="Enter your full name" />
+          </div>
+
+          <div className="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="Enter your email" />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="Create a password" />
+          </div>
+
+          <button type="submit" className="primary-btn full-width">
+            Register
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
+      </div>
     </section>
   );
 }

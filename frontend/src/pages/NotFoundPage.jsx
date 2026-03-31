@@ -2,10 +2,15 @@ import { Link } from "react-router-dom";
 
 export function NotFoundPage() {
   return (
-    <section className="page-card">
-      <h1>Page not found</h1>
-      <p>The route you tried does not exist yet.</p>
-      <Link to="/">Back to home</Link>
+    <section className="notfound-page">
+      <div className="glass-card notfound-card">
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        <p>The page you’re looking for does not exist or was moved.</p>
+        <Link to="/" className="primary-btn">
+          Go Home
+        </Link>
+      </div>
     </section>
   );
 }
