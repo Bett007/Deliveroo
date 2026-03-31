@@ -43,3 +43,5 @@ def admin_check():
         message="Admin access confirmed.",
         data={"user": g.current_user.to_dict()},
     )
+
+print("Test Log")
