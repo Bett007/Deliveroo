@@ -44,4 +44,3 @@ def admin_check():
         data={"user": g.current_user.to_dict()},
     )
 
-print("Test Log")
