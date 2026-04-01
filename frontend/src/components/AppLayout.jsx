@@ -7,25 +7,28 @@ export function AppLayout() {
   const { sidebarOpen } = useSelector((state) => state.ui);
   const location = useLocation();
 
-  const isDashboard = location.pathname === "/dashboard";
+  const appShellRoutes = ["/dashboard", "/orders", "/help"];
+  const isAppArea = appShellRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
 
   const navItems = [
     { label: "Home", path: "/" },
-    { label: "Login", path: "/login" },
-    { label: "Register", path: "/register" },
-    { label: "Dashboard", path: "/dashboard" },
+    { label: "Orders", path: "/orders" },
+    { label: "Help", path: "/help" },
+    { label: "Admin Dashboard", path: "/dashboard" },
   ];
 
   return (
-    <div className={`app-shell ${isDashboard ? "dashboard-shell" : ""}`}>
-      {isDashboard && (
+    <div className={`app-shell ${isAppArea ? "dashboard-shell" : ""}`}>
+      {isAppArea && (
         <>
           <button
             className="mobile-menu-btn"
             onClick={() => dispatch(toggleSidebar())}
             aria-label="Toggle sidebar"
           >
-            ☰
+            Menu
           </button>
 
           <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -33,7 +36,7 @@ export function AppLayout() {
               <div className="brand-logo">D</div>
               <div>
                 <h2>Deliveroo</h2>
-                <p>Order Control</p>
+                <p>Customer & Admin Hub</p>
               </div>
             </div>
 
@@ -51,6 +54,14 @@ export function AppLayout() {
                 </NavLink>
               ))}
 
+              <NavLink
+                to="/login"
+                className="nav-link"
+                onClick={() => dispatch(closeSidebar())}
+              >
+                Sign In
+              </NavLink>
+
               <button className="nav-link logout-btn" type="button">
                 Logout
               </button>
@@ -66,7 +77,7 @@ export function AppLayout() {
         </>
       )}
 
-      <main className={`main-content ${isDashboard ? "dashboard-main" : ""}`}>
+      <main className={`main-content ${isAppArea ? "dashboard-main" : ""}`}>
         <Outlet />
       </main>
     </div>
