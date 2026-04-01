@@ -485,6 +485,9 @@ button {
 .workspace-page {
   display: grid;
   gap: 1.5rem;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
 }
 
 .dashboard-topbar,
@@ -916,7 +919,10 @@ button {
   .public-header-inner,
   .public-nav,
   .public-nav-links,
-  .public-auth-links {
+  .public-auth-links,
+  .dashboard-topbar,
+  .workspace-hero,
+  .topbar-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -928,6 +934,10 @@ button {
 
   .public-nav-link {
     text-align: center;
+  }
+
+  .search-input {
+    min-width: unset;
   }
 }
 
@@ -955,4 +965,26 @@ button {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.dashboard-page,
+.workspace-page {
+  display: grid;
+  gap: 1.5rem;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-topbar,
+  .workspace-hero,
+  .topbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    min-width: unset;
+  }
 }
