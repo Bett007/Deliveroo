@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
+import { formatReadableDate } from "../utils/formatters/date";
 
 export function OrdersPage() {
   const location = useLocation();
@@ -38,13 +39,10 @@ export function OrdersPage() {
                     </div>
                     <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
                   </div>
-                  <p className="order-route">
-                    {order.pickupLocation} to {order.destination}
-                  </p>
+                  <p className="order-route">{order.pickupLocation} to {order.destination}</p>
+                  <p className="helper-text">Updated {formatReadableDate(order.updatedAt)}</p>
                   <div className="order-actions-row">
-                    <Link to={`/orders/${order.id}`} className="secondary-btn">
-                      View Details
-                    </Link>
+                    <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
                   </div>
                 </article>
               ))}
@@ -68,6 +66,7 @@ export function OrdersPage() {
                     <th>Parcel</th>
                     <th>Route</th>
                     <th>Status</th>
+                    <th>Updated</th>
                     <th>Details</th>
                   </tr>
                 </thead>
@@ -78,9 +77,8 @@ export function OrdersPage() {
                       <td>{order.parcelName}</td>
                       <td>{order.pickupLocation} to {order.destination}</td>
                       <td><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
-                      <td>
-                        <Link to={`/orders/${order.id}`} className="inline-link">Open</Link>
-                      </td>
+                      <td>{formatReadableDate(order.updatedAt)}</td>
+                      <td><Link to={`/orders/${order.id}`} className="inline-link">Open</Link></td>
                     </tr>
                   ))}
                 </tbody>

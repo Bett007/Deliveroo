@@ -9,6 +9,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { cancelOrder, updateOrderDestination } from "../features/orders/ordersSlice";
 import { validateDestination } from "../features/orders/orderValidators";
+import { formatReadableDate } from "../utils/formatters/date";
 
 export function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -69,6 +70,8 @@ export function OrderDetailsPage() {
             <div><strong>Destination:</strong> {order.destination}</div>
             <div><strong>Weight:</strong> {order.weightCategory}</div>
             <div><strong>Description:</strong> {order.description}</div>
+            <div><strong>Created:</strong> {formatReadableDate(order.createdAt)}</div>
+            <div><strong>Last Updated:</strong> {formatReadableDate(order.updatedAt)}</div>
           </div>
         </SectionCard>
 
@@ -100,12 +103,7 @@ export function OrderDetailsPage() {
         </SectionCard>
       </div>
 
-      <RouteMapCard
-        origin={order.pickupLocation}
-        destination={order.destination}
-        distanceKm={order.distanceKm}
-        durationMinutes={order.durationMinutes}
-      />
+      <RouteMapCard origin={order.pickupLocation} destination={order.destination} distanceKm={order.distanceKm} durationMinutes={order.durationMinutes} />
     </section>
   );
 }

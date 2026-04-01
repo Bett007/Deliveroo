@@ -1,4 +1,5 @@
 import { RouteMapCard } from "../components/ui/RouteMapCard";
+import { formatRelativeLabel } from "../utils/formatters/date";
 
 export function DashboardPage() {
   const summaryCards = [
@@ -23,9 +24,9 @@ export function DashboardPage() {
   ];
 
   const notifications = [
-    "New rider assignment completed for order #DLV-1024",
-    "Peak demand detected in Westlands zone",
-    "Customer support request opened for order #DLV-1021",
+    { text: "New rider assignment completed for order #DLV-1024", timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString() },
+    { text: "Peak demand detected in Westlands zone", timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString() },
+    { text: "Customer support request opened for order #DLV-1021", timestamp: new Date(Date.now() - 1000 * 60 * 75).toISOString() },
   ];
 
   return (
@@ -103,12 +104,7 @@ export function DashboardPage() {
         </div>
 
         <aside className="dashboard-side-grid">
-          <RouteMapCard
-            origin="Westlands, Nairobi"
-            destination="Kilimani, Nairobi"
-            distanceKm={8.6}
-            durationMinutes={18}
-          />
+          <RouteMapCard origin="Westlands, Nairobi" destination="Kilimani, Nairobi" distanceKm={8.6} durationMinutes={18} />
 
           <section className="glass-card revenue-card">
             <p className="card-label">Daily Revenue</p>
@@ -127,7 +123,10 @@ export function DashboardPage() {
               {notifications.map((note, index) => (
                 <div key={index} className="notification-item">
                   <div className="notification-avatar">{index + 1}</div>
-                  <p>{note}</p>
+                  <div>
+                    <p>{note.text}</p>
+                    <span className="helper-text">{formatRelativeLabel(note.timestamp)}</span>
+                  </div>
                 </div>
               ))}
             </div>
