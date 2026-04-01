@@ -68,8 +68,8 @@ export function AppLayout() {
   const navItems = [
     { label: "Home", path: "/", icon: "home" },
     { label: "Orders", path: "/orders", icon: "orders" },
-    { label: "Help", path: "/help", icon: "help" },
     { label: "Admin Dashboard", path: "/dashboard", icon: "dashboard" },
+    { label: "Help", path: "/help", icon: "help" },
   ];
 
   const authItems = [
