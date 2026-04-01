@@ -1,4 +1,7 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../features/auth/authSlice";
+import { Button } from "./ui/Button";
 
 function NavIcon({ name }) {
   const icons = {
@@ -56,7 +59,10 @@ function NavIcon({ name }) {
 
 export function AppLayout() {
   const location = useLocation();
-  const hideHeaderRoutes = ["/login", "/register"];
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((state) => state.auth);
+  const hideHeaderRoutes = ["/login", "/register", "/verify"];
   const shouldShowHeader = !hideHeaderRoutes.includes(location.pathname);
 
   const navItems = [
@@ -70,6 +76,11 @@ export function AppLayout() {
     { label: "Sign In", path: "/login", icon: "login" },
     { label: "Register", path: "/register", icon: "register" },
   ];
+
+  function handleLogout() {
+    dispatch(logoutUser());
+    navigate("/");
+  }
 
   return (
     <div className="app-shell public-shell">
@@ -98,18 +109,28 @@ export function AppLayout() {
               </div>
 
               <div className="public-auth-links">
-                {authItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) =>
-                      `public-nav-link auth-link ${isActive ? "active" : ""}`
-                    }
-                  >
-                    <NavIcon name={item.icon} />
-                    <span>{item.label}</span>
-                  </NavLink>
-                ))}
+                {token && user ? (
+                  <>
+                    <span className="user-chip">{user.email}</span>
+                    <Button className="public-nav-link auth-link" onClick={handleLogout}>
+                      <NavIcon name="login" />
+                      <span>Logout</span>
+                    </Button>
+                  </>
+                ) : (
+                  authItems.map((item) => (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `public-nav-link auth-link ${isActive ? "active" : ""}`
+                      }
+                    >
+                      <NavIcon name={item.icon} />
+                      <span>{item.label}</span>
+                    </NavLink>
+                  ))
+                )}
               </div>
             </nav>
           </div>

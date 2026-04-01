@@ -7,6 +7,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { OrdersPage } from "../pages/OrdersPage";
 import { RegisterPage } from "../pages/RegisterPage";
+import { VerifyPage } from "../pages/VerifyPage";
 
 export function AppRouter() {
   return (
@@ -16,6 +17,7 @@ export function AppRouter() {
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="verify" element={<VerifyPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="help" element={<HelpPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
