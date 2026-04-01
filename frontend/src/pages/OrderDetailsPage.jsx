@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { FormField } from "../components/ui/FormField";
+import { RouteMapCard } from "../components/ui/RouteMapCard";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { cancelOrder, updateOrderDestination } from "../features/orders/ordersSlice";
@@ -98,6 +99,13 @@ export function OrderDetailsPage() {
           </Button>
         </SectionCard>
       </div>
+
+      <RouteMapCard
+        origin={order.pickupLocation}
+        destination={order.destination}
+        distanceKm={order.distanceKm}
+        durationMinutes={order.durationMinutes}
+      />
     </section>
   );
 }
