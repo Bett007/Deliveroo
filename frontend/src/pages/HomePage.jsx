@@ -38,15 +38,6 @@ export function HomePage() {
               <p className="hero-badge">Parcel delivery for customers and admins</p>
             </div>
           </div>
-
-          <div className="topbar-auth-links">
-            <Link to="/login" className="secondary-btn">
-              Sign In
-            </Link>
-            <Link to="/register" className="primary-btn">
-              Register
-            </Link>
-          </div>
         </div>
 
         <div className="hero-grid hero-grid-single">
