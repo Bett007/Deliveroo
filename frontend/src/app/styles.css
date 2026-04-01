@@ -1061,3 +1061,44 @@ button {
   color: var(--text-primary);
   font-weight: 700;
 }
+
+.form-panel {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.6);
+  outline: none;
+  resize: vertical;
+}
+
+.form-textarea:focus {
+  border-color: rgba(30, 200, 255, 0.7);
+  box-shadow: 0 0 0 4px rgba(30, 200, 255, 0.12);
+}
+
+.order-actions-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.inline-link {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.detail-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.danger-btn {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #ff738d, #d84a6a);
+}

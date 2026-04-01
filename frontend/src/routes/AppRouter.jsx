@@ -1,10 +1,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "../components/AppLayout";
+import { CreateOrderPage } from "../pages/CreateOrderPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { HelpPage } from "../pages/HelpPage";
 import { HomePage } from "../pages/HomePage";
 import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
+import { OrderDetailsPage } from "../pages/OrderDetailsPage";
 import { OrdersPage } from "../pages/OrdersPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { VerifyPage } from "../pages/VerifyPage";
@@ -22,6 +24,8 @@ export function AppRouter() {
           <Route path="help" element={<HelpPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/create" element={<CreateOrderPage />} />
+            <Route path="orders/:orderId" element={<OrderDetailsPage />} />
           </Route>
           <Route element={<AdminRoute />}>
             <Route path="dashboard" element={<DashboardPage />} />
