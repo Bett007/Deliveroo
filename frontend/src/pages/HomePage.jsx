@@ -7,7 +7,18 @@ export function HomePage() {
       <div className="landing-glow landing-glow-2"></div>
 
       <div className="landing-card glass-card">
-        <div className="hero-badge">Frontend Lead Pack â€¢ Deliveroo UI</div>
+        <div className="landing-topbar">
+          <div className="hero-badge">Frontend Lead Pack • Deliveroo UI</div>
+
+          <div className="topbar-auth-links">
+            <Link to="/login" className="secondary-btn">
+              Sign In
+            </Link>
+            <Link to="/register" className="primary-btn">
+              Register
+            </Link>
+          </div>
+        </div>
 
         <h1 className="hero-title">
           Build smarter delivery operations with a clean, modern dashboard.
@@ -21,9 +32,6 @@ export function HomePage() {
         <div className="hero-actions">
           <Link to="/dashboard" className="primary-btn">
             Open Dashboard
-          </Link>
-          <Link to="/login" className="secondary-btn">
-            Sign In
           </Link>
         </div>
 
