@@ -4,6 +4,13 @@ export function LoginPage() {
   return (
     <section className="auth-page">
       <div className="auth-card glass-card">
+        <Link to="/" className="back-link">
+          <span className="back-link-icon" aria-hidden="true">
+            &lt;
+          </span>
+          <span>Back to Home</span>
+        </Link>
+
         <div className="auth-header">
           <h1>Welcome Back</h1>
           <p>Sign in to continue managing orders and deliveries.</p>

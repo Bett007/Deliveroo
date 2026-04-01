@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 function NavIcon({ name }) {
   const icons = {
@@ -55,6 +55,10 @@ function NavIcon({ name }) {
 }
 
 export function AppLayout() {
+  const location = useLocation();
+  const hideHeaderRoutes = ["/login", "/register"];
+  const shouldShowHeader = !hideHeaderRoutes.includes(location.pathname);
+
   const navItems = [
     { label: "Home", path: "/", icon: "home" },
     { label: "Orders", path: "/orders", icon: "orders" },
@@ -69,46 +73,48 @@ export function AppLayout() {
 
   return (
     <div className="app-shell public-shell">
-      <header className="public-header">
-        <div className="public-header-inner glass-card">
-          <NavLink to="/" className="public-brand">
-            <span className="public-brand-mark">D</span>
-            <span>Deliveroo</span>
-          </NavLink>
+      {shouldShowHeader && (
+        <header className="public-header">
+          <div className="public-header-inner glass-card">
+            <NavLink to="/" className="public-brand">
+              <span className="public-brand-mark">D</span>
+              <span>Deliveroo</span>
+            </NavLink>
 
-          <nav className="public-nav">
-            <div className="public-nav-links">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `public-nav-link ${isActive ? "active" : ""}`
-                  }
-                >
-                  <NavIcon name={item.icon} />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-            </div>
+            <nav className="public-nav">
+              <div className="public-nav-links">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `public-nav-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <NavIcon name={item.icon} />
+                    <span>{item.label}</span>
+                  </NavLink>
+                ))}
+              </div>
 
-            <div className="public-auth-links">
-              {authItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `public-nav-link auth-link ${isActive ? "active" : ""}`
-                  }
-                >
-                  <NavIcon name={item.icon} />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-            </div>
-          </nav>
-        </div>
-      </header>
+              <div className="public-auth-links">
+                {authItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `public-nav-link auth-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <NavIcon name={item.icon} />
+                    <span>{item.label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </nav>
+          </div>
+        </header>
+      )}
 
       <main className="main-content public-main">
         <Outlet />

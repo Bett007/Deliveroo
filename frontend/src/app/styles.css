@@ -988,3 +988,28 @@ button {
     min-width: unset;
   }
 }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+}
+
+.back-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
+}
