@@ -54,8 +54,8 @@ export function DashboardPage() {
     <section className="dashboard-page">
       <header className="dashboard-topbar glass-card">
         <div>
-          <p className="eyebrow">Operations Dashboard</p>
-          <h1>Active Orders</h1>
+          <p className="eyebrow">Admin Dashboard</p>
+          <h1>Operations overview</h1>
         </div>
 
         <div className="topbar-actions">
