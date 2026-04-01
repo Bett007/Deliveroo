@@ -49,14 +49,14 @@ export function HomePage() {
           </div>
         </div>
 
-        <div className="hero-grid">
+        <div className="hero-grid hero-grid-single">
           <div>
             <h1 className="hero-title">
-              Deliver parcels with a frontend that works for both customers and operations teams.
+              Deliver parcels with a faster, clearer way to place, track, and manage every order.
             </h1>
 
             <p className="hero-subtitle">
-              The customer side focuses on placing and tracking orders, while the admin side focuses on updating delivery progress, parcel location, and support issues.
+              Create deliveries, follow active parcels, review completed orders, and reach support quickly whenever something needs attention.
             </p>
 
             <div className="hero-actions">
@@ -69,20 +69,6 @@ export function HomePage() {
               <Link to="/dashboard" className="secondary-btn">
                 Open Admin Dashboard
               </Link>
-            </div>
-          </div>
-
-          <div className="glass-card role-summary-card">
-            <p className="card-label">Frontend structure</p>
-            <div className="role-summary-list">
-              <div className="role-summary-item">
-                <h3>Customer</h3>
-                <p>Create orders, follow active deliveries, and review history.</p>
-              </div>
-              <div className="role-summary-item">
-                <h3>Admin</h3>
-                <p>Manage statuses, parcel locations, and daily delivery operations.</p>
-              </div>
             </div>
           </div>
         </div>
