@@ -8,6 +8,7 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 import { OrdersPage } from "../pages/OrdersPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { VerifyPage } from "../pages/VerifyPage";
+import { AdminRoute, ProtectedRoute } from "./ProtectedRoute";
 
 export function AppRouter() {
   return (
@@ -18,9 +19,13 @@ export function AppRouter() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="verify" element={<VerifyPage />} />
-          <Route path="orders" element={<OrdersPage />} />
           <Route path="help" element={<HelpPage />} />
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="orders" element={<OrdersPage />} />
+          </Route>
+          <Route element={<AdminRoute />}>
+            <Route path="dashboard" element={<DashboardPage />} />
+          </Route>
           <Route path="home" element={<Navigate to="/" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
