@@ -19,9 +19,14 @@ export function AppLayout() {
     { label: "Admin Dashboard", path: "/dashboard" },
   ];
 
+  const authItems = [
+    { label: "Sign In", path: "/login" },
+    { label: "Register", path: "/register" },
+  ];
+
   return (
-    <div className={`app-shell ${isAppArea ? "dashboard-shell" : ""}`}>
-      {isAppArea && (
+    <div className={`app-shell ${isAppArea ? "dashboard-shell" : "public-shell"}`}>
+      {isAppArea ? (
         <>
           <button
             className="mobile-menu-btn"
@@ -75,9 +80,48 @@ export function AppLayout() {
             />
           )}
         </>
+      ) : (
+        <header className="public-header">
+          <div className="public-header-inner glass-card">
+            <NavLink to="/" className="public-brand">
+              <span className="public-brand-mark">D</span>
+              <span>Deliveroo</span>
+            </NavLink>
+
+            <nav className="public-nav">
+              <div className="public-nav-links">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `public-nav-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+
+              <div className="public-auth-links">
+                {authItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `public-nav-link auth-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            </nav>
+          </div>
+        </header>
       )}
 
-      <main className={`main-content ${isAppArea ? "dashboard-main" : ""}`}>
+      <main className={`main-content ${isAppArea ? "dashboard-main" : "public-main"}`}>
         <Outlet />
       </main>
     </div>
