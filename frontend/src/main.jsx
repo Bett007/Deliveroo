@@ -5,6 +5,8 @@ import { store } from "./store";
 import App from "./App";
 import "./app/styles.css";
 
+document.title = "Deliveroo";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
