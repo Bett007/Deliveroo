@@ -1,6 +1,4 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { closeSidebar, toggleSidebar } from "../store";
 
 function NavIcon({ name }) {
   const icons = {
@@ -57,14 +55,9 @@ function NavIcon({ name }) {
 }
 
 export function AppLayout() {
-  const dispatch = useDispatch();
-  const { sidebarOpen } = useSelector((state) => state.ui);
   const location = useLocation();
-
-  const appShellRoutes = ["/dashboard", "/orders", "/help"];
-  const isAppArea = appShellRoutes.some((route) =>
-    location.pathname.startsWith(route)
-  );
+  const hideHeaderRoutes = ["/login", "/register"];
+  const shouldShowHeader = !hideHeaderRoutes.includes(location.pathname);
 
   const navItems = [
     { label: "Home", path: "/", icon: "home" },
@@ -79,65 +72,8 @@ export function AppLayout() {
   ];
 
   return (
-    <div className={`app-shell ${isAppArea ? "dashboard-shell" : "public-shell"}`}>
-      {isAppArea ? (
-        <>
-          <button
-            className="mobile-menu-btn"
-            onClick={() => dispatch(toggleSidebar())}
-            aria-label="Toggle sidebar"
-          >
-            Menu
-          </button>
-
-          <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-            <div className="brand-row">
-              <div className="brand-logo">D</div>
-              <div>
-                <h2>Deliveroo</h2>
-                <p>Customer & Admin Hub</p>
-              </div>
-            </div>
-
-            <nav className="sidebar-nav">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? "active" : ""}`
-                  }
-                  onClick={() => dispatch(closeSidebar())}
-                >
-                  <NavIcon name={item.icon} />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-
-              <NavLink
-                to="/login"
-                className="nav-link"
-                onClick={() => dispatch(closeSidebar())}
-              >
-                <NavIcon name="login" />
-                <span>Sign In</span>
-              </NavLink>
-
-              <button className="nav-link logout-btn" type="button">
-                <NavIcon name="login" />
-                <span>Logout</span>
-              </button>
-            </nav>
-          </aside>
-
-          {sidebarOpen && (
-            <div
-              className="sidebar-backdrop"
-              onClick={() => dispatch(closeSidebar())}
-            />
-          )}
-        </>
-      ) : (
+    <div className="app-shell public-shell">
+      {shouldShowHeader && (
         <header className="public-header">
           <div className="public-header-inner glass-card">
             <NavLink to="/" className="public-brand">
@@ -180,7 +116,7 @@ export function AppLayout() {
         </header>
       )}
 
-      <main className={`main-content ${isAppArea ? "dashboard-main" : "public-main"}`}>
+      <main className="main-content public-main">
         <Outlet />
       </main>
     </div>
