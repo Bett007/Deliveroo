@@ -149,6 +149,22 @@ button {
   right: 10%;
 }
 
+.landing-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.topbar-auth-links {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .hero-badge {
   display: inline-block;
   padding: 0.55rem 1rem;
@@ -697,6 +713,19 @@ button {
 
   .hero-subtitle {
     font-size: 0.95rem;
+  }
+
+  .landing-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar-auth-links {
+    justify-content: stretch;
+  }
+
+  .topbar-auth-links a {
+    flex: 1;
   }
 
   .brand-row {
