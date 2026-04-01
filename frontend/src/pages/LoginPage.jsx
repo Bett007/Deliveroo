@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
+import { validateLoginForm } from "../features/auth/authValidators";
 
 export function LoginPage() {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ export function LoginPage() {
   const location = useLocation();
   const { status, error, fieldErrors, user } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [clientErrors, setClientErrors] = useState({});
 
   useEffect(() => {
     dispatch(clearAuthError());
@@ -27,10 +29,18 @@ export function LoginPage() {
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
+    setClientErrors((current) => ({ ...current, [name]: "" }));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const validationErrors = validateLoginForm(formData);
+
+    if (Object.keys(validationErrors).length) {
+      setClientErrors(validationErrors);
+      return;
+    }
+
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
@@ -55,26 +65,12 @@ export function LoginPage() {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <FormField id="login-email" label="Email Address" error={fieldErrors.email?.[0]}>
-            <input
-              id="login-email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+          <FormField id="login-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
+            <input id="login-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
           </FormField>
 
-          <FormField id="login-password" label="Password" error={fieldErrors.password?.[0]}>
-            <input
-              id="login-password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+          <FormField id="login-password" label="Password" error={clientErrors.password || fieldErrors.password?.[0]}>
+            <input id="login-password" name="password" type="password" placeholder="Enter your password" value={formData.password} onChange={handleChange} />
           </FormField>
 
           <Button type="submit" className="primary-btn full-width" disabled={status === "loading"}>
@@ -82,9 +78,7 @@ export function LoginPage() {
           </Button>
         </form>
 
-        <p className="auth-footer">
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
-        </p>
+        <p className="auth-footer">Don&apos;t have an account? <Link to="/register">Create one</Link></p>
       </div>
     </section>
   );

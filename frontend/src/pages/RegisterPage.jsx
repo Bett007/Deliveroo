@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, registerUser } from "../features/auth/authSlice";
+import { validateRegisterForm } from "../features/auth/authValidators";
 
 const initialFormData = {
   email: "",
@@ -16,6 +17,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const { registerStatus, error, fieldErrors, verificationEmail } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState(initialFormData);
+  const [clientErrors, setClientErrors] = useState({});
 
   useEffect(() => {
     dispatch(clearAuthError());
@@ -24,10 +26,18 @@ export function RegisterPage() {
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
+    setClientErrors((current) => ({ ...current, [name]: "" }));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const validationErrors = validateRegisterForm(formData);
+
+    if (Object.keys(validationErrors).length) {
+      setClientErrors(validationErrors);
+      return;
+    }
+
     const result = await dispatch(registerUser(formData));
 
     if (registerUser.fulfilled.match(result)) {
@@ -54,29 +64,15 @@ export function RegisterPage() {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <FormField id="register-email" label="Email Address" error={fieldErrors.email?.[0]}>
-            <input
-              id="register-email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+          <FormField id="register-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
+            <input id="register-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
           </FormField>
 
-          <FormField id="register-password" label="Password" error={fieldErrors.password?.[0]}>
-            <input
-              id="register-password"
-              name="password"
-              type="password"
-              placeholder="Create a password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+          <FormField id="register-password" label="Password" error={clientErrors.password || fieldErrors.password?.[0]}>
+            <input id="register-password" name="password" type="password" placeholder="Create a password" value={formData.password} onChange={handleChange} />
           </FormField>
 
-          <FormField id="register-role" label="Account Type" error={fieldErrors.role?.[0]}>
+          <FormField id="register-role" label="Account Type" error={clientErrors.role || fieldErrors.role?.[0]}>
             <select id="register-role" name="role" value={formData.role} onChange={handleChange} className="form-select">
               <option value="customer">Customer</option>
               <option value="admin">Admin</option>
@@ -89,9 +85,7 @@ export function RegisterPage() {
           </Button>
         </form>
 
-        <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
+        <p className="auth-footer">Already have an account? <Link to="/login">Sign in</Link></p>
       </div>
     </section>
   );

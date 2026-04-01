@@ -7,6 +7,7 @@ import { FormField } from "../components/ui/FormField";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { cancelOrder, updateOrderDestination } from "../features/orders/ordersSlice";
+import { validateDestination } from "../features/orders/orderValidators";
 
 export function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -14,10 +15,8 @@ export function OrderDetailsPage() {
   const dispatch = useDispatch();
   const { currentOrders, orderHistory } = useSelector((state) => state.orders);
   const [destination, setDestination] = useState("");
-  const order = useMemo(
-    () => [...currentOrders, ...orderHistory].find((item) => item.id === orderId),
-    [currentOrders, orderHistory, orderId]
-  );
+  const [destinationError, setDestinationError] = useState("");
+  const order = useMemo(() => [...currentOrders, ...orderHistory].find((item) => item.id === orderId), [currentOrders, orderHistory, orderId]);
 
   if (!order) {
     return (
@@ -32,11 +31,16 @@ export function OrderDetailsPage() {
 
   function handleUpdateDestination(event) {
     event.preventDefault();
-    if (!destination.trim()) {
+    const error = validateDestination(destination);
+
+    if (error) {
+      setDestinationError(error);
       return;
     }
+
     dispatch(updateOrderDestination({ id: order.id, destination: destination.trim() }));
     setDestination("");
+    setDestinationError("");
   }
 
   function handleCancelOrder() {
@@ -68,14 +72,18 @@ export function OrderDetailsPage() {
         </SectionCard>
 
         <SectionCard title="Manage Delivery" description="Change destination or cancel before the parcel is marked as delivered.">
+          {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
           <form className="auth-form" onSubmit={handleUpdateDestination}>
-            <FormField id="new-destination" label="Change Destination">
+            <FormField id="new-destination" label="Change Destination" error={destinationError}>
               <input
                 id="new-destination"
                 name="destination"
                 placeholder="Enter a new destination"
                 value={destination}
-                onChange={(event) => setDestination(event.target.value)}
+                onChange={(event) => {
+                  setDestination(event.target.value);
+                  setDestinationError("");
+                }}
                 disabled={!canEditDestination}
               />
             </FormField>
