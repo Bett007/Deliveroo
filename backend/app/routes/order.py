@@ -63,7 +63,8 @@ def change_destination(order_id: int):
 @order_bp.patch("/<int:order_id>/cancel")
 @auth_required
 def cancel(order_id: int):
-    order = cancel_order(g.current_user, order_id)
+    payload = request.get_json(silent=True)
+    order = cancel_order(g.current_user, order_id, payload)
     return success_response(
         message="Order cancelled successfully.",
         data={"order": order},

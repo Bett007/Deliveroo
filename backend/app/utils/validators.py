@@ -199,6 +199,27 @@ def validate_status_payload(payload: Optional[dict] = None) -> dict:
     return {"status": status}
 
 
+def validate_cancel_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    reason = data.get("reason")
+    if reason is not None:
+        if not isinstance(reason, str):
+            errors["reason"] = ["Cancellation reason must be a string."]
+        else:
+            reason = reason.strip()
+            if not reason:
+                errors["reason"] = ["Cancellation reason cannot be empty."]
+            elif len(reason) > 500:
+                errors["reason"] = ["Cancellation reason must be under 500 characters."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"reason": reason}
+
+
 def validate_tracking_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}

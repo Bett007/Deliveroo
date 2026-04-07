@@ -3,6 +3,7 @@ from app.extensions import db
 from app.models import Location, Order
 from app.services.parcel_service import create_parcel
 from app.utils.validators import (
+    validate_cancel_payload,
     validate_destination_payload,
     validate_order_payload,
     validate_status_payload,
@@ -85,7 +86,8 @@ def update_order_destination(user, order_id, payload):
     return order.to_dict()
 
 
-def cancel_order(user, order_id):
+def cancel_order(user, order_id, payload=None):
+    data = validate_cancel_payload(payload)
     order = Order.query.get(order_id)
     _ensure_order_access(user, order)
 
