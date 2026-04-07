@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 const customerHighlights = [
   {
     title: "Book parcel delivery fast",
@@ -49,18 +47,6 @@ export function HomePage() {
             <p className="hero-subtitle">
               Create deliveries, follow active parcels, review completed orders, and reach support quickly whenever something needs attention.
             </p>
-
-            <div className="hero-actions">
-              <Link to="/orders" className="primary-btn">
-                View Orders
-              </Link>
-              <Link to="/help" className="secondary-btn">
-                Contact Help
-              </Link>
-              <Link to="/dashboard" className="secondary-btn">
-                Open Admin Dashboard
-              </Link>
-            </div>
           </div>
         </div>
 

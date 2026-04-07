@@ -1,27 +1,12 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
-
-const uiSlice = createSlice({
-  name: "ui",
-  initialState: {
-    sidebarOpen: false,
-  },
-  reducers: {
-    toggleSidebar: (state) => {
-      state.sidebarOpen = !state.sidebarOpen;
-    },
-    closeSidebar: (state) => {
-      state.sidebarOpen = false;
-    },
-    openSidebar: (state) => {
-      state.sidebarOpen = true;
-    },
-  },
-});
-
-export const { toggleSidebar, closeSidebar, openSidebar } = uiSlice.actions;
+import { configureStore } from "@reduxjs/toolkit";
+import { adminReducer } from "../features/admin/adminSlice";
+import { authReducer } from "../features/auth/authSlice";
+import { ordersReducer } from "../features/orders/ordersSlice";
 
 export const store = configureStore({
   reducer: {
-    ui: uiSlice.reducer,
+    auth: authReducer,
+    orders: ordersReducer,
+    admin: adminReducer,
   },
 });
