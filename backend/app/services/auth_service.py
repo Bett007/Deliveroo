@@ -1,10 +1,12 @@
+from typing import Optional
+
 from app.errors.exceptions import AuthenticationError, ValidationError
 from app.extensions import db
 from app.models import User
 from app.utils.validators import validate_login_payload, validate_registration_payload
 
 
-def register_user(payload: dict | None) -> User:
+def register_user(payload: Optional[dict] = None) -> User:
     data = validate_registration_payload(payload)
 
     if User.query.filter_by(email=data["email"]).first():
@@ -22,7 +24,7 @@ def register_user(payload: dict | None) -> User:
     return user
 
 
-def authenticate_user(payload: dict | None) -> User:
+def authenticate_user(payload: Optional[dict] = None) -> User:
     data = validate_login_payload(payload)
     user = User.query.filter_by(email=data["email"]).first()
 

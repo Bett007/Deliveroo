@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from flask import Flask
 
@@ -10,7 +11,7 @@ from .routes.docs import docs_bp
 from .routes.health import health_bp
 
 
-def create_app(config_name: str | None = None) -> Flask:
+def create_app(config_name: Optional[str] = None) -> Flask:
     if config_name is None:
         config_name = os.getenv("APP_ENV") or os.getenv("FLASK_ENV", "development")
 

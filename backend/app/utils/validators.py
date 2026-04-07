@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from app.errors.exceptions import ValidationError
 
@@ -7,7 +8,7 @@ MIN_PASSWORD_LENGTH = 8
 VALID_ROLES = {"customer", "admin", "rider"}
 
 
-def validate_registration_payload(payload: dict | None) -> dict:
+def validate_registration_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
 
@@ -40,7 +41,7 @@ def validate_registration_payload(payload: dict | None) -> dict:
     return {"email": email, "password": password, "role": role}
 
 
-def validate_login_payload(payload: dict | None) -> dict:
+def validate_login_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
 
