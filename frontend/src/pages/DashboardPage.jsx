@@ -1,3 +1,6 @@
+import { RouteMapCard } from "../components/ui/RouteMapCard";
+import { formatRelativeLabel } from "../utils/formatters/date";
+
 export function DashboardPage() {
   const summaryCards = [
     { title: "Total Orders", value: "1,248", sub: "+12% this week" },
@@ -14,40 +17,16 @@ export function DashboardPage() {
   ];
 
   const liveOrders = [
-    {
-      id: "#DLV-1024",
-      customer: "Sarah Wanjiku",
-      rider: "Kevin",
-      status: "Out for delivery",
-      eta: "12 mins",
-    },
-    {
-      id: "#DLV-1025",
-      customer: "Brian Kiptoo",
-      rider: "Mercy",
-      status: "Preparing",
-      eta: "18 mins",
-    },
-    {
-      id: "#DLV-1026",
-      customer: "Amina Noor",
-      rider: "James",
-      status: "Delivered",
-      eta: "Completed",
-    },
-    {
-      id: "#DLV-1027",
-      customer: "John Kamau",
-      rider: "Faith",
-      status: "Placed",
-      eta: "26 mins",
-    },
+    { id: "#DLV-1024", customer: "Sarah Wanjiku", rider: "Kevin", status: "Out for delivery", eta: "12 mins" },
+    { id: "#DLV-1025", customer: "Brian Kiptoo", rider: "Mercy", status: "Preparing", eta: "18 mins" },
+    { id: "#DLV-1026", customer: "Amina Noor", rider: "James", status: "Delivered", eta: "Completed" },
+    { id: "#DLV-1027", customer: "John Kamau", rider: "Faith", status: "Placed", eta: "26 mins" },
   ];
 
   const notifications = [
-    "New rider assignment completed for order #DLV-1024",
-    "Peak demand detected in Westlands zone",
-    "Customer support request opened for order #DLV-1021",
+    { text: "New rider assignment completed for order #DLV-1024", timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString() },
+    { text: "Peak demand detected in Westlands zone", timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString() },
+    { text: "Customer support request opened for order #DLV-1021", timestamp: new Date(Date.now() - 1000 * 60 * 75).toISOString() },
   ];
 
   return (
@@ -59,11 +38,7 @@ export function DashboardPage() {
         </div>
 
         <div className="topbar-actions">
-          <input
-            type="text"
-            placeholder="Search orders, riders, customers..."
-            className="search-input"
-          />
+          <input type="text" placeholder="Search orders, riders, customers..." className="search-input" />
           <button className="primary-btn">Create Order</button>
         </div>
       </header>
@@ -118,9 +93,7 @@ export function DashboardPage() {
                       <td>{order.id}</td>
                       <td>{order.customer}</td>
                       <td>{order.rider}</td>
-                      <td>
-                        <span className="status-badge">{order.status}</span>
-                      </td>
+                      <td><span className="status-badge">{order.status}</span></td>
                       <td>{order.eta}</td>
                     </tr>
                   ))}
@@ -131,15 +104,7 @@ export function DashboardPage() {
         </div>
 
         <aside className="dashboard-side-grid">
-          <section className="glass-card map-card">
-            <div className="section-header">
-              <h2>Delivery Map</h2>
-              <span className="mini-badge">Live</span>
-            </div>
-            <div className="fake-map">
-              <div className="map-pin"></div>
-            </div>
-          </section>
+          <RouteMapCard origin="Westlands, Nairobi" destination="Kilimani, Nairobi" distanceKm={8.6} durationMinutes={18} />
 
           <section className="glass-card revenue-card">
             <p className="card-label">Daily Revenue</p>
@@ -158,7 +123,10 @@ export function DashboardPage() {
               {notifications.map((note, index) => (
                 <div key={index} className="notification-item">
                   <div className="notification-avatar">{index + 1}</div>
-                  <p>{note}</p>
+                  <div>
+                    <p>{note.text}</p>
+                    <span className="helper-text">{formatRelativeLabel(note.timestamp)}</span>
+                  </div>
                 </div>
               ))}
             </div>

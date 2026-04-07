@@ -1,6 +1,18 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { hydrateSession } from "./features/auth/authSlice";
 import { AppRouter } from "./routes/AppRouter";
 
 function App() {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(hydrateSession());
+    }
+  }, [dispatch, token]);
+
   return <AppRouter />;
 }
 

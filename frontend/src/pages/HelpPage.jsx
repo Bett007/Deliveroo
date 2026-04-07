@@ -21,7 +21,7 @@ const faqItems = [
 
 export function HelpPage() {
   return (
-    <section className="workspace-page">
+    <section className="workspace-page help-page">
       <header className="workspace-hero glass-card help-hero">
         <div>
           <p className="eyebrow">Help & Support</p>
