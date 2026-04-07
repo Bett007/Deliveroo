@@ -24,6 +24,8 @@ class User(db.Model):
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
+    orders = db.relationship("Order", back_populates="user", cascade="all, delete-orphan")
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
