@@ -3,7 +3,6 @@ import { AppLayout } from "../components/AppLayout";
 import { CreateOrderPage } from "../pages/CreateOrderPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { HelpPage } from "../pages/HelpPage";
-import { HomePage } from "../pages/HomePage";
 import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { OrderDetailsPage } from "../pages/OrderDetailsPage";
@@ -17,20 +16,23 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<Navigate to="/login" replace />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="verify" element={<VerifyPage />} />
-          <Route path="help" element={<HelpPage />} />
+
           <Route element={<ProtectedRoute />}>
             <Route path="orders" element={<OrdersPage />} />
             <Route path="orders/create" element={<CreateOrderPage />} />
             <Route path="orders/:orderId" element={<OrderDetailsPage />} />
+            <Route path="help" element={<HelpPage />} />
           </Route>
+
           <Route element={<AdminRoute />}>
             <Route path="dashboard" element={<DashboardPage />} />
           </Route>
-          <Route path="home" element={<Navigate to="/" replace />} />
+
+          <Route path="home" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
