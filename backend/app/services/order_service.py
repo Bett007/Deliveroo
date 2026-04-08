@@ -6,6 +6,7 @@ from app.utils.validators import (
     validate_cancel_payload,
     validate_destination_payload,
     validate_order_payload,
+    validate_pagination_params,
     validate_status_payload,
 )
 
@@ -51,14 +52,19 @@ def create_order(user, payload):
 
 
 def get_orders(user, page=1, limit=10):
+    pagination = validate_pagination_params(page=page, limit=limit)
     query = Order.query.filter_by(user_id=user.id).order_by(Order.created_at.desc())
     total = query.count()
-    orders = query.offset((page - 1) * limit).limit(limit).all()
+    orders = (
+        query.offset((pagination["page"] - 1) * pagination["limit"])
+        .limit(pagination["limit"])
+        .all()
+    )
 
     return {
         "items": [order.to_dict() for order in orders],
-        "page": page,
-        "limit": limit,
+        "page": pagination["page"],
+        "limit": pagination["limit"],
         "total": total,
     }
 

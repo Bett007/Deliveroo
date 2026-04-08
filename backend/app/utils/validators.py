@@ -245,3 +245,26 @@ def validate_tracking_payload(payload: Optional[dict] = None) -> dict:
         raise ValidationError("Validation failed.", errors=errors)
 
     return {"status": status, "location_id": location_id, "note": note}
+
+
+def validate_pagination_params(page=1, limit=10) -> dict:
+    errors = {}
+
+    try:
+        page = int(page)
+        if page < 1:
+            raise ValueError()
+    except (TypeError, ValueError):
+        errors["page"] = ["Page must be an integer greater than or equal to 1."]
+
+    try:
+        limit = int(limit)
+        if limit < 1:
+            raise ValueError()
+    except (TypeError, ValueError):
+        errors["limit"] = ["Limit must be an integer greater than or equal to 1."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"page": page, "limit": limit}
