@@ -9,26 +9,38 @@ function mapOrder(order) {
   return {
     id: String(order.id),
     backendId: order.id,
+    parcelId: order.parcel_id,
     parcelName: parcel.description ?? `Order ${order.id}`,
+    pickupLocationId: order.pickup_location_id,
     pickupLocation: pickupLocation.address ?? `Location #${order.pickup_location_id}`,
+    deliveryLocationId: order.delivery_location_id,
     destination: deliveryLocation.address ?? `Location #${order.delivery_location_id}`,
-    currentLocation: currentLocation.address ?? null,
-    status: order.status,
-    weightCategory: parcel.weight_category_name ?? `Category #${parcel.weight_category_id ?? ""}`,
-    description: parcel.special_instructions ?? parcel.description ?? "",
+    currentLocationId: order.current_location_id,
+    currentLocation: currentLocation.address ?? (order.current_location_id ? `Location #${order.current_location_id}` : "Awaiting rider update"),
+    quotedPrice: order.quoted_price,
     distanceKm: order.distance_km ?? 0,
     durationMinutes: order.estimated_duration_minutes ?? 0,
+    status: order.status,
     createdAt: order.created_at,
     updatedAt: order.updated_at,
-    pickupLocationId: order.pickup_location_id,
-    destinationLocationId: order.delivery_location_id,
-    currentLocationId: order.current_location_id,
-    quotedPrice: order.quoted_price,
+    weightCategory: parcel.weight_category_name ?? `Category #${parcel.weight_category_id ?? ""}`,
+    description: parcel.special_instructions ?? parcel.description ?? "",
     parcel: {
       ...parcel,
       specialInstructions: parcel.special_instructions ?? null,
       weightCategoryName: parcel.weight_category_name ?? null,
     },
+  };
+}
+
+function mapTrackingUpdate(update) {
+  return {
+    id: update.id,
+    status: update.status,
+    note: update.note || "No note added yet.",
+    locationLabel: update.location_id ? `Location #${update.location_id}` : "Location not provided",
+    createdAt: update.created_at,
+    updatedBy: update.updated_by,
   };
 }
 
@@ -40,21 +52,33 @@ function splitOrders(orders) {
       } else {
         groups.currentOrders.push(order);
       }
+
       return groups;
     },
     { currentOrders: [], orderHistory: [] },
   );
 }
 
-export async function listOrders(token) {
-  const response = await apiRequest("/orders/", { token });
-  const mappedOrders = response.data.items.map(mapOrder);
+export async function listOrders(token, { page = 1, limit = 20 } = {}) {
+  const response = await apiRequest(`/orders/?page=${page}&limit=${limit}`, { token });
+  const items = (response.data.items || []).map(mapOrder);
 
   return {
-    ...splitOrders(mappedOrders),
-    total: response.data.total,
+    items,
+    ...splitOrders(items),
     page: response.data.page,
     limit: response.data.limit,
+    total: response.data.total,
+    message: response.message,
+  };
+}
+
+export async function getOrderRequest(token, orderId) {
+  const response = await apiRequest(`/orders/${orderId}`, { token });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
   };
 }
 
@@ -113,6 +137,15 @@ export async function cancelOrderRequest(token, orderId, payload = {}) {
 
   return {
     order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function listTrackingUpdatesRequest(token, orderId) {
+  const response = await apiRequest(`/tracking/${orderId}`, { token });
+
+  return {
+    updates: (response.data.updates || []).map(mapTrackingUpdate),
     message: response.message,
   };
 }

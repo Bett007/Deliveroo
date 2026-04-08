@@ -1,23 +1,29 @@
 export function validateCreateOrderForm(values) {
   const errors = {};
 
-  if (!values.parcelName.trim()) {
+  if (!String(values.parcelName || "").trim()) {
     errors.parcelName = "Parcel name is required.";
   }
 
-  if (!values.pickupLocationId) {
+  if (!String(values.pickupLocationId || "").trim()) {
     errors.pickupLocation = "Pickup location is required.";
   }
 
-  if (!values.destinationLocationId) {
+  if (!String(values.destinationLocationId || "").trim()) {
     errors.destination = "Destination is required.";
   }
 
-  if (!values.weightKg || Number(values.weightKg) <= 0) {
+  if (!String(values.weightCategoryId || "").trim()) {
+    errors.weightCategoryId = "Weight category is required.";
+  }
+
+  if (!String(values.weightKg || "").trim()) {
+    errors.weightKg = "Parcel weight is required.";
+  } else if (Number(values.weightKg) <= 0) {
     errors.weightKg = "Parcel weight must be greater than 0.";
   }
 
-  if (!values.description.trim()) {
+  if (!String(values.description || "").trim()) {
     errors.description = "Parcel description is required.";
   }
 
@@ -25,8 +31,12 @@ export function validateCreateOrderForm(values) {
 }
 
 export function validateDestination(value) {
-  if (!value) {
+  if (!String(value || "").trim()) {
     return "Enter a new destination before saving.";
+  }
+
+  if (Number(value) <= 0) {
+    return "Delivery location ID must be a positive number.";
   }
 
   return "";

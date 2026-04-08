@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
-import { clearOrderError, loadOrderReferenceData, submitOrder } from "../features/orders/ordersSlice";
+import { clearOrderError, createOrder, loadOrderReferenceData } from "../features/orders/ordersSlice";
 import { validateCreateOrderForm } from "../features/orders/orderValidators";
 
 const initialFormData = {
@@ -23,6 +23,7 @@ export function CreateOrderPage() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    dispatch(clearOrderError());
     if (referenceStatus === "idle") {
       dispatch(loadOrderReferenceData());
     }
@@ -35,6 +36,7 @@ export function CreateOrderPage() {
       destination: fieldErrors.delivery_location_id?.[0] ?? current.destination,
       parcelName: fieldErrors.description?.[0] ?? current.parcelName,
       weightKg: fieldErrors.weight?.[0] ?? current.weightKg,
+      weightCategoryId: fieldErrors.weight_category_id?.[0] ?? current.weightCategoryId,
     }));
   }, [fieldErrors]);
 
@@ -59,11 +61,10 @@ export function CreateOrderPage() {
       return;
     }
 
-    const quotedPrice = selectedWeightCategory?.basePrice ?? 0;
     const payload = {
       pickup_location_id: Number(formData.pickupLocationId),
       delivery_location_id: Number(formData.destinationLocationId),
-      quoted_price: Number(quotedPrice),
+      quoted_price: Number(selectedWeightCategory?.basePrice ?? 0),
       parcel: {
         description: formData.parcelName.trim(),
         weight: Number(formData.weightKg),
@@ -72,11 +73,13 @@ export function CreateOrderPage() {
       },
     };
 
-    try {
-      const result = await dispatch(submitOrder(payload)).unwrap();
-      navigate(`/orders/${result.order.id}`, { replace: true });
-    } catch {
-      return;
+    const result = await dispatch(createOrder(payload));
+
+    if (createOrder.fulfilled.match(result)) {
+      navigate(`/orders/${result.payload.order.id}`, {
+        replace: true,
+        state: { message: "Order created successfully." },
+      });
     }
   }
 
@@ -85,19 +88,21 @@ export function CreateOrderPage() {
       <header className="workspace-hero glass-card">
         <div>
           <p className="eyebrow">Create Parcel</p>
-          <h1>Create a new parcel delivery order</h1>
-          <p className="workspace-copy">Capture the parcel details, pickup point, and destination before sending it into the delivery flow.</p>
+          <h1>Create a backend-ready delivery order</h1>
+          <p className="workspace-copy">
+            This form now uses live reference data from the backend so you can submit a valid order payload without guessing IDs.
+          </p>
         </div>
         <Link to="/orders" className="secondary-btn">Back to Orders</Link>
       </header>
 
       <section className="glass-card workspace-panel form-panel">
         <form className="auth-form" onSubmit={handleSubmit}>
+          {error ? <p className="form-status error">{error}</p> : null}
+
           <FormField id="parcel-name" label="Parcel Name" error={errors.parcelName}>
             <input id="parcel-name" name="parcelName" value={formData.parcelName} onChange={handleChange} placeholder="e.g. Office documents" />
           </FormField>
-
-          {error ? <p className="form-status error">{error}</p> : null}
 
           <FormField id="pickup-location" label="Pickup Location" error={errors.pickupLocation}>
             <select
@@ -131,7 +136,7 @@ export function CreateOrderPage() {
             </select>
           </FormField>
 
-          <FormField id="weight-category" label="Weight Category">
+          <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
             <select id="weight-category" name="weightCategoryId" className="form-select" value={formData.weightCategoryId} onChange={handleChange}>
               <option value="">Select weight category</option>
               {referenceData.weightCategories.map((category) => (
