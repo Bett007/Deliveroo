@@ -95,10 +95,18 @@ The seed command is idempotent and inserts starter:
 
 1. Copy `.env.example` to `.env`.
 2. Paste your Supabase direct Postgres URL into `DATABASE_URL`.
-3. Run `flask verify-db`.
-4. Run `flask db upgrade`.
-5. Run `flask seed-reference-data`.
-6. In Supabase Table Editor or SQL, confirm the six tables exist and that `locations` and `weight_categories` contain starter rows.
+3. If you are working from an NTFS external drive on macOS, run Flask commands through the cleanup wrapper so AppleDouble sidecar files do not break Alembic:
+
+```bash
+./scripts/run_clean.sh flask verify-db
+./scripts/run_clean.sh flask db upgrade
+./scripts/run_clean.sh flask seed-reference-data
+```
+
+4. Otherwise run `flask verify-db`.
+5. Run `flask db upgrade`.
+6. Run `flask seed-reference-data`.
+7. In Supabase Table Editor or SQL, confirm the six tables exist and that `locations` and `weight_categories` contain starter rows.
 
 ## Run The Backend
 
