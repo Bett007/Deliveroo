@@ -54,3 +54,27 @@ def test_order_list_rejects_invalid_pagination(client):
     assert body["message"] == "Validation failed."
     assert body["errors"]["page"] == ["Page must be an integer greater than or equal to 1."]
     assert body["errors"]["limit"] == ["Limit must be an integer greater than or equal to 1."]
+
+
+def test_order_reference_data_returns_seedable_shapes(client, app):
+    from app.extensions import db
+    from app.models import Location, WeightCategory
+
+    with app.app_context():
+        db.session.add(Location(address="CBD Customer Desk, Kenyatta Avenue", city="Nairobi", country="Kenya", latitude=-1.2864, longitude=36.8172))
+        db.session.add(WeightCategory(name="light", min_weight=0, max_weight=2, base_price=250))
+        db.session.commit()
+
+    register_user(client)
+    token = login_token(client)
+
+    response = client.get(
+        "/api/orders/reference-data",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["success"] is True
+    assert len(body["data"]["locations"]) == 1
+    assert len(body["data"]["weight_categories"]) == 1

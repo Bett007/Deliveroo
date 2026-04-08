@@ -1,13 +1,23 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
+import { fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
 
 export function OrdersPage() {
+  const dispatch = useDispatch();
   const location = useLocation();
-  const { currentOrders, orderHistory } = useSelector((state) => state.orders);
+  const token = useSelector((state) => state.auth.token);
+  const { currentOrders, orderHistory, status, error } = useSelector((state) => state.orders);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchOrders());
+    }
+  }, [dispatch, token]);
 
   return (
     <section className="workspace-page">
@@ -19,6 +29,7 @@ export function OrdersPage() {
             Manage your active deliveries, review completed parcels, and open any order to change destination or cancel it when allowed.
           </p>
           {location.state?.message ? <p className="form-status error">{location.state.message}</p> : null}
+          {error ? <p className="form-status error">{error}</p> : null}
         </div>
 
         <Link to="/orders/create" className="primary-btn">
@@ -28,6 +39,7 @@ export function OrdersPage() {
 
       <div className="workspace-grid">
         <SectionCard title="Current Orders" description="Orders that are still active across pickup, transit, and delivery.">
+          {status === "loading" ? <p className="helper-text">Loading orders...</p> : null}
           {currentOrders.length ? (
             <div className="order-card-list">
               {currentOrders.map((order) => (

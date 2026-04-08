@@ -4,6 +4,7 @@ from app.services.order_service import (
     cancel_order,
     create_order,
     get_order,
+    get_order_reference_data,
     get_orders,
     admin_update_order_location,
     admin_update_order_status,
@@ -35,6 +36,16 @@ def list_orders():
     result = get_orders(g.current_user, page=page, limit=limit)
     return success_response(
         message="Orders retrieved successfully.",
+        data=result,
+    )
+
+
+@order_bp.get("/reference-data")
+@auth_required
+def reference_data():
+    result = get_order_reference_data()
+    return success_response(
+        message="Order reference data retrieved successfully.",
         data=result,
     )
 

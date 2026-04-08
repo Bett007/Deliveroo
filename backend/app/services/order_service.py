@@ -1,6 +1,6 @@
 from app.errors.exceptions import AuthorizationError, NotFoundError, ValidationError
 from app.extensions import db
-from app.models import Location, Order
+from app.models import Location, Order, WeightCategory
 from app.services.parcel_service import create_parcel
 from app.utils.validators import (
     validate_cancel_payload,
@@ -66,6 +66,16 @@ def get_orders(user, page=1, limit=10):
         "page": pagination["page"],
         "limit": pagination["limit"],
         "total": total,
+    }
+
+
+def get_order_reference_data():
+    locations = Location.query.order_by(Location.city.asc(), Location.address.asc()).all()
+    weight_categories = WeightCategory.query.order_by(WeightCategory.min_weight.asc()).all()
+
+    return {
+        "locations": [location.to_dict() for location in locations],
+        "weight_categories": [category.to_dict() for category in weight_categories],
     }
 
 

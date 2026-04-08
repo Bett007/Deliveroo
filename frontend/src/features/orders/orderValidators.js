@@ -5,12 +5,16 @@ export function validateCreateOrderForm(values) {
     errors.parcelName = "Parcel name is required.";
   }
 
-  if (!values.pickupLocation.trim()) {
+  if (!values.pickupLocationId) {
     errors.pickupLocation = "Pickup location is required.";
   }
 
-  if (!values.destination.trim()) {
+  if (!values.destinationLocationId) {
     errors.destination = "Destination is required.";
+  }
+
+  if (!values.weightKg || Number(values.weightKg) <= 0) {
+    errors.weightKg = "Parcel weight must be greater than 0.";
   }
 
   if (!values.description.trim()) {
@@ -21,7 +25,7 @@ export function validateCreateOrderForm(values) {
 }
 
 export function validateDestination(value) {
-  if (!value.trim()) {
+  if (!value) {
     return "Enter a new destination before saving.";
   }
 

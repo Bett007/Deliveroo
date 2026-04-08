@@ -28,6 +28,7 @@ class Parcel(db.Model):
             "description": self.description,
             "weight": float(self.weight),
             "weight_category_id": self.weight_category_id,
+            "weight_category_name": self.weight_category.name if self.weight_category else None,
             "image_url": self.image_url,
             "special_instructions": self.special_instructions,
             "created_at": self.created_at.isoformat() if self.created_at else None,
