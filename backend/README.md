@@ -37,7 +37,7 @@ Main variables used right now:
 - `JWT_SECRET_KEY` for signing JWT access tokens
 - `JWT_ACCESS_TOKEN_EXPIRES_MINUTES` for auth token lifetime
 - `DATABASE_URL` for the PostgreSQL connection string
-- `CLIENT_ORIGIN` for frontend CORS access
+- `CLIENT_ORIGIN` for frontend CORS access. You can provide a comma-separated list for multiple frontend origins.
 
 ## PostgreSQL Setup
 
@@ -139,6 +139,12 @@ Recommended Render environment variables:
 - `SECRET_KEY=<your secret>`
 - `DATABASE_URL=<your hosted postgres url>`
 - `CLIENT_ORIGIN=<your frontend url>`
+
+Example with local and deployed frontend origins:
+
+```text
+CLIENT_ORIGIN=http://localhost:5173,https://deliveroo-tan.vercel.app
+```
 
 ## Run Tests
 

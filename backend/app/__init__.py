@@ -25,7 +25,7 @@ def create_app(config_name: Optional[str] = None) -> Flask:
     migrate.init_app(app, db)
     cors.init_app(
         app,
-        resources={r"/api/*": {"origins": app.config["CLIENT_ORIGIN"]}},
+        resources={r"/api/*": {"origins": app.config["CLIENT_ORIGINS"]}},
     )
 
     app.register_blueprint(health_bp, url_prefix="/api")
