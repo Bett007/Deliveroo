@@ -22,7 +22,7 @@ def _ensure_order_access(user, order):
 
 
 def _validate_location_exists(location_id):
-    location = Location.query.get(location_id)
+    location = db.session.get(Location, location_id)
     if location is None:
         raise NotFoundError("Location not found.")
     return location
@@ -70,14 +70,14 @@ def get_orders(user, page=1, limit=10):
 
 
 def get_order(user, order_id):
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
     return order.to_dict()
 
 
 def update_order_destination(user, order_id, payload):
     data = validate_destination_payload(payload)
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
 
     if order.status == "delivered":
@@ -94,7 +94,7 @@ def update_order_destination(user, order_id, payload):
 
 def cancel_order(user, order_id, payload=None):
     data = validate_cancel_payload(payload)
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
 
     if order.status == "delivered":
@@ -110,7 +110,7 @@ def cancel_order(user, order_id, payload=None):
 
 def admin_update_order_status(user, order_id, payload):
     data = validate_status_payload(payload)
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
 
     order.status = data["status"]
@@ -131,7 +131,7 @@ def admin_update_order_location(user, order_id, payload):
     except (TypeError, ValueError):
         raise ValidationError("Location ID must be an integer.")
 
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
     _validate_location_exists(location_id)
 

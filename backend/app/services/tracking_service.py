@@ -18,14 +18,14 @@ def _validate_location_exists(location_id):
     if location_id is None:
         return None
 
-    location = Location.query.get(location_id)
+    location = db.session.get(Location, location_id)
     if location is None:
         raise NotFoundError("Location not found.")
     return location
 
 
 def get_tracking_updates(user, order_id):
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
 
     updates = TrackingUpdate.query.filter_by(order_id=order.id).order_by(TrackingUpdate.created_at.desc()).all()
@@ -34,7 +34,7 @@ def get_tracking_updates(user, order_id):
 
 def add_tracking_update(user, order_id, payload):
     data = validate_tracking_payload(payload)
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
     _validate_location_exists(data["location_id"])
 

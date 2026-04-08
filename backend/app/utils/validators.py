@@ -79,6 +79,12 @@ def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     image_url = data.get("image_url")
     special_instructions = data.get("special_instructions")
 
+    if isinstance(image_url, str):
+        image_url = image_url.strip() or None
+
+    if isinstance(special_instructions, str):
+        special_instructions = special_instructions.strip() or None
+
     if not description:
         errors["description"] = ["Parcel description is required."]
 
@@ -227,6 +233,9 @@ def validate_tracking_payload(payload: Optional[dict] = None) -> dict:
     status = (data.get("status") or "").strip().lower()
     location_id = data.get("location_id")
     note = data.get("note")
+
+    if isinstance(note, str):
+        note = note.strip() or None
 
     if not status:
         errors["status"] = ["Tracking status is required."]
