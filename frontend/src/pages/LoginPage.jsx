@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
+import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
 import { validateLoginForm } from "../features/auth/authValidators";
 
@@ -50,35 +51,42 @@ export function LoginPage() {
   }
 
   return (
-    <section className="auth-page">
-      <div className="auth-card glass-card">
-        <Link to="/" className="back-link">
-          <span className="back-link-icon" aria-hidden="true">&lt;</span>
-          <span>Back to Home</span>
-        </Link>
+    <section className="auth-page auth-page-split">
+      <div className="auth-card auth-card-wide glass-card">
+        <div className="auth-content-grid">
+          <div className="auth-panel">
+            <div className="auth-header">
+              <p className="eyebrow">Sign In First</p>
+              <h1>Access your role-specific workspace</h1>
+              <p>Admins go to the operations portal. Customers and riders go to the parcel workspace.</p>
+              {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
+              {error ? <p className="form-status error">{error}</p> : null}
+            </div>
 
-        <div className="auth-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue managing orders and deliveries.</p>
-          {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
-          {error ? <p className="form-status error">{error}</p> : null}
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <FormField id="login-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
+                <input id="login-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
+              </FormField>
+
+              <FormField id="login-password" label="Password" error={clientErrors.password || fieldErrors.password?.[0]}>
+                <input id="login-password" name="password" type="password" placeholder="Enter your password" value={formData.password} onChange={handleChange} />
+              </FormField>
+
+              <Button type="submit" className="primary-btn full-width" disabled={status === "loading"}>
+                {status === "loading" ? "Signing In..." : "Sign In"}
+              </Button>
+            </form>
+
+            <p className="auth-footer">Need an account? <Link to="/register">Create one</Link></p>
+          </div>
+
+          <PlaceholderArtwork
+            variant="auth"
+            label="Auth Preview"
+            title="A clean sign-in surface ready for real photography"
+            caption="This placeholder block can later hold branded delivery photography, rider portraits, or onboarding illustrations."
+          />
         </div>
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <FormField id="login-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
-            <input id="login-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
-          </FormField>
-
-          <FormField id="login-password" label="Password" error={clientErrors.password || fieldErrors.password?.[0]}>
-            <input id="login-password" name="password" type="password" placeholder="Enter your password" value={formData.password} onChange={handleChange} />
-          </FormField>
-
-          <Button type="submit" className="primary-btn full-width" disabled={status === "loading"}>
-            {status === "loading" ? "Signing In..." : "Login"}
-          </Button>
-        </form>
-
-        <p className="auth-footer">Don&apos;t have an account? <Link to="/register">Create one</Link></p>
       </div>
     </section>
   );
