@@ -69,6 +69,46 @@ def validate_login_payload(payload: Optional[dict] = None) -> dict:
     return {"email": email, "password": password}
 
 
+def validate_verification_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    email = (data.get("email") or "").strip().lower()
+    code = str(data.get("code") or "").strip()
+
+    if not email:
+        errors["email"] = ["Email is required."]
+    elif not EMAIL_PATTERN.match(email):
+        errors["email"] = ["Enter a valid email address."]
+
+    if not code:
+        errors["code"] = ["Verification code is required."]
+    elif not re.fullmatch(r"\d{6}", code):
+        errors["code"] = ["Verification code must be a 6-digit number."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"email": email, "code": code}
+
+
+def validate_verification_resend_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    email = (data.get("email") or "").strip().lower()
+
+    if not email:
+        errors["email"] = ["Email is required."]
+    elif not EMAIL_PATTERN.match(email):
+        errors["email"] = ["Enter a valid email address."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"email": email}
+
+
 def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}

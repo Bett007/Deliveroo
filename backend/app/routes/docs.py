@@ -28,7 +28,16 @@ def swagger_spec():
                             "id": {"type": "integer", "example": 1},
                             "email": {"type": "string", "format": "email", "example": "user@example.com"},
                             "role": {"type": "string", "enum": ["customer", "admin", "rider"], "example": "customer"},
+                            "is_verified": {"type": "boolean", "example": False},
                             "created_at": {"type": "string", "format": "date-time"},
+                        },
+                    },
+                    "VerificationDetails": {
+                        "type": "object",
+                        "properties": {
+                            "email": {"type": "string", "format": "email", "example": "user@example.com"},
+                            "code": {"type": "string", "example": "123456"},
+                            "expires_at": {"type": "string", "format": "date-time"},
                         },
                     },
                     "Location": {
@@ -125,6 +134,21 @@ def swagger_spec():
                             "password": {"type": "string"},
                         },
                     },
+                    "VerifyRegistrationRequest": {
+                        "type": "object",
+                        "required": ["email", "code"],
+                        "properties": {
+                            "email": {"type": "string", "format": "email"},
+                            "code": {"type": "string", "example": "123456"},
+                        },
+                    },
+                    "ResendVerificationRequest": {
+                        "type": "object",
+                        "required": ["email"],
+                        "properties": {
+                            "email": {"type": "string", "format": "email"},
+                        },
+                    },
                     "ParcelInput": {
                         "type": "object",
                         "required": ["description", "weight", "weight_category_id"],
@@ -209,11 +233,24 @@ def swagger_spec():
                             "user": {"$ref": "#/components/schemas/User"},
                         },
                     },
+                    "RegistrationResponseData": {
+                        "type": "object",
+                        "properties": {
+                            "user": {"$ref": "#/components/schemas/User"},
+                            "verification": {"$ref": "#/components/schemas/VerificationDetails"},
+                        },
+                    },
                     "LoginResponseData": {
                         "type": "object",
                         "properties": {
                             "access_token": {"type": "string", "example": "<jwt>"},
                             "user": {"$ref": "#/components/schemas/User"},
+                        },
+                    },
+                    "VerificationResponseData": {
+                        "type": "object",
+                        "properties": {
+                            "verification": {"$ref": "#/components/schemas/VerificationDetails"},
                         },
                     },
                     "OrderResponseData": {
@@ -297,7 +334,99 @@ def swagger_spec():
                                                 {
                                                     "type": "object",
                                                     "properties": {
+                                                        "data": {"$ref": "#/components/schemas/RegistrationResponseData"}
+                                                    },
+                                                },
+                                            ]
+                                        }
+                                    }
+                                },
+                            },
+                            "400": {
+                                "description": "Validation failed",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                                    }
+                                },
+                            },
+                        },
+                    }
+                },
+                "/api/auth/verify": {
+                    "post": {
+                        "summary": "Verify a newly registered user",
+                        "tags": ["Authentication"],
+                        "requestBody": {
+                            "required": True,
+                            "content": {
+                                "application/json": {
+                                    "schema": {"$ref": "#/components/schemas/VerifyRegistrationRequest"}
+                                }
+                            },
+                        },
+                        "responses": {
+                            "200": {
+                                "description": "Account verified successfully",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "allOf": [
+                                                {"$ref": "#/components/schemas/SuccessResponse"},
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
                                                         "data": {"$ref": "#/components/schemas/AuthUserResponseData"}
+                                                    },
+                                                },
+                                            ]
+                                        }
+                                    }
+                                },
+                            },
+                            "400": {
+                                "description": "Validation failed",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                                    }
+                                },
+                            },
+                            "401": {
+                                "description": "Invalid or expired verification code",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                                    }
+                                },
+                            },
+                        },
+                    }
+                },
+                "/api/auth/resend-verification": {
+                    "post": {
+                        "summary": "Regenerate a verification code",
+                        "tags": ["Authentication"],
+                        "requestBody": {
+                            "required": True,
+                            "content": {
+                                "application/json": {
+                                    "schema": {"$ref": "#/components/schemas/ResendVerificationRequest"}
+                                }
+                            },
+                        },
+                        "responses": {
+                            "200": {
+                                "description": "Verification code regenerated successfully",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "allOf": [
+                                                {"$ref": "#/components/schemas/SuccessResponse"},
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {"$ref": "#/components/schemas/VerificationResponseData"}
                                                     },
                                                 },
                                             ]

@@ -1,6 +1,12 @@
 from flask import Blueprint, g, request
 
-from app.services.auth_service import authenticate_user, register_user
+from app.services.auth_service import (
+    authenticate_user,
+    register_user,
+    resend_verification_code,
+    serialize_verification_details,
+    verify_user_registration,
+)
 from app.utils.auth import admin_required, auth_required, generate_access_token
 from app.utils.responses import success_response
 
@@ -12,7 +18,10 @@ def register():
     user = register_user(request.get_json(silent=True))
     return success_response(
         message="User registered successfully.",
-        data={"user": user.to_dict()},
+        data={
+            "user": user.to_dict(),
+            "verification": serialize_verification_details(user),
+        },
         status_code=201,
     )
 
@@ -24,6 +33,24 @@ def login():
     return success_response(
         message="Login successful.",
         data={"access_token": access_token, "user": user.to_dict()},
+    )
+
+
+@auth_bp.post("/verify")
+def verify():
+    user = verify_user_registration(request.get_json(silent=True))
+    return success_response(
+        message="Account verified successfully. You can sign in now.",
+        data={"user": user.to_dict()},
+    )
+
+
+@auth_bp.post("/resend-verification")
+def resend_verification():
+    user = resend_verification_code(request.get_json(silent=True))
+    return success_response(
+        message="A new verification code has been generated.",
+        data={"verification": serialize_verification_details(user)},
     )
 
 
@@ -43,4 +70,3 @@ def admin_check():
         message="Admin access confirmed.",
         data={"user": g.current_user.to_dict()},
     )
-

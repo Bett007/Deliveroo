@@ -3,10 +3,16 @@ from app.models import Location, WeightCategory
 
 
 def register_user(client, email="user@example.com", password="Password123", role="customer"):
-    return client.post(
+    response = client.post(
         "/api/auth/register",
         json={"email": email, "password": password, "role": role},
     )
+    code = response.get_json()["data"]["verification"]["code"]
+    client.post(
+        "/api/auth/verify",
+        json={"email": email, "code": code},
+    )
+    return response
 
 
 def login_user(client, email="user@example.com", password="Password123"):
