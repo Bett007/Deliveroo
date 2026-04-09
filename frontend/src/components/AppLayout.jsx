@@ -1,5 +1,8 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
+import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
+import deliverooLogoText from "../assets/deliveroo-logo-text.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
@@ -58,14 +61,25 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function PortalHeader({ title, subtitle, navItems, userEmail, onLogout, shellClass }) {
+function BrandLockup({ compact = false, subtitle }) {
   return (
-    <header className={`portal-header ${shellClass}-header`}>
+    <div className={`brand-lockup ${compact ? "compact" : ""}`}>
+      <div className="brand-logo-row">
+        <img src={deliverooLogoIcon} alt="" className="brand-logo-icon" />
+        <img src={deliverooLogoText} alt="Deliveroo" className="brand-logo-text" />
+      </div>
+      {subtitle ? <p className="portal-kicker">{subtitle}</p> : null}
+    </div>
+  );
+}
+
+function PortalHeader({ title, subtitle, navItems, userEmail, onLogout }) {
+  return (
+    <header className="portal-header">
       <div className="portal-header-inner glass-card">
         <div className="portal-brand-block">
-          <div className={`portal-mark ${shellClass}-mark`}>{shellClass === "admin" ? "A" : "C"}</div>
+          <BrandLockup subtitle={title} compact />
           <div>
-            <p className="portal-kicker">{title}</p>
             <h1>{subtitle}</h1>
           </div>
         </div>
@@ -99,8 +113,8 @@ function AuthHeader() {
   return (
     <header className="auth-portal-header">
       <div className="auth-portal-inner glass-card">
-        <div className="portal-brand-block">
-          <div className="portal-mark auth-mark">D</div>
+        <div className="portal-brand-block auth-brand-block">
+          <img src={deliverooLogoFull} alt="Deliveroo" className="brand-logo-full" />
           <div>
             <p className="portal-kicker">Deliveroo Access</p>
             <h1>Authenticate before entering the workspace</h1>
@@ -168,7 +182,6 @@ export function AppLayout() {
         navItems={navItems}
         userEmail={user.email}
         onLogout={handleLogout}
-        shellClass={isAdmin ? "admin" : "customer"}
       />
 
       <main className={`main-content role-main ${isAdmin ? "admin-main" : "customer-main"}`}>
