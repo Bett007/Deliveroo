@@ -1,135 +1,152 @@
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
-import { SectionCard } from "../components/ui/SectionCard";
-import { StatusBadge } from "../components/ui/StatusBadge";
+import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { fetchOrders } from "../features/orders/ordersSlice";
 
-const backendCapabilities = [
-  "POST /api/auth/login and GET /api/auth/me are already wired into the frontend auth flow.",
-  "GET /api/orders and GET /api/orders/:id now drive the customer order workspace.",
-  "PATCH /api/orders/:id/destination and PATCH /api/orders/:id/cancel are available from the order details page.",
-  "GET /api/tracking/:id is exposed in the order details page for delivery progress updates.",
-];
+const sidebarItems = ["Dashboard", "Orders", "Riders", "Customers", "Payments", "Reports", "Settings", "Analytics"];
 
-const backendGaps = [
-  "There is no frontend location picker yet because the backend does not expose a location lookup endpoint.",
-  "The backend currently does not provide a global admin analytics feed, so this dashboard stays focused on shipped capabilities.",
-  "Admin-only status and location update endpoints exist in the backend, but they still need dedicated UI forms.",
+const trendCards = [
+  { title: "Total Orders", value: "1,250", change: "+15% this week", chart: "bar" },
+  { title: "Active Deliveries", value: "178", change: "+8% this hour", chart: "line" },
+  { title: "Pending Orders", value: "32", change: "13 new orders", chart: "donut" },
 ];
 
 export function DashboardPage() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { currentOrders, orderHistory, status } = useSelector((state) => state.orders);
+  const { currentOrders, orderHistory } = useSelector((state) => state.orders);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  const summaryCards = useMemo(() => {
-    const totalOrders = currentOrders.length + orderHistory.length;
-    const inFlight = currentOrders.filter((order) => order.status === "in_transit").length;
-
-    return [
-      { title: "Orders In Account", value: String(totalOrders), sub: "Fetched from the current orders API" },
-      { title: "Active Orders", value: String(currentOrders.length), sub: "Pending, confirmed, or in transit" },
-      { title: "Delivered Or Cancelled", value: String(orderHistory.length), sub: "Historic records already returned" },
-      { title: "In Transit", value: String(inFlight), sub: "Live deliveries from your current data" },
+  const rows = useMemo(() => {
+    const fallbackRows = [
+      { id: "#5763", customer: "John Dohn", service: "Pickup - Medium City-wide", price: "$6.50", status: "Pending" },
+      { id: "#5762", customer: "David Soda", service: "Pickup - Medium City Route", price: "$6.55", status: "In Transit" },
+      { id: "#5761", customer: "Jen Sulton", service: "Pickup - Medium City-wide", price: "$6.50", status: "Delivered" },
+      { id: "#5759", customer: "Rachel Allen", service: "Drop-off - Large NJ Route", price: "$7.05", status: "Delivered" },
     ];
+
+    const liveRows = [...currentOrders, ...orderHistory].slice(0, 8).map((order, index) => ({
+      id: `#${order.id}`,
+      customer: index % 2 === 0 ? "Customer Account" : "Delivery Client",
+      service: `${order.pickupLocation} -> ${order.destination}`,
+      price: `$${Number(order.quotedPrice || 0).toFixed(2)}`,
+      status: order.status.replaceAll("_", " "),
+    }));
+
+    return liveRows.length ? liveRows : fallbackRows;
   }, [currentOrders, orderHistory]);
 
   return (
-    <section className="dashboard-page">
-      <header className="dashboard-topbar workspace-hero-split glass-card">
-        <div className="workspace-hero-copy">
-          <p className="eyebrow">Admin Dashboard</p>
-          <h1>Backend integration progress</h1>
-          <p className="workspace-copy">
-            This dashboard now reflects the APIs the backend team has shipped so far instead of mock operational analytics.
-          </p>
+    <section className="role-dashboard-page admin-dashboard-theme">
+      <div className="dashboard-frame admin-frame">
+        <aside className="dashboard-sidebar admin-sidebar">
+          <div className="sidebar-brand">
+            <img src={deliverooLogoIcon} alt="Deliveroo" className="sidebar-logo" />
+            <span>Deliveroo</span>
+          </div>
 
-          <div className="topbar-actions">
-            <span className="user-chip">{user?.email || "Signed-in admin"}</span>
-            <Link to="/orders" className="primary-btn">Open Orders Workspace</Link>
+          <nav className="sidebar-menu">
+            {sidebarItems.map((item, index) => (
+              <button key={item} type="button" className={`sidebar-item ${index === 0 ? "active" : ""}`}>
+                <span className="sidebar-dot"></span>
+                <span>{item}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="dashboard-content admin-content">
+          <header className="dashboard-toolbar">
+            <div className="search-shell">
+              <input type="text" className="search-input sleek-search" placeholder="Search..." />
+            </div>
+            <div className="toolbar-user-block">
+              <span>Welcome back, {user?.email?.split("@")[0] || "Admin"}!</span>
+              <div className="toolbar-avatar"></div>
+            </div>
+          </header>
+
+          <section className="stats-overview">
+            <div className="stats-heading">
+              <h1>Stats Overview</h1>
+              <p>Operational control and summaries at a glance.</p>
+            </div>
+            <div className="stats-card-grid">
+              {trendCards.map((card) => (
+                <article key={card.title} className="stats-card glass-card">
+                  <p>{card.title}</p>
+                  <h3>{card.value}</h3>
+                  <span>{card.change}</span>
+                  <div className={`mini-chart ${card.chart}`}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="data-grid-panel glass-card">
+            <div className="panel-header-row">
+              <div>
+                <h2>Recent Orders</h2>
+                <p>Filtered, searchable operational list.</p>
+              </div>
+              <div className="table-filters">
+                <button type="button" className="table-filter-chip active">Filtering</button>
+                <button type="button" className="table-filter-chip">Sort</button>
+              </div>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="orders-table dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Service Type</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id}>
+                      <td>{row.id}</td>
+                      <td>{row.customer}</td>
+                      <td>{row.service}</td>
+                      <td>{row.price}</td>
+                      <td><span className={`table-status status-${row.status.toLowerCase().replaceAll(" ", "-")}`}>{row.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="table-pagination-row">
+              <span>Showing {Math.min(rows.length, 6)} of 1,250</span>
+              <div className="pagination-chips">
+                <span className="pagination-chip active">1</span>
+                <span className="pagination-chip">2</span>
+                <span className="pagination-chip">3</span>
+                <span className="pagination-chip">4</span>
+              </div>
+            </div>
+          </section>
+
+          <div className="dashboard-cta-row">
+            <Link to="/orders" className="primary-btn">Open Customer Workspace</Link>
+            <Link to="/rider" className="secondary-btn">Preview Rider View</Link>
           </div>
         </div>
-
-        <PlaceholderArtwork
-          variant="admin"
-          label="Admin Preview"
-          title="A reserved panel for ops imagery and analytics visuals"
-          caption="This placeholder can later become a live hero chart, dispatch photo, team banner, or branded admin illustration."
-        />
-      </header>
-
-      <section className="summary-grid">
-        {summaryCards.map((card) => (
-          <div key={card.title} className="glass-card summary-card">
-            <p className="card-label">{card.title}</p>
-            <h3>{card.value}</h3>
-            <span>{card.sub}</span>
-          </div>
-        ))}
-      </section>
-
-      <div className="workspace-grid">
-        <SectionCard title="Available Backend Features" description="What the frontend can already use safely today.">
-          <div className="feature-list">
-            {backendCapabilities.map((item) => (
-              <article key={item} className="feature-item">
-                <p>{item}</p>
-              </article>
-            ))}
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Current Backend Constraints" description="Important limits to keep in mind while frontend work continues.">
-          <div className="feature-list">
-            {backendGaps.map((item) => (
-              <article key={item} className="feature-item">
-                <p>{item}</p>
-              </article>
-            ))}
-          </div>
-        </SectionCard>
       </div>
-
-      <SectionCard title="Operational Snapshot" description="A truthful view of the data currently available to this admin account.">
-        {status === "loading" ? (
-          <p className="helper-text">Loading order data for this account...</p>
-        ) : currentOrders.length || orderHistory.length ? (
-          <div className="table-wrapper">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Status</th>
-                  <th>Pickup</th>
-                  <th>Delivery</th>
-                  <th>Quoted Price</th>
-                  <th>Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...currentOrders, ...orderHistory].slice(0, 8).map((order) => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
-                    <td>{order.pickupLocation}</td>
-                    <td>{order.destination}</td>
-                    <td>KES {Number(order.quotedPrice || 0).toFixed(2)}</td>
-                    <td>{new Date(order.updatedAt).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="helper-text">No order records are available for this signed-in admin account yet.</p>
-        )}
-      </SectionCard>
     </section>
   );
 }

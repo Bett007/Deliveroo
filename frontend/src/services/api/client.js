@@ -8,16 +8,34 @@ async function parseJsonSafely(response) {
   }
 }
 
+function buildNetworkError(error) {
+  const isConnectionFailure = error instanceof TypeError;
+
+  return {
+    status: 0,
+    message: isConnectionFailure
+      ? `Could not reach the backend at ${API_BASE_URL}. Make sure the API server is running and accessible.`
+      : "Network request failed.",
+    errors: {},
+  };
+}
+
 export async function apiRequest(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.method ?? "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-      ...(options.headers ?? {}),
-    },
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: options.method ?? "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...(options.headers ?? {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+  } catch (error) {
+    throw buildNetworkError(error);
+  }
 
   const payload = await parseJsonSafely(response);
 
