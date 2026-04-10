@@ -7,7 +7,14 @@ import { FormField } from "../components/ui/FormField";
 import { RouteMapCard } from "../components/ui/RouteMapCard";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
-import { cancelOrder, clearOrderError, fetchOrderById, fetchTrackingUpdates, updateOrderDestination } from "../features/orders/ordersSlice";
+import {
+  cancelOrder,
+  clearOrderError,
+  fetchOrderById,
+  fetchTrackingUpdates,
+  loadOrderReferenceData,
+  updateOrderDestination,
+} from "../features/orders/ordersSlice";
 import { validateDestination } from "../features/orders/orderValidators";
 import { formatReadableDate } from "../utils/formatters/date";
 
@@ -21,6 +28,8 @@ export function OrderDetailsPage() {
     orderHistory,
     selectedOrder,
     trackingUpdates,
+    referenceData,
+    referenceStatus,
     detailsStatus,
     trackingStatus,
     mutationStatus,
@@ -40,9 +49,18 @@ export function OrderDetailsPage() {
     };
   }, [dispatch, orderId]);
 
+  useEffect(() => {
+    if (referenceStatus === "idle") {
+      dispatch(loadOrderReferenceData());
+    }
+  }, [dispatch, referenceStatus]);
+
   const order = useMemo(() => {
     const mergedOrders = [...currentOrders, ...orderHistory];
-    return mergedOrders.find((item) => String(item.id) === String(orderId)) || (String(selectedOrder?.id) === String(orderId) ? selectedOrder : null);
+    return (
+      mergedOrders.find((item) => String(item.id) === String(orderId)) ||
+      (String(selectedOrder?.id) === String(orderId) ? selectedOrder : null)
+    );
   }, [currentOrders, orderHistory, orderId, selectedOrder]);
 
   const orderTracking = trackingUpdates[String(orderId)] || [];
@@ -77,7 +95,7 @@ export function OrderDetailsPage() {
 
     const result = await dispatch(
       updateOrderDestination({
-        orderId: order.id,
+        orderId: order.backendId,
         deliveryLocationId: Number(destination),
       }),
     );
@@ -91,7 +109,7 @@ export function OrderDetailsPage() {
   async function handleCancelOrder() {
     const result = await dispatch(
       cancelOrder({
-        orderId: order.id,
+        orderId: order.backendId,
         reason: cancelReason.trim() || undefined,
       }),
     );
@@ -136,20 +154,28 @@ export function OrderDetailsPage() {
 
         <SectionCard title="Manage Delivery" description="The backend currently supports destination updates and cancellation for eligible orders.">
           {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
+          {error ? <p className="form-status error">{error}</p> : null}
           <form className="auth-form" onSubmit={handleUpdateDestination}>
-            <FormField id="new-destination" label="New Delivery Location ID" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
-              <input
+            <FormField id="new-destination" label="New Delivery Location" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
+              <select
                 id="new-destination"
                 name="destination"
-                placeholder="Enter a new numeric location ID"
                 value={destination}
                 onChange={(event) => {
                   setDestination(event.target.value);
                   setDestinationError("");
+                  dispatch(clearOrderError());
                 }}
-                disabled={!canEditDestination || mutationStatus === "loading"}
-                inputMode="numeric"
-              />
+                disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
+                className="form-select"
+              >
+                <option value="">Select a new destination</option>
+                {referenceData.locations
+                  .filter((item) => String(item.id) !== String(order.deliveryLocationId))
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>{item.label}</option>
+                  ))}
+              </select>
             </FormField>
 
             <Button type="submit" className="secondary-btn full-width" disabled={!canEditDestination || mutationStatus === "loading"}>

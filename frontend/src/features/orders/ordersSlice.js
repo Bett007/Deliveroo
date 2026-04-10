@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   cancelOrderRequest,
   createOrderRequest,
+  fetchOrderReferenceData,
   getOrderRequest,
   listOrders,
   listTrackingUpdatesRequest,
@@ -9,6 +10,14 @@ import {
 } from "../../services/api/ordersApi";
 
 const terminalStatuses = new Set(["delivered", "cancelled"]);
+
+function getAuthToken(getState) {
+  return getState().auth.token;
+}
+
+function rejectMissingToken(rejectWithValue) {
+  return rejectWithValue({ message: "Missing authentication token." });
+}
 
 function sortByNewest(items) {
   return [...items].sort((left, right) => {
@@ -50,6 +59,10 @@ const initialState = {
   orderHistory: [],
   selectedOrder: null,
   trackingUpdates: {},
+  referenceData: {
+    locations: [],
+    weightCategories: [],
+  },
   filters: {
     status: "all",
     query: "",
@@ -59,15 +72,16 @@ const initialState = {
   detailsStatus: "idle",
   trackingStatus: "idle",
   mutationStatus: "idle",
+  referenceStatus: "idle",
   error: null,
   fieldErrors: {},
 };
 
 export const fetchOrders = createAsyncThunk("orders/fetchOrders", async (_, { getState, rejectWithValue }) => {
-  const token = getState().auth.token;
+  const token = getAuthToken(getState);
 
   if (!token) {
-    return rejectWithValue({ message: "Missing authentication token." });
+    return rejectMissingToken(rejectWithValue);
   }
 
   try {
@@ -78,10 +92,10 @@ export const fetchOrders = createAsyncThunk("orders/fetchOrders", async (_, { ge
 });
 
 export const fetchOrderById = createAsyncThunk("orders/fetchOrderById", async (orderId, { getState, rejectWithValue }) => {
-  const token = getState().auth.token;
+  const token = getAuthToken(getState);
 
   if (!token) {
-    return rejectWithValue({ message: "Missing authentication token." });
+    return rejectMissingToken(rejectWithValue);
   }
 
   try {
@@ -94,10 +108,10 @@ export const fetchOrderById = createAsyncThunk("orders/fetchOrderById", async (o
 export const fetchTrackingUpdates = createAsyncThunk(
   "orders/fetchTrackingUpdates",
   async (orderId, { getState, rejectWithValue }) => {
-    const token = getState().auth.token;
+    const token = getAuthToken(getState);
 
     if (!token) {
-      return rejectWithValue({ message: "Missing authentication token." });
+      return rejectMissingToken(rejectWithValue);
     }
 
     try {
@@ -109,11 +123,28 @@ export const fetchTrackingUpdates = createAsyncThunk(
   },
 );
 
+export const loadOrderReferenceData = createAsyncThunk(
+  "orders/loadOrderReferenceData",
+  async (_, { getState, rejectWithValue }) => {
+    const token = getAuthToken(getState);
+
+    if (!token) {
+      return rejectMissingToken(rejectWithValue);
+    }
+
+    try {
+      return await fetchOrderReferenceData(token);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const createOrder = createAsyncThunk("orders/createOrder", async (payload, { getState, rejectWithValue }) => {
-  const token = getState().auth.token;
+  const token = getAuthToken(getState);
 
   if (!token) {
-    return rejectWithValue({ message: "Missing authentication token." });
+    return rejectMissingToken(rejectWithValue);
   }
 
   try {
@@ -126,10 +157,10 @@ export const createOrder = createAsyncThunk("orders/createOrder", async (payload
 export const updateOrderDestination = createAsyncThunk(
   "orders/updateOrderDestination",
   async ({ orderId, deliveryLocationId }, { getState, rejectWithValue }) => {
-    const token = getState().auth.token;
+    const token = getAuthToken(getState);
 
     if (!token) {
-      return rejectWithValue({ message: "Missing authentication token." });
+      return rejectMissingToken(rejectWithValue);
     }
 
     try {
@@ -143,14 +174,14 @@ export const updateOrderDestination = createAsyncThunk(
 );
 
 export const cancelOrder = createAsyncThunk("orders/cancelOrder", async ({ orderId, reason }, { getState, rejectWithValue }) => {
-  const token = getState().auth.token;
+  const token = getAuthToken(getState);
 
   if (!token) {
-    return rejectWithValue({ message: "Missing authentication token." });
+    return rejectMissingToken(rejectWithValue);
   }
 
   try {
-    return await cancelOrderRequest(token, orderId, { reason });
+    return await cancelOrderRequest(token, orderId, reason ? { reason } : {});
   } catch (error) {
     return rejectWithValue(error);
   }
@@ -200,8 +231,8 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchOrderById.fulfilled, (state, action) => {
         state.detailsStatus = "succeeded";
-        state.selectedOrder = action.payload.order;
         state.error = null;
+        state.selectedOrder = action.payload.order;
         mergeOrderCollections(state, action.payload.order);
       })
       .addCase(fetchOrderById.rejected, (state, action) => {
@@ -219,6 +250,17 @@ const ordersSlice = createSlice({
         state.trackingStatus = "failed";
         state.error = action.payload?.message ?? "Failed to load tracking updates.";
       })
+      .addCase(loadOrderReferenceData.pending, (state) => {
+        state.referenceStatus = "loading";
+      })
+      .addCase(loadOrderReferenceData.fulfilled, (state, action) => {
+        state.referenceStatus = "succeeded";
+        state.referenceData = action.payload;
+      })
+      .addCase(loadOrderReferenceData.rejected, (state, action) => {
+        state.referenceStatus = "failed";
+        state.error = action.payload?.message ?? "Failed to load order reference data.";
+      })
       .addCase(createOrder.pending, (state) => {
         state.createStatus = "loading";
         state.error = null;
@@ -226,9 +268,9 @@ const ordersSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.createStatus = "succeeded";
-        state.selectedOrder = action.payload.order;
         state.error = null;
         mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.createStatus = "failed";
@@ -242,9 +284,9 @@ const ordersSlice = createSlice({
       })
       .addCase(updateOrderDestination.fulfilled, (state, action) => {
         state.mutationStatus = "succeeded";
-        state.selectedOrder = action.payload.order;
         state.error = null;
         mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
       })
       .addCase(updateOrderDestination.rejected, (state, action) => {
         state.mutationStatus = "failed";
@@ -258,9 +300,9 @@ const ordersSlice = createSlice({
       })
       .addCase(cancelOrder.fulfilled, (state, action) => {
         state.mutationStatus = "succeeded";
-        state.selectedOrder = action.payload.order;
         state.error = null;
         mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
       })
       .addCase(cancelOrder.rejected, (state, action) => {
         state.mutationStatus = "failed";

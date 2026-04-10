@@ -42,6 +42,10 @@ class Order(db.Model):
             "distance_km": float(self.distance_km) if self.distance_km is not None else None,
             "estimated_duration_minutes": self.estimated_duration_minutes,
             "status": self.status,
+            "parcel": self.parcel.to_dict() if self.parcel else None,
+            "pickup_location": self.pickup_location.to_dict() if self.pickup_location else None,
+            "delivery_location": self.delivery_location.to_dict() if self.delivery_location else None,
+            "current_location": self.current_location.to_dict() if self.current_location else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

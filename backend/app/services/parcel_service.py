@@ -7,7 +7,7 @@ from app.utils.validators import validate_parcel_payload
 def create_parcel(payload):
     data = validate_parcel_payload(payload)
 
-    if WeightCategory.query.get(data["weight_category_id"]) is None:
+    if db.session.get(WeightCategory, data["weight_category_id"]) is None:
         raise NotFoundError("Weight category not found.")
 
     parcel = Parcel(
@@ -23,7 +23,7 @@ def create_parcel(payload):
 
 
 def get_parcel(parcel_id):
-    parcel = Parcel.query.get(parcel_id)
+    parcel = db.session.get(Parcel, parcel_id)
     if parcel is None:
         raise NotFoundError("Parcel not found.")
     return parcel
