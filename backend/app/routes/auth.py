@@ -5,6 +5,7 @@ from app.services.auth_service import (
     register_user,
     resend_verification_code,
     serialize_verification_details,
+    update_user_profile,
     verify_user_registration,
 )
 from app.utils.auth import admin_required, auth_required, generate_access_token
@@ -60,6 +61,16 @@ def get_current_user():
     return success_response(
         message="Authenticated user retrieved successfully.",
         data={"user": g.current_user.to_dict()},
+    )
+
+
+@auth_bp.patch("/me")
+@auth_required
+def update_current_user():
+    user = update_user_profile(g.current_user, request.get_json(silent=True))
+    return success_response(
+        message="Profile updated successfully.",
+        data={"user": user.to_dict()},
     )
 
 

@@ -1,22 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
+import { EmptyState } from "../components/ui/EmptyState";
+import { RouteMapCard } from "../components/ui/RouteMapCard";
+import { SectionCard } from "../components/ui/SectionCard";
+import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
-
-const customerSidebar = ["Home", "Orders", "Profile", "Support"];
-
-const quickStatus = [
-  { label: "Assigned", color: "blue" },
-  { label: "Drop-off Location", color: "orange" },
-  { label: "Expected arrival time", color: "green" },
-];
+import { formatReadableDate } from "../utils/formatters/date";
 
 export function OrdersPage() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { currentOrders, orderHistory, error } = useSelector((state) => state.orders);
-  const [quickForm, setQuickForm] = useState({ pickup: "", dropoff: "", weight: "Medium" });
+  const location = useLocation();
+  const { currentOrders, orderHistory, status, error } = useSelector((state) => state.orders);
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -26,141 +21,111 @@ export function OrdersPage() {
     };
   }, [dispatch]);
 
-  const listRows = useMemo(() => {
-    const fallback = [
-      { id: "#5759", title: "Active delivery", subtitle: "Order placed and rider assigned", state: "assigned" },
-      { id: "#5762", title: "Finding rider", subtitle: "Pickup window updated", state: "pending" },
-      { id: "#5766", title: "Delivered", subtitle: "Completed successfully", state: "delivered" },
-    ];
-
-    const live = [...currentOrders, ...orderHistory].slice(0, 5).map((order) => ({
-      id: `#${order.id}`,
-      title: `${order.pickupLocation} to ${order.destination}`,
-      subtitle: `${order.status.replaceAll("_", " ")} · KES ${Number(order.quotedPrice || 0).toFixed(2)}`,
-      state: order.status,
-    }));
-
-    return live.length ? live : fallback;
-  }, [currentOrders, orderHistory]);
+  const totalOrders = useMemo(() => currentOrders.length + orderHistory.length, [currentOrders.length, orderHistory.length]);
+  const featuredOrder = currentOrders[0] || orderHistory[0];
+  const inTransitCount = useMemo(() => currentOrders.filter((order) => order.status === "in_transit").length, [currentOrders]);
 
   return (
-    <section className="role-dashboard-page customer-dashboard-theme">
-      <div className="dashboard-frame customer-frame">
-        <aside className="dashboard-sidebar customer-sidebar">
-          <div className="sidebar-brand customer-brand">
-            <img src={deliverooLogoIcon} alt="Deliveroo" className="sidebar-logo" />
-            <span>deliveroo</span>
-          </div>
-
-          <nav className="sidebar-menu compact-menu">
-            {customerSidebar.map((item, index) => (
-              <button key={item} type="button" className={`sidebar-item icon-only ${index === 1 ? "active" : ""}`}>
-                <span className="sidebar-dot"></span>
-                <span>{item}</span>
-              </button>
-            ))}
-          </nav>
-        </aside>
-
-        <div className="dashboard-content customer-content">
-          <header className="customer-topbar glass-card">
-            <div>
-              <p className="toolbar-greeting">Good afternoon, {user?.email?.split("@")[0] || "Alex"},</p>
-              <div className="address-chip">28 Hillside Ave, New York, NY</div>
-            </div>
-            <div className="toolbar-actions-cluster">
-              <button type="button" className="notification-bell"></button>
-              <div className="toolbar-avatar"></div>
-            </div>
-          </header>
-
-          {error ? <p className="form-status error dashboard-error-banner">{error}</p> : null}
-
-          <div className="customer-main-grid">
-            <section className="order-hub-card glass-card">
-              <div className="panel-header-row">
-                <div>
-                  <h1>Order Hub</h1>
-                  <p>Create Delivery</p>
-                </div>
-              </div>
-
-              <form className="customer-order-form" onSubmit={(event) => event.preventDefault()}>
-                <input
-                  value={quickForm.pickup}
-                  onChange={(event) => setQuickForm((current) => ({ ...current, pickup: event.target.value }))}
-                  className="auth-input"
-                  placeholder="Pickup Location"
-                />
-                <input
-                  value={quickForm.dropoff}
-                  onChange={(event) => setQuickForm((current) => ({ ...current, dropoff: event.target.value }))}
-                  className="auth-input"
-                  placeholder="Drop-off Location"
-                />
-                <div className="form-grid-two compact-grid">
-                  <select className="auth-input" value={quickForm.weight} onChange={(event) => setQuickForm((current) => ({ ...current, weight: event.target.value }))}>
-                    <option>Weight Category</option>
-                    <option>Light</option>
-                    <option>Medium</option>
-                    <option>Heavy</option>
-                  </select>
-                  <div className="price-chip">$6.50</div>
-                </div>
-                <label className="schedule-row">
-                  <input type="checkbox" />
-                  <span>Schedule a delivery</span>
-                </label>
-                <Link to="/orders/create" className="primary-btn full-width customer-action-btn">Start Delivery</Link>
-              </form>
-            </section>
-
-            <aside className="customer-side-stack">
-              <section className="glass-card order-list-card">
-                <div className="panel-header-row">
-                  <div>
-                    <h2>Active Order Tracking</h2>
-                    <p>Recent orders with visual status indicators.</p>
-                  </div>
-                </div>
-
-                <div className="customer-order-list">
-                  {listRows.map((row) => (
-                    <article key={row.id} className="customer-order-item">
-                      <div className={`status-rail state-${row.state.replaceAll("_", "-")}`}></div>
-                      <div className="customer-order-copy">
-                        <strong>{row.id}</strong>
-                        <p>{row.title}</p>
-                        <span>{row.subtitle}</span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="glass-card mini-map-card">
-                <div className="mini-map-surface">
-                  <div className="mini-route orange-route"></div>
-                  <div className="mini-route teal-route"></div>
-                  <div className="mini-pin pin-a"></div>
-                  <div className="mini-pin pin-b"></div>
-                  <div className="mini-pin pin-c"></div>
-                </div>
-                <div className="tracking-status-list">
-                  {quickStatus.map((item) => (
-                    <div key={item.label} className="tracking-status-item">
-                      <span className={`status-dot ${item.color}`}></span>
-                      <div>
-                        <strong>{item.label}</strong>
-                        <p>Expected route status</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </aside>
-          </div>
+    <section className="workspace-page ops-page">
+      <header className="ops-topbar">
+        <div>
+          <p className="eyebrow">Customer Orders</p>
+          <h1>Orders and tracking</h1>
+          <p className="workspace-copy">Track live routes, reorder quickly, and review past deliveries.</p>
+          {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
+          {error ? <p className="form-status error">{error}</p> : null}
         </div>
+
+        <div className="topbar-actions">
+          <div className="rider-stats-strip customer-stats-strip" aria-label="Customer order summary">
+            <span><strong>{currentOrders.length}</strong> active</span>
+            <span><strong>{inTransitCount}</strong> moving</span>
+            <span><strong>{totalOrders}</strong> total</span>
+          </div>
+          <Link to="/orders/history" className="secondary-btn">History</Link>
+          <Link to="/orders/create" className="primary-btn">
+            New Order
+          </Link>
+        </div>
+      </header>
+
+      <div className="customer-workspace-grid">
+        <div className="customer-order-column">
+          <SectionCard title="Current Orders" description="Live deliveries that still need attention.">
+            {status === "loading" ? (
+              <p className="helper-text">Loading current orders from the backend...</p>
+            ) : currentOrders.length ? (
+              <div className="order-card-list">
+                {currentOrders.map((order) => (
+                  <article key={order.id} className="order-card">
+                    <div className="order-card-top">
+                      <span className="order-icon" aria-hidden="true">P</span>
+                      <div>
+                        <p className="card-label">Order #{order.id}</p>
+                        <h3>{order.parcelName}</h3>
+                      </div>
+                      <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
+                    </div>
+                    <div className="mini-route">
+                      <span>{order.pickupLocation}</span>
+                      <i aria-hidden="true"></i>
+                      <span>{order.destination}</span>
+                    </div>
+                    <div className="order-meta-row">
+                      <span>KES {Number(order.quotedPrice || 0).toFixed(2)}</span>
+                      <span>{order.assignedRider?.email || "Awaiting rider"}</span>
+                      <span>{formatReadableDate(order.updatedAt)}</span>
+                    </div>
+                    <div className="order-actions-row">
+                      <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="No active orders"
+                description="Create your first parcel order to start tracking deliveries here."
+                action={<Link to="/orders/create" className="primary-btn">Create Order</Link>}
+              />
+            )}
+          </SectionCard>
+        </div>
+
+        <aside className="customer-side-stack">
+          {featuredOrder ? (
+            <>
+              <RouteMapCard
+                origin={featuredOrder.pickupLocation}
+                destination={featuredOrder.destination}
+                distanceKm={featuredOrder.distanceKm}
+                durationMinutes={featuredOrder.durationMinutes}
+              />
+
+              <section className="ops-insight-card">
+                <p className="card-label">Latest Order</p>
+                <h2>{featuredOrder.parcelName}</h2>
+                <div className="delivery-ownership mine">
+                  <span aria-hidden="true">S</span>
+                  <strong>{featuredOrder.status.replaceAll("_", " ")}</strong>
+                </div>
+                <div className="detail-list">
+                  <div><strong>Pickup:</strong> {featuredOrder.pickupLocation}</div>
+                  <div><strong>Drop-off:</strong> {featuredOrder.destination}</div>
+                  <div><strong>Rider:</strong> {featuredOrder.assignedRider?.email || "Not assigned"}</div>
+                </div>
+                <Link to={`/orders/${featuredOrder.id}`} className="primary-btn full-width">Open Tracking</Link>
+                <Link to="/orders/history" className="secondary-btn full-width">Past Deliveries</Link>
+              </section>
+            </>
+          ) : (
+            <section className="ops-insight-card">
+              <p className="card-label">Tracking</p>
+              <h2>No routes yet</h2>
+              <p className="helper-text">Your newest route map appears here after you create an order.</p>
+            </section>
+          )}
+        </aside>
       </div>
     </section>
   );

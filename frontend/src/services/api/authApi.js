@@ -31,6 +31,19 @@ export async function fetchCurrentUser(token) {
   return { user: response.data.user };
 }
 
+export async function updateProfileRequest(token, payload) {
+  const response = await apiRequest("/auth/me", {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    user: response.data.user,
+    message: response.message,
+  };
+}
+
 export async function verifyAdminAccess(token) {
   const response = await apiRequest("/auth/admin-check", { token });
   return response.data.user;

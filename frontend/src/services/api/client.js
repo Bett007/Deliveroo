@@ -35,23 +35,12 @@ async function parseJsonSafely(response) {
   }
 }
 
-function buildNetworkError(error) {
-  const isConnectionFailure = error instanceof TypeError;
-
-  return {
-    status: 0,
-    message: isConnectionFailure
-      ? `Could not reach the backend at ${API_BASE_URL}. Make sure the API server is running and accessible.`
-      : "Network request failed.",
-    errors: {},
-  };
-}
-
 export async function apiRequest(path, options = {}) {
   assertDeployedFrontendIsNotUsingLocalApi();
 
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), options.timeoutMs ?? REQUEST_TIMEOUT_MS);
+
   let response;
 
   try {
@@ -76,7 +65,11 @@ export async function apiRequest(path, options = {}) {
       };
     }
 
-    throw buildNetworkError(error);
+    throw {
+      status: 0,
+      message: "Unable to reach the backend. Please confirm the backend is running and accessible from the deployed frontend.",
+      errors: {},
+    };
   }
 
   window.clearTimeout(timeoutId);

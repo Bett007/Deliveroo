@@ -4,6 +4,7 @@ import {
   loginRequest,
   registerRequest,
   resendVerificationRequest,
+  updateProfileRequest,
   verifyRegistrationRequest,
 } from "../../services/api/authApi";
 import { clearStoredSession, persistSession, readStoredSession } from "./authStorage";
@@ -56,6 +57,20 @@ export const hydrateSession = createAsyncThunk("auth/hydrateSession", async (_, 
   }
 });
 
+export const updateProfile = createAsyncThunk("auth/updateProfile", async (payload, { getState, rejectWithValue }) => {
+  const token = getState().auth.token;
+
+  if (!token) {
+    return rejectWithValue({ message: "Missing authentication token." });
+  }
+
+  try {
+    return await updateProfileRequest(token, payload);
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -69,6 +84,7 @@ const authSlice = createSlice({
     registerStatus: "idle",
     verifyStatus: "idle",
     resendStatus: "idle",
+    profileStatus: "idle",
     error: null,
     fieldErrors: {},
   },
@@ -93,6 +109,7 @@ const authSlice = createSlice({
       state.registerStatus = "idle";
       state.verifyStatus = "idle";
       state.resendStatus = "idle";
+      state.profileStatus = "idle";
       state.error = null;
       state.fieldErrors = {};
       state.verificationPending = false;
@@ -220,6 +237,28 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         clearStoredSession();
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.profileStatus = "loading";
+        state.error = null;
+        state.fieldErrors = {};
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.profileStatus = "succeeded";
+        state.user = action.payload.user;
+        state.error = null;
+        persistSession({
+          user: state.user,
+          token: state.token,
+          verificationEmail: state.verificationEmail,
+          verificationCode: state.verificationCode,
+          verificationExpiresAt: state.verificationExpiresAt,
+        });
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.profileStatus = "failed";
+        state.error = action.payload?.message ?? "Profile update failed.";
+        state.fieldErrors = action.payload?.errors ?? {};
       });
   },
 });

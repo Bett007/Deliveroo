@@ -109,6 +109,42 @@ def validate_verification_resend_payload(payload: Optional[dict] = None) -> dict
     return {"email": email}
 
 
+def validate_profile_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    phone = data.get("phone")
+    avatar_url = data.get("avatar_url")
+
+    def normalize_text(value, field, max_length):
+        if value is None:
+            return None
+        if not isinstance(value, str):
+            errors[field] = [f"{field.replace('_', ' ').title()} must be a string."]
+            return None
+        value = value.strip()
+        if len(value) > max_length:
+            errors[field] = [f"{field.replace('_', ' ').title()} must be {max_length} characters or fewer."]
+        return value or None
+
+    first_name = normalize_text(first_name, "first_name", 120)
+    last_name = normalize_text(last_name, "last_name", 120)
+    phone = normalize_text(phone, "phone", 40)
+    avatar_url = normalize_text(avatar_url, "avatar_url", 500000)
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {
+        "first_name": first_name,
+        "last_name": last_name,
+        "phone": phone,
+        "avatar_url": avatar_url,
+    }
+
+
 def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
@@ -243,6 +279,25 @@ def validate_status_payload(payload: Optional[dict] = None) -> dict:
         raise ValidationError("Validation failed.", errors=errors)
 
     return {"status": status}
+
+
+def validate_assignment_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+    rider_id = data.get("rider_id")
+
+    if rider_id is None:
+        return {"rider_id": None}
+
+    try:
+        rider_id = int(rider_id)
+    except (TypeError, ValueError):
+        errors["rider_id"] = ["Rider ID must be an integer."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"rider_id": rider_id}
 
 
 def validate_cancel_payload(payload: Optional[dict] = None) -> dict:
