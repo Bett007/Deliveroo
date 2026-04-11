@@ -57,27 +57,43 @@ export function OrdersPage() {
             ) : currentOrders.length ? (
               <div className="order-card-list">
                 {currentOrders.map((order) => (
-                  <article key={order.id} className="order-card">
+                  <article key={order.id} className="order-card current-order-card">
                     <div className="order-card-top">
-                      <span className="order-icon" aria-hidden="true">P</span>
-                      <div>
-                        <p className="card-label">Order #{order.id}</p>
-                        <h3>{order.parcelName}</h3>
+                      <div className="order-summary-main">
+                        <span className="order-icon" aria-hidden="true">P</span>
+                        <div>
+                          <p className="card-label">#{order.id}</p>
+                          <h3>{order.parcelName}</h3>
+                        </div>
                       </div>
-                      <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
+                      <div className="order-status-stack">
+                        <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
+                        <small>{order.assignedRider?.email || "Awaiting rider"}</small>
+                      </div>
                     </div>
-                    <div className="mini-route">
-                      <span>{order.pickupLocation}</span>
+
+                    <div className="route-chip-row">
+                      <div className="route-chip">
+                        <span>P</span>
+                        <strong>{order.pickupLocation}</strong>
+                      </div>
                       <i aria-hidden="true"></i>
-                      <span>{order.destination}</span>
+                      <div className="route-chip">
+                        <span>D</span>
+                        <strong>{order.destination}</strong>
+                      </div>
                     </div>
-                    <div className="order-meta-row">
-                      <span>KES {Number(order.quotedPrice || 0).toFixed(2)}</span>
-                      <span>{order.assignedRider?.email || "Awaiting rider"}</span>
-                      <span>{formatReadableDate(order.updatedAt)}</span>
-                    </div>
-                    <div className="order-actions-row">
-                      <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
+
+                    <div className="order-bottom-row">
+                      <div className="order-price-block">
+                        <small>Quote</small>
+                        <strong>KES {Number(order.quotedPrice || 0).toFixed(2)}</strong>
+                      </div>
+                      <div className="order-price-block">
+                        <small>Updated</small>
+                        <strong>{formatReadableDate(order.updatedAt)}</strong>
+                      </div>
+                      <Link to={`/orders/${order.id}`} className="secondary-btn compact-order-btn">Details</Link>
                     </div>
                   </article>
                 ))}
@@ -102,20 +118,32 @@ export function OrdersPage() {
                 durationMinutes={featuredOrder.durationMinutes}
               />
 
-              <section className="ops-insight-card">
-                <p className="card-label">Latest Order</p>
-                <h2>{featuredOrder.parcelName}</h2>
-                <div className="delivery-ownership mine">
-                  <span aria-hidden="true">S</span>
-                  <strong>{featuredOrder.status.replaceAll("_", " ")}</strong>
+              <section className="ops-insight-card latest-order-card">
+                <div className="order-card-top">
+                  <div>
+                    <p className="card-label">Latest Order</p>
+                    <h2>{featuredOrder.parcelName}</h2>
+                  </div>
+                  <StatusBadge>{featuredOrder.status.replaceAll("_", " ")}</StatusBadge>
                 </div>
-                <div className="detail-list">
-                  <div><strong>Pickup:</strong> {featuredOrder.pickupLocation}</div>
-                  <div><strong>Drop-off:</strong> {featuredOrder.destination}</div>
-                  <div><strong>Rider:</strong> {featuredOrder.assignedRider?.email || "Not assigned"}</div>
+                <div className="route-chip-row compact">
+                  <div className="route-chip">
+                    <span>P</span>
+                    <strong>{featuredOrder.pickupLocation}</strong>
+                  </div>
+                  <i aria-hidden="true"></i>
+                  <div className="route-chip">
+                    <span>D</span>
+                    <strong>{featuredOrder.destination}</strong>
+                  </div>
                 </div>
-                <Link to={`/orders/${featuredOrder.id}`} className="primary-btn full-width">Open Tracking</Link>
-                <Link to="/orders/history" className="secondary-btn full-width">Past Deliveries</Link>
+                <div className="order-bottom-row">
+                  <div className="order-price-block">
+                    <small>Rider</small>
+                    <strong>{featuredOrder.assignedRider?.email || "Not assigned"}</strong>
+                  </div>
+                  <Link to={`/orders/${featuredOrder.id}`} className="primary-btn compact-order-btn">Track</Link>
+                </div>
               </section>
             </>
           ) : (
