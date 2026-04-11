@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../features/orders/ordersSlice";
+import "./DashboardPage.module.css";
 
 export function DashboardPage() {
   const dispatch = useDispatch();

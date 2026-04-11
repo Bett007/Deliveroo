@@ -1,0 +1,64 @@
+:global {
+.auth-card,
+.notfound-card {
+  max-width: 520px;
+}
+
+.auth-header h1,
+.notfound-card h1 {
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p,
+.notfound-card p {
+  margin-bottom: 1.5rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.search-input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.6);
+  outline: none;
+}
+
+.form-group input:focus,
+.search-input:focus {
+  border-color: rgba(30, 200, 255, 0.7);
+  box-shadow: 0 0 0 4px rgba(30, 200, 255, 0.12);
+}
+
+.auth-footer a {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.notfound-card {
+  text-align: center;
+}
+
+.notfound-card h1 {
+  font-size: 4rem;
+}
+
+.notfound-card h2 {
+  margin-bottom: 0.75rem;
+}
+}

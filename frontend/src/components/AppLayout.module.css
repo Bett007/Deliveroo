@@ -1,0 +1,233 @@
+:global {
+/* Remediation pass: authenticated app shell and dashboard surfaces. */
+.ops-shell {
+  --ops-bg: #f3f6f9;
+  --ops-panel: #ffffff;
+  --ops-ink: #182233;
+  --ops-muted: #687587;
+  --ops-sidebar: #162a4b;
+  --ops-sidebar-strong: #0f1f3a;
+  --ops-sidebar-active: #25436e;
+  --ops-border: #dfe6ee;
+  --ops-blue: #2f73d9;
+  --ops-teal: #28b8a8;
+  --ops-orange: #f0a43a;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--ops-bg);
+  color: var(--ops-ink);
+}
+
+.ops-shell.admin-shell,
+.ops-shell.customer-shell {
+  background: var(--ops-bg);
+}
+
+.ops-sidebar {
+  min-height: 0;
+  height: 100dvh;
+  padding: 1.15rem 1rem;
+  background: linear-gradient(180deg, var(--ops-sidebar), var(--ops-sidebar-strong));
+  color: #ffffff;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 1.25rem;
+}
+
+.ops-brand-block,
+.ops-nav-link,
+.ops-sidebar-footer,
+.ops-logout-btn {
+  border-radius: 8px;
+}
+
+.ops-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+}
+
+.ops-brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--ops-teal);
+  color: #062c34;
+  font-weight: 900;
+}
+
+.ops-brand-logo,
+.auth-header-logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.ops-brand-logo {
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.auth-form-logo {
+  width: min(210px, 100%);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 0.25rem;
+}
+
+.ops-brand-block p,
+.ops-sidebar-copy h2,
+.ops-sidebar-footer span {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ops-brand-block strong {
+  display: block;
+  margin-top: 0.15rem;
+  color: #ffffff;
+}
+
+.ops-sidebar-copy {
+  padding: 0 0.65rem;
+}
+
+.ops-sidebar-copy h2 {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.ops-nav {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+}
+
+.ops-nav-link,
+.ops-logout-btn {
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.8rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 700;
+  text-align: left;
+}
+
+.ops-nav-link:hover,
+.ops-nav-link.active,
+.ops-logout-btn:hover {
+  background: var(--ops-sidebar-active);
+  color: #ffffff;
+}
+
+.ops-sidebar-footer {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  min-width: 0;
+}
+
+.ops-sidebar-footer span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.86rem;
+}
+
+.ops-main {
+  min-width: 0;
+  min-height: 0;
+  height: 100dvh;
+  overflow: auto;
+  padding: 1.2rem;
+  background: var(--ops-bg);
+  scrollbar-width: thin;
+}
+
+.ops-main .dashboard-page,
+.ops-main .workspace-page,
+.ops-main .help-page {
+  width: min(1380px, 100%);
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.auth-shell {
+  background: #f3f6f9;
+}
+
+.auth-portal-inner,
+.auth-card {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dfe6ee;
+  box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.auth-portal-inner {
+  grid-template-columns: 1fr auto;
+}
+
+.auth-page {
+  padding: 1.25rem;
+}
+
+.auth-content-grid,
+.reverse-layout {
+  gap: 0;
+}
+
+.auth-panel {
+  padding: 0.5rem;
+}
+
+.auth-panel input,
+.auth-panel select,
+.verification-card input {
+  border-radius: 8px;
+  border: 1px solid #dfe6ee;
+  background: #ffffff;
+}
+
+.auth-panel .primary-btn,
+.verification-card .primary-btn {
+  border-radius: 8px;
+  background: #2f73d9;
+  box-shadow: none;
+}
+
+.auth-panel .secondary-btn,
+.verification-card .secondary-btn {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.placeholder-art-frame,
+.scene-card {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.placeholder-art-glow {
+  display: none;
+}
+
+.verification-card {
+  border-radius: 8px;
+}
+}

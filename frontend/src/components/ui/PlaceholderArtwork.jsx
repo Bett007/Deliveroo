@@ -1,3 +1,5 @@
+import "./PlaceholderArtwork.module.css";
+
 export function PlaceholderArtwork({ variant = "customer", label = "Preview", title, caption }) {
   return (
     <aside className={`placeholder-art placeholder-art-${variant}`} aria-label={label}>

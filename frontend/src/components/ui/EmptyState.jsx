@@ -1,3 +1,5 @@
+import "./EmptyState.module.css";
+
 export function EmptyState({ title, description, action }) {
   return (
     <div className="glass-card empty-state">
