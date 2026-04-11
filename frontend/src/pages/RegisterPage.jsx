@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
@@ -55,16 +56,17 @@ export function RegisterPage() {
         <div className="auth-content-grid reverse-layout">
           <PlaceholderArtwork
             variant="customer"
-            label="Signup Preview"
-            title="A flexible visual slot for onboarding graphics"
-            caption="Swap this placeholder with parcel lifestyle shots, delivery team artwork, or account setup storytelling later."
+            label="New Account"
+            title="Start with the workspace you need"
+            caption="Customers place parcels, riders accept routes, admins coordinate the floor."
           />
 
           <div className="auth-panel">
+            <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
             <div className="auth-header">
               <p className="eyebrow">Create Access</p>
-              <h1>Register for the right portal</h1>
-              <p>Choose the role you need so the app can route you into the matching customer or rider experience.</p>
+              <h1>Create your account</h1>
+              <p>Pick a role and verify your email to continue.</p>
               {error ? <p className="form-status error">{error}</p> : null}
               {verificationEmail ? <p className="helper-text">Verification will continue for {verificationEmail} after registration.</p> : null}
             </div>
@@ -82,6 +84,7 @@ export function RegisterPage() {
                 <select id="register-role" name="role" value={formData.role} onChange={handleChange} className="form-select">
                   <option value="customer">Customer</option>
                   <option value="rider">Rider</option>
+                  <option value="admin">Admin</option>
                 </select>
               </FormField>
 

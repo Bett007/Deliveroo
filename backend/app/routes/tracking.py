@@ -4,7 +4,7 @@ from app.services.tracking_service import (
     add_tracking_update,
     get_tracking_updates,
 )
-from app.utils.auth import admin_required, auth_required
+from app.utils.auth import auth_required
 from app.utils.responses import success_response
 
 tracking_bp = Blueprint("tracking", __name__)
@@ -21,7 +21,7 @@ def list_tracking(order_id: int):
 
 
 @tracking_bp.post("/<int:order_id>")
-@admin_required
+@auth_required
 def create_tracking(order_id: int):
     payload = request.get_json(silent=True)
     update = add_tracking_update(g.current_user, order_id, payload)

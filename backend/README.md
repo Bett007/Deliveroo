@@ -37,7 +37,7 @@ Main variables used right now:
 - `JWT_SECRET_KEY` for signing JWT access tokens
 - `JWT_ACCESS_TOKEN_EXPIRES_MINUTES` for auth token lifetime
 - `DATABASE_URL` for the PostgreSQL connection string
-- `CLIENT_ORIGIN` for frontend CORS access
+- `CLIENT_ORIGIN` for frontend CORS access. You can provide a comma-separated list for multiple frontend origins.
 
 ## PostgreSQL Setup
 
@@ -49,9 +49,64 @@ Example format:
 postgresql://username:password@localhost:5432/deliveroo_dev
 ```
 
-The starter backend is ready to point at PostgreSQL through that variable, but it does not create application tables yet because schema work is outside this setup task.
+For Supabase migrations, prefer the direct database connection string instead of the pooled connection string and include `sslmode=require`.
 
-If you use Supabase or another hosted PostgreSQL service, make sure the connection string includes the provider's required SSL settings.
+Example format:
+
+```text
+postgresql://postgres.<project-ref>:<password>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
+```
+
+### Run Migrations
+
+With your virtualenv active and `.env` configured:
+
+```bash
+flask db upgrade
+```
+
+This applies the initial schema and creates:
+
+- `users`
+- `locations`
+- `weight_categories`
+- `parcels`
+- `orders`
+- `tracking_updates`
+
+### Verify The Database Connection
+
+```bash
+flask verify-db
+```
+
+### Seed Initial Reference Data
+
+```bash
+flask seed-reference-data
+```
+
+The seed command is idempotent and inserts starter:
+
+- locations
+- weight categories (`light`, `medium`, `heavy`)
+
+### Recommended Section 1 Flow For Supabase
+
+1. Copy `.env.example` to `.env`.
+2. Paste your Supabase direct Postgres URL into `DATABASE_URL`.
+3. If you are working from an NTFS external drive on macOS, run Flask commands through the cleanup wrapper so AppleDouble sidecar files do not break Alembic:
+
+```bash
+./scripts/run_clean.sh flask verify-db
+./scripts/run_clean.sh flask db upgrade
+./scripts/run_clean.sh flask seed-reference-data
+```
+
+4. Otherwise run `flask verify-db`.
+5. Run `flask db upgrade`.
+6. Run `flask seed-reference-data`.
+7. In Supabase Table Editor or SQL, confirm the six tables exist and that `locations` and `weight_categories` contain starter rows.
 
 ## Run The Backend
 
@@ -84,6 +139,12 @@ Recommended Render environment variables:
 - `SECRET_KEY=<your secret>`
 - `DATABASE_URL=<your hosted postgres url>`
 - `CLIENT_ORIGIN=<your frontend url>`
+
+Example with local and deployed frontend origins:
+
+```text
+CLIENT_ORIGIN=http://localhost:5173,https://deliveroo-tan.vercel.app
+```
 
 ## Run Tests
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hydrateSession } from "./features/auth/authSlice";
+import { fetchOrders } from "./features/orders/ordersSlice";
 import { AppRouter } from "./routes/AppRouter";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   useEffect(() => {
     if (token) {
       dispatch(hydrateSession());
+      dispatch(fetchOrders());
     }
   }, [dispatch, token]);
 
