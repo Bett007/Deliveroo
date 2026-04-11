@@ -1,0 +1,178 @@
+:global {
+.auth-card-wide {
+  width: min(1180px, 100%);
+}
+.auth-page-split .auth-card {
+  padding: 1.5rem;
+}
+.auth-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+.reverse-layout {
+  grid-template-columns: minmax(340px, 1.05fr) minmax(0, 0.95fr);
+}
+.auth-panel,
+.workspace-hero-copy {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+}
+.workspace-hero-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+.placeholder-art {
+  position: relative;
+  min-height: 100%;
+}
+.placeholder-art-glow {
+  position: absolute;
+  inset: 12% 8% auto auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 999px;
+  filter: blur(30px);
+  opacity: 0.45;
+}
+.placeholder-art-auth .placeholder-art-glow,
+.placeholder-art-customer .placeholder-art-glow {
+  background: rgba(30, 200, 255, 0.32);
+}
+.placeholder-art-admin .placeholder-art-glow {
+  background: rgba(16, 61, 93, 0.28);
+}
+.placeholder-art-frame {
+  position: relative;
+  min-height: 100%;
+  padding: 1.35rem;
+  overflow: hidden;
+  border-radius: 26px;
+}
+.placeholder-art-auth .placeholder-art-frame,
+.placeholder-art-customer .placeholder-art-frame {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.75), rgba(201, 241, 255, 0.62));
+}
+.placeholder-art-admin .placeholder-art-frame {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.7), rgba(214, 232, 242, 0.76));
+}
+.placeholder-art-hero {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+.placeholder-art-hero h3 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.placeholder-art-hero p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.placeholder-pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.placeholder-scene {
+  display: grid;
+  gap: 1rem;
+}
+.scene-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.scene-card {
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow);
+}
+.scene-card-large {
+  min-height: 220px;
+}
+.scene-card-small {
+  min-height: 145px;
+}
+.scene-image {
+  border-radius: 18px;
+  background-size: cover;
+  background-position: center;
+}
+.scene-image-main {
+  height: 130px;
+  margin-bottom: 0.85rem;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.16)),
+    linear-gradient(120deg, #1ec8ff, #8be6ff 48%, #0b2942 100%);
+}
+.scene-image-alt {
+  height: 70px;
+  margin-bottom: 0.75rem;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.45), transparent 28%),
+    linear-gradient(140deg, #103d5d, #2c8baa, #dff7ff);
+}
+.scene-lines {
+  display: grid;
+  gap: 0.55rem;
+}
+.scene-lines span {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(11, 41, 66, 0.12);
+}
+.scene-lines span:nth-child(1) {
+  width: 84%;
+}
+.scene-lines span:nth-child(2) {
+  width: 68%;
+}
+.scene-lines span:nth-child(3) {
+  width: 52%;
+}
+.scene-lines.compact span:nth-child(1) {
+  width: 88%;
+}
+.scene-lines.compact span:nth-child(2) {
+  width: 62%;
+}
+.scene-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  margin-bottom: 0.9rem;
+  background: linear-gradient(135deg, rgba(30, 200, 255, 0.95), rgba(0, 166, 230, 0.88));
+}
+.placeholder-art-admin .scene-badge {
+  background: linear-gradient(135deg, rgba(16, 61, 93, 0.96), rgba(31, 111, 139, 0.9));
+}
+.floating-card {
+  transform: translateY(18px);
+}
+
+.auth-card-wide {
+  max-width: none;
+}
+.auth-panel {
+  min-width: 0;
+}
+.auth-content-grid {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+}
+.reverse-layout {
+  grid-template-columns: minmax(360px, 1.1fr) minmax(320px, 0.9fr);
+}
+}

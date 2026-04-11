@@ -6,6 +6,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
+import "./OrderHistoryPage.module.css";
 
 export function OrderHistoryPage() {
   const dispatch = useDispatch();

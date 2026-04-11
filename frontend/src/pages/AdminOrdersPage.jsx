@@ -13,6 +13,7 @@ import {
   updateOrderStatus,
 } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
+import "./AdminOrdersPage.module.css";
 
 const adminStatuses = ["pending", "confirmed", "in_transit", "delivered", "cancelled"];
 

@@ -1,3 +1,5 @@
+import "./HomePage.module.css";
+
 const customerHighlights = [
   {
     title: "Book parcel delivery fast",

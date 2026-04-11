@@ -17,6 +17,7 @@ import {
 } from "../features/orders/ordersSlice";
 import { validateDestination } from "../features/orders/orderValidators";
 import { formatReadableDate } from "../utils/formatters/date";
+import "./OrderDetailsPage.module.css";
 
 const lifecycleSteps = [
   { key: "pending", label: "Placed" },

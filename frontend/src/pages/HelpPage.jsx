@@ -1,3 +1,5 @@
+import "./HelpPage.module.css";
+
 const helpTopics = [
   {
     icon: "D",

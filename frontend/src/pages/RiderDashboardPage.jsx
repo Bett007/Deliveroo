@@ -14,6 +14,7 @@ import {
   updateOrderLocation,
   updateOrderStatus,
 } from "../features/orders/ordersSlice";
+import "./RiderDashboardPage.module.css";
 import { formatReadableDate } from "../utils/formatters/date";
 
 const riderStatuses = ["confirmed", "in_transit", "delivered"];

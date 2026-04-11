@@ -1,4 +1,5 @@
 import { formatDistance, formatDuration } from "../../utils/formatters/distance";
+import "./RouteMapCard.module.css";
 
 function buildDirectionsUrl(origin, destination) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY;

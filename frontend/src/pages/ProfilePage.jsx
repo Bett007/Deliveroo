@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, updateProfile } from "../features/auth/authSlice";
+import "./ProfilePage.module.css";
 
 function getInitials(user) {
   const first = user?.first_name?.trim()?.[0];
