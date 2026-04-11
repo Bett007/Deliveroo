@@ -72,15 +72,15 @@ export function OrdersPage() {
                       </div>
                     </div>
 
-                    <div className="route-chip-row">
-                      <div className="route-chip">
+                    <div className="customer-card-route" aria-label={`Route for order ${order.id}`}>
+                      <div className="customer-route-stop">
                         <span>P</span>
-                        <strong>{order.pickupLocation}</strong>
+                        <strong title={order.pickupLocation}>{order.pickupLocation}</strong>
                       </div>
                       <i aria-hidden="true"></i>
-                      <div className="route-chip">
+                      <div className="customer-route-stop">
                         <span>D</span>
-                        <strong>{order.destination}</strong>
+                        <strong title={order.destination}>{order.destination}</strong>
                       </div>
                     </div>
 
