@@ -48,7 +48,7 @@ cp .env.example .env
 python run.py
 ```
 
-The backend runs on `http://127.0.0.1:5000` by default. The starter API check is available at `GET /api/health`.
+The backend runs on `http://127.0.0.1:5001` by default. The starter API check is available at `GET /api/health`.
 
 ## Environment Notes
 
