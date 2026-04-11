@@ -272,6 +272,66 @@ def test_non_admin_cannot_update_order_status_or_location(client, app):
     assert location_response.status_code == 403
 
 
+def test_rider_can_accept_and_update_open_delivery(client, app):
+    reference_ids = create_reference_data(app)
+    register_user(client, email="customer@example.com", role="customer")
+    register_user(client, email="rider@example.com", role="rider")
+    customer_token = login_user(client, email="customer@example.com")
+    rider_token = login_user(client, email="rider@example.com")
+    create_response = create_order(client, customer_token, build_order_payload(reference_ids))
+    order_id = create_response.get_json()["data"]["order"]["id"]
+
+    assign_response = client.patch(
+        f"/api/orders/{order_id}/assign",
+        json={},
+        headers=auth_headers(rider_token),
+    )
+    status_response = client.patch(
+        f"/api/orders/{order_id}/status",
+        json={"status": "in_transit"},
+        headers=auth_headers(rider_token),
+    )
+    location_response = client.patch(
+        f"/api/orders/{order_id}/location",
+        json={"location_id": reference_ids["current_location_id"]},
+        headers=auth_headers(rider_token),
+    )
+
+    assert assign_response.status_code == 200
+    assert assign_response.get_json()["data"]["order"]["assigned_rider"]["email"] == "rider@example.com"
+    assert assign_response.get_json()["data"]["order"]["status"] == "confirmed"
+    assert status_response.status_code == 200
+    assert status_response.get_json()["data"]["order"]["picked_up_at"] is not None
+    assert location_response.status_code == 200
+    assert location_response.get_json()["data"]["order"]["current_location_id"] == reference_ids["current_location_id"]
+
+
+def test_second_rider_cannot_update_assigned_delivery(client, app):
+    reference_ids = create_reference_data(app)
+    register_user(client, email="customer@example.com", role="customer")
+    register_user(client, email="rider1@example.com", role="rider")
+    register_user(client, email="rider2@example.com", role="rider")
+    customer_token = login_user(client, email="customer@example.com")
+    rider_one_token = login_user(client, email="rider1@example.com")
+    rider_two_token = login_user(client, email="rider2@example.com")
+    create_response = create_order(client, customer_token, build_order_payload(reference_ids))
+    order_id = create_response.get_json()["data"]["order"]["id"]
+
+    client.patch(
+        f"/api/orders/{order_id}/assign",
+        json={},
+        headers=auth_headers(rider_one_token),
+    )
+    response = client.patch(
+        f"/api/orders/{order_id}/status",
+        json={"status": "in_transit"},
+        headers=auth_headers(rider_two_token),
+    )
+
+    assert response.status_code == 403
+    assert response.get_json()["message"] == "Accept this delivery before updating it."
+
+
 def test_tracking_updates_create_and_list(client, app):
     reference_ids = create_reference_data(app)
     register_user(client, email="customer@example.com", role="customer")

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  assignOrderRequest,
   cancelOrderRequest,
   createOrderRequest,
   fetchOrderReferenceData,
@@ -7,6 +8,8 @@ import {
   listOrders,
   listTrackingUpdatesRequest,
   updateOrderDestinationRequest,
+  updateOrderLocationRequest,
+  updateOrderStatusRequest,
 } from "../../services/api/ordersApi";
 
 const terminalStatuses = new Set(["delivered", "cancelled"]);
@@ -173,6 +176,58 @@ export const updateOrderDestination = createAsyncThunk(
   },
 );
 
+export const updateOrderStatus = createAsyncThunk(
+  "orders/updateOrderStatus",
+  async ({ orderId, status }, { getState, rejectWithValue }) => {
+    const token = getAuthToken(getState);
+
+    if (!token) {
+      return rejectMissingToken(rejectWithValue);
+    }
+
+    try {
+      return await updateOrderStatusRequest(token, orderId, { status });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const updateOrderLocation = createAsyncThunk(
+  "orders/updateOrderLocation",
+  async ({ orderId, locationId }, { getState, rejectWithValue }) => {
+    const token = getAuthToken(getState);
+
+    if (!token) {
+      return rejectMissingToken(rejectWithValue);
+    }
+
+    try {
+      return await updateOrderLocationRequest(token, orderId, { location_id: locationId });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const assignOrder = createAsyncThunk(
+  "orders/assignOrder",
+  async ({ orderId, riderId } = {}, { getState, rejectWithValue }) => {
+    const token = getAuthToken(getState);
+
+    if (!token) {
+      return rejectMissingToken(rejectWithValue);
+    }
+
+    try {
+      const payload = riderId ? { rider_id: riderId } : {};
+      return await assignOrderRequest(token, orderId, payload);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const cancelOrder = createAsyncThunk("orders/cancelOrder", async ({ orderId, reason }, { getState, rejectWithValue }) => {
   const token = getAuthToken(getState);
 
@@ -291,6 +346,54 @@ const ordersSlice = createSlice({
       .addCase(updateOrderDestination.rejected, (state, action) => {
         state.mutationStatus = "failed";
         state.error = action.payload?.message ?? "Failed to update destination.";
+        state.fieldErrors = action.payload?.errors ?? {};
+      })
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.mutationStatus = "loading";
+        state.error = null;
+        state.fieldErrors = {};
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.mutationStatus = "succeeded";
+        state.error = null;
+        mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.mutationStatus = "failed";
+        state.error = action.payload?.message ?? "Failed to update order status.";
+        state.fieldErrors = action.payload?.errors ?? {};
+      })
+      .addCase(updateOrderLocation.pending, (state) => {
+        state.mutationStatus = "loading";
+        state.error = null;
+        state.fieldErrors = {};
+      })
+      .addCase(updateOrderLocation.fulfilled, (state, action) => {
+        state.mutationStatus = "succeeded";
+        state.error = null;
+        mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
+      })
+      .addCase(updateOrderLocation.rejected, (state, action) => {
+        state.mutationStatus = "failed";
+        state.error = action.payload?.message ?? "Failed to update order location.";
+        state.fieldErrors = action.payload?.errors ?? {};
+      })
+      .addCase(assignOrder.pending, (state) => {
+        state.mutationStatus = "loading";
+        state.error = null;
+        state.fieldErrors = {};
+      })
+      .addCase(assignOrder.fulfilled, (state, action) => {
+        state.mutationStatus = "succeeded";
+        state.error = null;
+        mergeOrderCollections(state, action.payload.order);
+        state.selectedOrder = action.payload.order;
+      })
+      .addCase(assignOrder.rejected, (state, action) => {
+        state.mutationStatus = "failed";
+        state.error = action.payload?.message ?? "Failed to assign order.";
         state.fieldErrors = action.payload?.errors ?? {};
       })
       .addCase(cancelOrder.pending, (state) => {
