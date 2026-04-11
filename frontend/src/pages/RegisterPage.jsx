@@ -64,7 +64,7 @@ export function RegisterPage() {
             <div className="auth-header">
               <p className="eyebrow">Create Access</p>
               <h1>Register for the right portal</h1>
-              <p>Choose the role you need so the app can route you into the matching admin or regular-user experience.</p>
+              <p>Choose the role you need so the app can route you into the matching customer or rider experience.</p>
               {error ? <p className="form-status error">{error}</p> : null}
               {verificationEmail ? <p className="helper-text">Verification will continue for {verificationEmail} after registration.</p> : null}
             </div>
@@ -82,7 +82,6 @@ export function RegisterPage() {
                 <select id="register-role" name="role" value={formData.role} onChange={handleChange} className="form-select">
                   <option value="customer">Customer</option>
                   <option value="rider">Rider</option>
-                  <option value="admin">Admin</option>
                 </select>
               </FormField>
 
