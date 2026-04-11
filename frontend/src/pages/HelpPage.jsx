@@ -1,15 +1,18 @@
 const helpTopics = [
   {
+    icon: "D",
     title: "Order delays",
-    description: "Share your order number, expected destination, and what changed so the team can investigate faster.",
+    description: "Order number, destination, current status.",
   },
   {
+    icon: "A",
     title: "Account and access issues",
-    description: "Tell us whether the issue affects sign in, registration, or account verification so we route it correctly.",
+    description: "Email, role, sign-in or verification step.",
   },
   {
+    icon: "B",
     title: "Billing or parcel concerns",
-    description: "Include the parcel ID, charge details, and a short summary of the issue in your email.",
+    description: "Parcel ID, charge details, short summary.",
   },
 ];
 
@@ -25,10 +28,8 @@ export function HelpPage() {
       <header className="workspace-hero glass-card help-hero">
         <div>
           <p className="eyebrow">Help & Support</p>
-          <h1>Need help with an order? Email the team directly.</h1>
-          <p className="workspace-copy">
-            Instead of an automated bot, this support flow encourages users to email the team with the details we need to help quickly.
-          </p>
+          <h1>Get support faster</h1>
+          <p className="workspace-copy">Send the right details and the team can move quickly.</p>
         </div>
 
         <a
@@ -43,14 +44,15 @@ export function HelpPage() {
         <section className="glass-card workspace-panel">
           <div className="section-header">
             <div>
-              <h2>What to include in your email</h2>
-              <p>Giving the right context helps the team resolve issues faster.</p>
+              <h2>Choose your issue</h2>
+              <p>Copy the matching details into your email.</p>
             </div>
           </div>
 
           <div className="feature-list">
             {helpTopics.map((topic) => (
               <article key={topic.title} className="feature-item help-item">
+                <span className="help-icon" aria-hidden="true">{topic.icon}</span>
                 <h3>{topic.title}</h3>
                 <p>{topic.description}</p>
               </article>
@@ -61,8 +63,8 @@ export function HelpPage() {
         <section className="glass-card workspace-panel">
           <div className="section-header">
             <div>
-              <h2>Support details</h2>
-              <p>Simple contact information for customers and admins.</p>
+              <h2>Contact</h2>
+              <p>One support inbox for every role.</p>
             </div>
           </div>
 
@@ -70,13 +72,13 @@ export function HelpPage() {
             <div className="support-card">
               <p className="card-label">Support Email</p>
               <h3>support@deliveroo-app.com</h3>
-              <p>Use this address for delivery issues, account concerns, and escalations.</p>
+              <p>Orders, accounts, parcels, escalations.</p>
             </div>
 
             <div className="support-card">
               <p className="card-label">Expected response</p>
               <h3>Within one business day</h3>
-              <p>Urgent active-order issues should be marked clearly in the subject line.</p>
+              <p>Mark urgent active orders in the subject.</p>
             </div>
 
             <div className="support-card faq-card">

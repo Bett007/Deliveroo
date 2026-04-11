@@ -69,6 +69,82 @@ def validate_login_payload(payload: Optional[dict] = None) -> dict:
     return {"email": email, "password": password}
 
 
+def validate_verification_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    email = (data.get("email") or "").strip().lower()
+    code = str(data.get("code") or "").strip()
+
+    if not email:
+        errors["email"] = ["Email is required."]
+    elif not EMAIL_PATTERN.match(email):
+        errors["email"] = ["Enter a valid email address."]
+
+    if not code:
+        errors["code"] = ["Verification code is required."]
+    elif not re.fullmatch(r"\d{6}", code):
+        errors["code"] = ["Verification code must be a 6-digit number."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"email": email, "code": code}
+
+
+def validate_verification_resend_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    email = (data.get("email") or "").strip().lower()
+
+    if not email:
+        errors["email"] = ["Email is required."]
+    elif not EMAIL_PATTERN.match(email):
+        errors["email"] = ["Enter a valid email address."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"email": email}
+
+
+def validate_profile_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    phone = data.get("phone")
+    avatar_url = data.get("avatar_url")
+
+    def normalize_text(value, field, max_length):
+        if value is None:
+            return None
+        if not isinstance(value, str):
+            errors[field] = [f"{field.replace('_', ' ').title()} must be a string."]
+            return None
+        value = value.strip()
+        if len(value) > max_length:
+            errors[field] = [f"{field.replace('_', ' ').title()} must be {max_length} characters or fewer."]
+        return value or None
+
+    first_name = normalize_text(first_name, "first_name", 120)
+    last_name = normalize_text(last_name, "last_name", 120)
+    phone = normalize_text(phone, "phone", 40)
+    avatar_url = normalize_text(avatar_url, "avatar_url", 500000)
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {
+        "first_name": first_name,
+        "last_name": last_name,
+        "phone": phone,
+        "avatar_url": avatar_url,
+    }
+
+
 def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
@@ -78,6 +154,12 @@ def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     weight_category_id = data.get("weight_category_id")
     image_url = data.get("image_url")
     special_instructions = data.get("special_instructions")
+
+    if isinstance(image_url, str):
+        image_url = image_url.strip() or None
+
+    if isinstance(special_instructions, str):
+        special_instructions = special_instructions.strip() or None
 
     if not description:
         errors["description"] = ["Parcel description is required."]
@@ -199,6 +281,25 @@ def validate_status_payload(payload: Optional[dict] = None) -> dict:
     return {"status": status}
 
 
+def validate_assignment_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+    rider_id = data.get("rider_id")
+
+    if rider_id is None:
+        return {"rider_id": None}
+
+    try:
+        rider_id = int(rider_id)
+    except (TypeError, ValueError):
+        errors["rider_id"] = ["Rider ID must be an integer."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"rider_id": rider_id}
+
+
 def validate_cancel_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
@@ -228,6 +329,9 @@ def validate_tracking_payload(payload: Optional[dict] = None) -> dict:
     location_id = data.get("location_id")
     note = data.get("note")
 
+    if isinstance(note, str):
+        note = note.strip() or None
+
     if not status:
         errors["status"] = ["Tracking status is required."]
     elif status not in VALID_ORDER_STATUSES:
@@ -245,3 +349,26 @@ def validate_tracking_payload(payload: Optional[dict] = None) -> dict:
         raise ValidationError("Validation failed.", errors=errors)
 
     return {"status": status, "location_id": location_id, "note": note}
+
+
+def validate_pagination_params(page=1, limit=10) -> dict:
+    errors = {}
+
+    try:
+        page = int(page)
+        if page < 1:
+            raise ValueError()
+    except (TypeError, ValueError):
+        errors["page"] = ["Page must be an integer greater than or equal to 1."]
+
+    try:
+        limit = int(limit)
+        if limit < 1:
+            raise ValueError()
+    except (TypeError, ValueError):
+        errors["limit"] = ["Limit must be an integer greater than or equal to 1."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"page": page, "limit": limit}

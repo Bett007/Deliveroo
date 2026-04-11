@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
@@ -26,6 +27,15 @@ function NavIcon({ name }) {
         <path d="M4.5 18h.01" />
       </svg>
     ),
+    dispatch: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 7h8" />
+        <path d="M5 12h5" />
+        <path d="M5 17h4" />
+        <path d="M15 8l4 4-4 4" />
+        <path d="M19 12h-7" />
+      </svg>
+    ),
     create: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 5v14" />
@@ -37,6 +47,12 @@ function NavIcon({ name }) {
         <circle cx="12" cy="12" r="9" />
         <path d="M9.75 9a2.25 2.25 0 1 1 3.75 1.68c-.87.73-1.5 1.23-1.5 2.57" />
         <path d="M12 17h.01" />
+      </svg>
+    ),
+    profile: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20a7 7 0 0 1 14 0" />
       </svg>
     ),
     login: (
@@ -58,40 +74,42 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function PortalHeader({ title, subtitle, navItems, userEmail, onLogout, shellClass }) {
+function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass }) {
   return (
-    <header className={`portal-header ${shellClass}-header`}>
-      <div className="portal-header-inner glass-card">
-        <div className="portal-brand-block">
-          <div className={`portal-mark ${shellClass}-mark`}>{shellClass === "admin" ? "A" : "C"}</div>
-          <div>
-            <p className="portal-kicker">{title}</p>
-            <h1>{subtitle}</h1>
-          </div>
-        </div>
-
-        <nav className="portal-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `portal-nav-link ${isActive ? "active" : ""}`}
-            >
-              <NavIcon name={item.icon} />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="portal-user-block">
-          <span className="user-chip">{userEmail}</span>
-          <Button className="portal-nav-link auth-link" onClick={onLogout}>
-            <NavIcon name="login" />
-            <span>Logout</span>
-          </Button>
+    <aside className={`ops-sidebar ${shellClass}-sidebar`}>
+      <div className="ops-brand-block">
+        <img src={deliverooLogoIcon} alt="Deliveroo" className="ops-brand-logo" />
+        <div>
+          <p>{title}</p>
+          <strong>Deliveroo</strong>
         </div>
       </div>
-    </header>
+
+      <div className="ops-sidebar-copy">
+        <h2>{subtitle}</h2>
+      </div>
+
+      <nav className="ops-nav" aria-label={`${title} navigation`}>
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => `ops-nav-link ${isActive ? "active" : ""}`}
+          >
+            <NavIcon name={item.icon} />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="ops-sidebar-footer">
+        <span>{userEmail}</span>
+        <Button className="ops-logout-btn" onClick={onLogout}>
+          <NavIcon name="login" />
+          <span>Logout</span>
+        </Button>
+      </div>
+    </aside>
   );
 }
 
@@ -100,7 +118,7 @@ function AuthHeader() {
     <header className="auth-portal-header">
       <div className="auth-portal-inner glass-card">
         <div className="portal-brand-block">
-          <div className="portal-mark auth-mark">D</div>
+          <img src={deliverooLogoIcon} alt="Deliveroo" className="auth-header-logo" />
           <div>
             <p className="portal-kicker">Deliveroo Access</p>
             <h1>Authenticate before entering the workspace</h1>
@@ -130,6 +148,7 @@ export function AppLayout() {
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
+  const isRider = user?.role === "rider";
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -151,27 +170,35 @@ export function AppLayout() {
   const navItems = isAdmin
     ? [
         { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
-        { label: "Orders", path: "/orders", icon: "orders" },
+        { label: "Dispatch", path: "/dashboard/orders", icon: "dispatch" },
+        { label: "Profile", path: "/profile", icon: "profile" },
         { label: "Help", path: "/help", icon: "help" },
       ]
-    : [
-        { label: "Orders", path: "/orders", icon: "orders" },
-        { label: "Create Order", path: "/orders/create", icon: "create" },
-        { label: "Help", path: "/help", icon: "help" },
-      ];
+    : isRider
+      ? [
+          { label: "Rider Board", path: "/rider", icon: "dashboard" },
+          { label: "Profile", path: "/profile", icon: "profile" },
+          { label: "Help", path: "/help", icon: "help" },
+        ]
+      : [
+          { label: "Orders", path: "/orders", icon: "orders" },
+          { label: "Create Order", path: "/orders/create", icon: "create" },
+          { label: "Profile", path: "/profile", icon: "profile" },
+          { label: "Help", path: "/help", icon: "help" },
+        ];
 
   return (
-    <div className={`app-shell role-shell ${isAdmin ? "admin-shell" : "customer-shell"}`}>
-      <PortalHeader
-        title={isAdmin ? "Admin Portal" : "Customer Workspace"}
-        subtitle={isAdmin ? "Operations, monitoring, and backend rollout status" : "Parcel booking, tracking, and support"}
+    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}>
+      <RoleSidebar
+        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+        subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}
         navItems={navItems}
         userEmail={user.email}
         onLogout={handleLogout}
-        shellClass={isAdmin ? "admin" : "customer"}
+        shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
       />
 
-      <main className={`main-content role-main ${isAdmin ? "admin-main" : "customer-main"}`}>
+      <main className={`main-content role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
         <Outlet />
       </main>
     </div>

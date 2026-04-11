@@ -1,32 +1,30 @@
 export function validateCreateOrderForm(values) {
   const errors = {};
 
+  if (!String(values.parcelName || "").trim()) {
+    errors.parcelName = "Parcel name is required.";
+  }
+
   if (!String(values.pickupLocationId || "").trim()) {
-    errors.pickupLocationId = "Pickup location ID is required.";
+    errors.pickupLocation = "Pickup location is required.";
   }
 
-  if (!String(values.deliveryLocationId || "").trim()) {
-    errors.deliveryLocationId = "Delivery location ID is required.";
-  }
-
-  if (!String(values.quotedPrice || "").trim()) {
-    errors.quotedPrice = "Quoted price is required.";
-  } else if (Number(values.quotedPrice) < 0) {
-    errors.quotedPrice = "Quoted price must be zero or greater.";
-  }
-
-  if (!String(values.parcelDescription || "").trim()) {
-    errors.parcelDescription = "Parcel description is required.";
-  }
-
-  if (!String(values.weight || "").trim()) {
-    errors.weight = "Parcel weight is required.";
-  } else if (Number(values.weight) <= 0) {
-    errors.weight = "Parcel weight must be greater than zero.";
+  if (!String(values.destinationLocationId || "").trim()) {
+    errors.destination = "Destination is required.";
   }
 
   if (!String(values.weightCategoryId || "").trim()) {
-    errors.weightCategoryId = "Weight category ID is required.";
+    errors.weightCategoryId = "Weight category is required.";
+  }
+
+  if (!String(values.weightKg || "").trim()) {
+    errors.weightKg = "Parcel weight is required.";
+  } else if (Number(values.weightKg) <= 0) {
+    errors.weightKg = "Parcel weight must be greater than 0.";
+  }
+
+  if (!String(values.description || "").trim()) {
+    errors.description = "Parcel description is required.";
   }
 
   return errors;
@@ -34,7 +32,7 @@ export function validateCreateOrderForm(values) {
 
 export function validateDestination(value) {
   if (!String(value || "").trim()) {
-    return "Enter a new delivery location ID before saving.";
+    return "Enter a new destination before saving.";
   }
 
   if (Number(value) <= 0) {
