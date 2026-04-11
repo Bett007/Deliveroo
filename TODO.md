@@ -1,0 +1,1 @@
+# Deliveroo - Reverted Changes\n\nNo changes made. Original files restored.\n\nTo fix errors:\n1. Keep legacy Router (warnings cosmetic).\n2. Main fix needed: Add VITE_API_BASE_URL=http://localhost:5000/api to .env or update config.py CLIENT_ORIGIN to include http://127.0.0.1:5173.\n3. Backend restart required after CORS.\n4. Redux: Errors now serializable? Test.
