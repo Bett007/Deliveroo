@@ -3,6 +3,7 @@ from typing import Optional
 
 from flask import Flask
 
+from .cli import register_cli_commands
 from .config import config_by_name
 from .errors.handlers import register_error_handlers
 from .extensions import cors, db, migrate
@@ -24,7 +25,7 @@ def create_app(config_name: Optional[str] = None) -> Flask:
     migrate.init_app(app, db)
     cors.init_app(
         app,
-        resources={r"/api/*": {"origins": app.config["CLIENT_ORIGIN"]}},
+        resources={r"/api/*": {"origins": app.config["CLIENT_ORIGINS"]}},
     )
 
     app.register_blueprint(health_bp, url_prefix="/api")
@@ -33,5 +34,6 @@ def create_app(config_name: Optional[str] = None) -> Flask:
     app.register_blueprint(tracking_bp, url_prefix="/api/tracking")
     app.register_blueprint(docs_bp, url_prefix="/api/docs")
     register_error_handlers(app)
+    register_cli_commands(app)
 
     return app

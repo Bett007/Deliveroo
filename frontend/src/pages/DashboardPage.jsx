@@ -1,137 +1,93 @@
-import { RouteMapCard } from "../components/ui/RouteMapCard";
-import { formatRelativeLabel } from "../utils/formatters/date";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrders } from "../features/orders/ordersSlice";
 
 export function DashboardPage() {
-  const summaryCards = [
-    { title: "Total Orders", value: "1,248", sub: "+12% this week" },
-    { title: "Active Riders", value: "86", sub: "14 currently delivering" },
-    { title: "Revenue Today", value: "$57,650", sub: "Strong order volume" },
-    { title: "Avg Delivery", value: "24 min", sub: "2 mins faster than yesterday" },
-  ];
+  const dispatch = useDispatch();
+  const [expandedStat, setExpandedStat] = useState("open");
+  const { user } = useSelector((state) => state.auth);
+  const {
+    currentOrders,
+    orderHistory,
+    status,
+  } = useSelector((state) => state.orders);
 
-  const orderStages = [
-    { label: "Placed", count: 124 },
-    { label: "Preparing", count: 48 },
-    { label: "Out for Delivery", count: 36 },
-    { label: "Delivered", count: 1012 },
-  ];
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
-  const liveOrders = [
-    { id: "#DLV-1024", customer: "Sarah Wanjiku", rider: "Kevin", status: "Out for delivery", eta: "12 mins" },
-    { id: "#DLV-1025", customer: "Brian Kiptoo", rider: "Mercy", status: "Preparing", eta: "18 mins" },
-    { id: "#DLV-1026", customer: "Amina Noor", rider: "James", status: "Delivered", eta: "Completed" },
-    { id: "#DLV-1027", customer: "John Kamau", rider: "Faith", status: "Placed", eta: "26 mins" },
-  ];
+  const summaryCards = useMemo(() => {
+    const totalOrders = currentOrders.length + orderHistory.length;
+    const inFlight = currentOrders.filter((order) => order.status === "in_transit").length;
+    const delivered = orderHistory.filter((order) => order.status === "delivered").length;
+    const unassigned = currentOrders.filter((order) => !order.assignedRiderId).length;
 
-  const notifications = [
-    { text: "New rider assignment completed for order #DLV-1024", timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString() },
-    { text: "Peak demand detected in Westlands zone", timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString() },
-    { text: "Customer support request opened for order #DLV-1021", timestamp: new Date(Date.now() - 1000 * 60 * 75).toISOString() },
-  ];
+    return [
+      { id: "open", title: "Open Queue", value: String(unassigned), sub: "No rider yet", detail: "Assign riders or let riders accept available work.", icon: "Q" },
+      { id: "active", title: "Active", value: String(currentOrders.length), sub: "Needs dispatch", detail: "Pending, confirmed, and in-transit orders.", icon: "A" },
+      { id: "moving", title: "In Transit", value: String(inFlight), sub: "Moving now", detail: "Orders currently on route.", icon: "T" },
+      { id: "delivered", title: "Delivered", value: String(delivered), sub: "Completed", detail: "Completed deliveries in the current data set.", icon: "D" },
+      { id: "total", title: "Total", value: String(totalOrders), sub: "All orders", detail: "All records returned for this admin account.", icon: "O" },
+    ];
+  }, [currentOrders, orderHistory]);
 
   return (
-    <section className="dashboard-page">
-      <header className="dashboard-topbar glass-card">
+    <section className="dashboard-page ops-page">
+      <header className="ops-topbar">
         <div>
           <p className="eyebrow">Admin Dashboard</p>
           <h1>Operations overview</h1>
+          <p className="workspace-copy">Monitor the floor. Jump into Dispatch when action is needed.</p>
         </div>
 
         <div className="topbar-actions">
-          <input type="text" placeholder="Search orders, riders, customers..." className="search-input" />
-          <button className="primary-btn">Create Order</button>
+          <span className="user-chip">{user?.email || "Signed-in admin"}</span>
+          <Link to="/dashboard/orders" className="primary-btn">Manage Dispatch</Link>
         </div>
       </header>
 
-      <div className="dashboard-grid">
-        <div className="dashboard-main-grid">
-          <section className="glass-card stage-strip">
-            {orderStages.map((stage) => (
-              <div key={stage.label} className="stage-pill">
-                <span className="stage-dot"></span>
-                <div>
-                  <h4>{stage.label}</h4>
-                  <p>{stage.count} orders</p>
-                </div>
-              </div>
-            ))}
-          </section>
+      <section className="summary-grid ops-summary-grid">
+        <Link to="/dashboard/orders" className="admin-action-icon" aria-label="Open dispatch">
+          <span className="summary-icon" aria-hidden="true">D</span>
+          <strong>Dispatch</strong>
+        </Link>
+        <button type="button" className="admin-action-icon" onClick={() => dispatch(fetchOrders())} disabled={status === "loading"} aria-label="Refresh orders">
+          <span className="summary-icon" aria-hidden="true">F</span>
+          <strong>{status === "loading" ? "Refreshing" : "Refresh"}</strong>
+        </button>
+        <Link to="/help" className="admin-action-icon" aria-label="Open help">
+          <span className="summary-icon" aria-hidden="true">H</span>
+          <strong>Help</strong>
+        </Link>
+      </section>
 
-          <section className="summary-grid">
-            {summaryCards.map((card) => (
-              <div key={card.title} className="glass-card summary-card">
-                <p className="card-label">{card.title}</p>
-                <h3>{card.value}</h3>
-                <span>{card.sub}</span>
-              </div>
-            ))}
-          </section>
+      <div className="admin-stat-accordion" aria-label="Operations metrics">
+        {summaryCards.map((card) => {
+          const isExpanded = expandedStat === card.id;
 
-          <section className="glass-card orders-table-card">
-            <div className="section-header">
-              <div>
-                <h2>Live Orders</h2>
-                <p>Track real-time delivery progress across the platform.</p>
-              </div>
-              <button className="secondary-btn">View All</button>
-            </div>
-
-            <div className="table-wrapper">
-              <table className="orders-table">
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Rider</th>
-                    <th>Status</th>
-                    <th>ETA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {liveOrders.map((order) => (
-                    <tr key={order.id}>
-                      <td>{order.id}</td>
-                      <td>{order.customer}</td>
-                      <td>{order.rider}</td>
-                      <td><span className="status-badge">{order.status}</span></td>
-                      <td>{order.eta}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
-
-        <aside className="dashboard-side-grid">
-          <RouteMapCard origin="Westlands, Nairobi" destination="Kilimani, Nairobi" distanceKm={8.6} durationMinutes={18} />
-
-          <section className="glass-card revenue-card">
-            <p className="card-label">Daily Revenue</p>
-            <h2>$57,650.00</h2>
-            <span>+18.7% vs yesterday</span>
-            <button className="primary-btn full-width">View Analytics</button>
-          </section>
-
-          <section className="glass-card notifications-card">
-            <div className="section-header">
-              <h2>Notifications</h2>
-              <span className="mini-badge">3 New</span>
-            </div>
-
-            <div className="notification-list">
-              {notifications.map((note, index) => (
-                <div key={index} className="notification-item">
-                  <div className="notification-avatar">{index + 1}</div>
-                  <div>
-                    <p>{note.text}</p>
-                    <span className="helper-text">{formatRelativeLabel(note.timestamp)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </aside>
+          return (
+            <button
+              key={card.id}
+              type="button"
+              className={`admin-stat-panel ${isExpanded ? "expanded" : ""}`}
+              onClick={() => setExpandedStat(card.id)}
+              aria-expanded={isExpanded}
+            >
+              <span className="summary-icon" aria-hidden="true">{card.icon}</span>
+              <span className="admin-stat-main">
+                <small>{card.title}</small>
+                <strong>{card.value}</strong>
+              </span>
+              {isExpanded ? (
+                <span className="admin-stat-detail">
+                  <em>{card.sub}</em>
+                  <span>{card.detail}</span>
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
