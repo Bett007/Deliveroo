@@ -130,6 +130,7 @@ export function AppLayout() {
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
+  const isRider = user?.role === "rider";
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -150,21 +151,37 @@ export function AppLayout() {
 
   const navItems = isAdmin
     ? [
-        { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
-        { label: "Orders", path: "/orders", icon: "orders" },
-        { label: "Help", path: "/help", icon: "help" },
+        { label: "Dashboard", path: "/admin/dashboard", icon: "dashboard" },
+        { label: "Analytics", path: "/admin/analytics", icon: "orders" },
+        { label: "Monitoring", path: "/admin/monitoring", icon: "help" },
+        { label: "Activity", path: "/admin/activity", icon: "create" },
       ]
-    : [
-        { label: "Orders", path: "/orders", icon: "orders" },
-        { label: "Create Order", path: "/orders/create", icon: "create" },
-        { label: "Help", path: "/help", icon: "help" },
-      ];
+    : isRider
+      ? [
+          { label: "Dashboard", path: "/rider/dashboard", icon: "dashboard" },
+          { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
+          { label: "Delivery History", path: "/deliveries/history", icon: "create" },
+          { label: "Route Map", path: "/map", icon: "help" },
+          { label: "Help", path: "/help", icon: "help" },
+        ]
+      : [
+          { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
+          { label: "Orders", path: "/orders", icon: "orders" },
+          { label: "Create Order", path: "/orders/create", icon: "create" },
+          { label: "Help", path: "/help", icon: "help" },
+        ];
 
   return (
     <div className={`app-shell role-shell ${isAdmin ? "admin-shell" : "customer-shell"}`}>
       <PortalHeader
-        title={isAdmin ? "Admin Portal" : "Customer Workspace"}
-        subtitle={isAdmin ? "Operations, monitoring, and backend rollout status" : "Parcel booking, tracking, and support"}
+        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+        subtitle={
+          isAdmin
+            ? "Operations, monitoring, and platform analytics"
+            : isRider
+              ? "Manage active deliveries, history, and route updates"
+              : "Parcel booking, tracking, and support"
+        }
         navItems={navItems}
         userEmail={user.email}
         onLogout={handleLogout}

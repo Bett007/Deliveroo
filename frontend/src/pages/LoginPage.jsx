@@ -21,9 +21,11 @@ export function LoginPage() {
 
   useEffect(() => {
     if (user?.role === "admin") {
-      navigate("/dashboard", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
+    } else if (user?.role === "rider") {
+      navigate("/rider/dashboard", { replace: true });
     } else if (user) {
-      navigate("/orders", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [navigate, user]);
 
@@ -46,7 +48,13 @@ export function LoginPage() {
 
     if (loginUser.fulfilled.match(result)) {
       const role = result.payload.user.role;
-      navigate(role === "admin" ? "/dashboard" : "/orders", { replace: true });
+      if (role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else if (role === "rider") {
+        navigate("/rider/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     }
   }
 

@@ -64,7 +64,7 @@ export function OrderDetailsPage() {
   }
 
   const canEditDestination = !["delivered", "cancelled"].includes(order.status);
-  const canCancel = !["delivered", "cancelled"].includes(order.status);
+  const canCancel = order.status === "pending";
 
   async function handleUpdateDestination(event) {
     event.preventDefault();
@@ -89,6 +89,16 @@ export function OrderDetailsPage() {
   }
 
   async function handleCancelOrder() {
+    if (!canCancel) {
+      return;
+    }
+
+    const confirmed = window.confirm("Are you sure you want to cancel this order?");
+
+    if (!confirmed) {
+      return;
+    }
+
     const result = await dispatch(
       cancelOrder({
         orderId: order.id,
@@ -169,9 +179,13 @@ export function OrderDetailsPage() {
             />
           </FormField>
 
-          <Button className="primary-btn full-width danger-btn" onClick={handleCancelOrder} disabled={!canCancel || mutationStatus === "loading"}>
-            {mutationStatus === "loading" ? "Saving Changes..." : "Cancel Order"}
-          </Button>
+          {canCancel ? (
+            <Button className="primary-btn full-width danger-btn" onClick={handleCancelOrder} disabled={mutationStatus === "loading"}>
+              {mutationStatus === "loading" ? "Saving Changes..." : "Cancel Order"}
+            </Button>
+          ) : (
+            <p className="helper-text">Only pending orders can be cancelled from this screen.</p>
+          )}
         </SectionCard>
       </div>
 
