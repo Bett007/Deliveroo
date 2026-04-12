@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import styles from "./HelpPage.module.css";
 
 const helpTopics = [
@@ -24,36 +26,64 @@ const faqItems = [
   "For urgent delivery problems, mention the current status and destination in the first sentence.",
 ];
 
+const roleCopy = {
+  customer: {
+    heading: "Get support faster",
+    subtitle: "Parcel, account, and billing help in one place.",
+    chip: "Customer queue",
+  },
+  rider: {
+    heading: "Rider support center",
+    subtitle: "Route, assignment, and account help in one place.",
+    chip: "Rider queue",
+  },
+  admin: {
+    heading: "Operations support",
+    subtitle: "Dispatch, account, and escalation help in one place.",
+    chip: "Admin queue",
+  },
+};
+
 export function HelpPage() {
+  const { user } = useSelector((state) => state.auth);
+  const copy = useMemo(() => roleCopy[user?.role] || roleCopy.customer, [user?.role]);
+
   return (
-    <section className={`workspace-page help-page ${styles.scope}`}>
-      <header className="workspace-hero glass-card help-hero">
+    <section className={`workspace-page help-page ops-page compact-help-page ${styles.scope}`}>
+      <header className="ops-topbar help-topbar">
         <div>
           <p className="eyebrow">Help & Support</p>
-          <h1>Get support faster</h1>
-          <p className="workspace-copy">Send the right details and the team can move quickly.</p>
+          <h1>{copy.heading}</h1>
+          <p className="workspace-copy">{copy.subtitle}</p>
         </div>
 
-        <a
-          className="primary-btn"
-          href="mailto:support@deliveroo-app.com?subject=Deliveroo%20Support%20Request"
-        >
-          Email Support
-        </a>
+        <div className="topbar-actions">
+          <div className="rider-stats-strip customer-stats-strip" aria-label="Support summary">
+            <span><strong>24h</strong> first reply</span>
+            <span><strong>1</strong> shared inbox</span>
+            <span><strong>{copy.chip}</strong></span>
+          </div>
+          <a
+            className="primary-btn"
+            href="mailto:support@deliveroo-app.com?subject=Deliveroo%20Support%20Request"
+          >
+            Email Support
+          </a>
+        </div>
       </header>
 
-      <div className="workspace-grid">
-        <section className="glass-card workspace-panel">
+      <div className="help-layout-grid">
+        <section className="glass-card workspace-panel help-issue-panel">
           <div className="section-header">
             <div>
               <h2>Choose your issue</h2>
-              <p>Copy the matching details into your email.</p>
+              <p>Pick one, then send your note.</p>
             </div>
           </div>
 
-          <div className="feature-list">
+          <div className="help-topic-list">
             {helpTopics.map((topic) => (
-              <article key={topic.title} className="feature-item help-item">
+              <article key={topic.title} className="feature-item help-item compact-help-item">
                 <span className="help-icon" aria-hidden="true">{topic.icon}</span>
                 <h3>{topic.title}</h3>
                 <p>{topic.description}</p>
@@ -62,7 +92,7 @@ export function HelpPage() {
           </div>
         </section>
 
-        <section className="glass-card workspace-panel">
+        <section className="glass-card workspace-panel help-contact-panel">
           <div className="section-header">
             <div>
               <h2>Contact</h2>
@@ -70,7 +100,7 @@ export function HelpPage() {
             </div>
           </div>
 
-          <div className="support-card-stack">
+          <div className="support-card-stack compact-support-stack">
             <div className="support-card">
               <p className="card-label">Support Email</p>
               <h3>support@deliveroo-app.com</h3>
