@@ -13,6 +13,7 @@ import {
   updateOrderStatus,
 } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
+import styles from "./AdminOrdersPage.module.css";
 
 const adminStatuses = ["pending", "confirmed", "in_transit", "delivered", "cancelled"];
 
@@ -79,7 +80,7 @@ export function AdminOrdersPage() {
   }
 
   return (
-    <section className="workspace-page ops-page admin-dispatch-page">
+    <section className={`workspace-page ops-page admin-dispatch-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Admin Dispatch</p>

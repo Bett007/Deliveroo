@@ -7,6 +7,7 @@ import { FormField } from "../components/ui/FormField";
 import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, registerUser } from "../features/auth/authSlice";
 import { validateRegisterForm } from "../features/auth/authValidators";
+import styles from "./AuthPages.module.css";
 
 const initialFormData = {
   email: "",
@@ -51,7 +52,7 @@ export function RegisterPage() {
   }
 
   return (
-    <section className="auth-page auth-page-split">
+    <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid reverse-layout">
           <PlaceholderArtwork

@@ -14,6 +14,7 @@ import {
   updateOrderLocation,
   updateOrderStatus,
 } from "../features/orders/ordersSlice";
+import styles from "./RiderDashboardPage.module.css";
 import { formatReadableDate } from "../utils/formatters/date";
 
 const riderStatuses = ["confirmed", "in_transit", "delivered"];
@@ -99,7 +100,7 @@ export function RiderDashboardPage() {
   }
 
   return (
-    <section className="workspace-page ops-page rider-page">
+    <section className={`workspace-page ops-page rider-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Rider Workspace</p>

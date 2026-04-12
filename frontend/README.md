@@ -1,6 +1,18 @@
 # Frontend
 
-This folder contains the React frontend starter for Deliveroo. It is intentionally small right now so the team can agree on patterns before feature work starts.
+This folder contains the React frontend for Deliveroo's role-based workspace experience.
+
+## Current Frontend Scope
+
+- Combined auth portal (`/login`, `/register`, `/verify`)
+- Role-based app shell:
+  - customer workspace (`/orders`, `/orders/create`, `/orders/history`, `/orders/:id`)
+  - rider workspace (`/rider`)
+  - admin workspace (`/dashboard`, `/dashboard/orders`)
+- Shared protected pages (`/profile`, `/help`)
+- Redux Toolkit data flow for auth and order state
+- UI layout tuned for app-like viewport behavior (reduced long-page scrolling on desktop)
+- CSS modules split by page/component instead of one monolithic stylesheet
 
 ## Install Dependencies
 
@@ -21,7 +33,7 @@ By default Vite serves the app at `http://localhost:5173`.
 - `npm run dev` starts the local development server
 - `npm run build` creates a production build in `dist/`
 - `npm run preview` previews the production build locally
-- `npm run lint` is a placeholder script for now
+- `npm run lint` linting placeholder for current setup
 
 ## Environment File
 
@@ -35,24 +47,13 @@ Current example:
 
 ```text
 src/
-├── app/         # shared app-level styles and setup
-├── assets/      # static assets
-├── components/  # reusable UI pieces
-├── features/    # future Redux slices and feature modules
+├── app/         # shared app-level setup and base styles
+├── assets/      # static assets and logos
+├── components/  # app shell + reusable UI components
+├── features/    # Redux slices (auth, orders)
 ├── pages/       # route-level page components
-├── routes/      # router setup
+├── routes/      # route guards and router setup
 ├── services/    # API helpers
-├── store/       # Redux store setup
+├── store/       # Redux store
 └── utils/       # shared helpers
 ```
-
-## Current Status
-
-The frontend currently includes:
-
-- a Vite-based React setup
-- React Router with placeholder pages
-- Redux Toolkit store wiring
-- a small app shell for basic route verification
-
-No real business features or authentication logic have been added yet.

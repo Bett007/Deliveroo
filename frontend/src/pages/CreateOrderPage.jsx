@@ -5,6 +5,7 @@ import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { clearOrderError, createOrder, loadOrderReferenceData } from "../features/orders/ordersSlice";
 import { validateCreateOrderForm } from "../features/orders/orderValidators";
+import styles from "./CreateOrderPage.module.css";
 
 const initialFormData = {
   parcelName: "",
@@ -99,7 +100,7 @@ export function CreateOrderPage() {
   }
 
   return (
-    <section className="workspace-page ops-page">
+    <section className={`workspace-page ops-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Create Parcel</p>

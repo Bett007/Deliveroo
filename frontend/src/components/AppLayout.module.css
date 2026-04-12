@@ -1,0 +1,205 @@
+.scope {
+  display: contents;
+}
+
+
+/* Remediation pass: authenticated app shell and dashboard surfaces. */
+:global(.ops-shell) {
+  --ops-bg: #f3f6f9;
+  --ops-panel: #ffffff;
+  --ops-ink: #182233;
+  --ops-muted: #687587;
+  --ops-sidebar: #162a4b;
+  --ops-sidebar-strong: #0f1f3a;
+  --ops-sidebar-active: #25436e;
+  --ops-border: #dfe6ee;
+  --ops-blue: #2f73d9;
+  --ops-teal: #28b8a8;
+  --ops-orange: #f0a43a;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--ops-bg);
+  color: var(--ops-ink);
+}
+:global(.ops-shell.admin-shell),
+:global(.ops-shell.customer-shell) {
+  background: var(--ops-bg);
+}
+:global(.ops-sidebar) {
+  min-height: 0;
+  height: 100dvh;
+  padding: 1.15rem 1rem;
+  background: linear-gradient(180deg, var(--ops-sidebar), var(--ops-sidebar-strong));
+  color: #ffffff;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 1.25rem;
+}
+:global(.ops-brand-block),
+:global(.ops-nav-link),
+:global(.ops-sidebar-footer),
+:global(.ops-logout-btn) {
+  border-radius: 8px;
+}
+:global(.ops-brand-block) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+}
+:global(.ops-brand-mark) {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--ops-teal);
+  color: #062c34;
+  font-weight: 900;
+}
+:global(.ops-brand-logo),
+:global(.auth-header-logo) {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+:global(.ops-brand-logo) {
+  border-radius: 8px;
+  background: #ffffff;
+}
+:global(.auth-form-logo) {
+  width: min(210px, 100%);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 0.25rem;
+}
+:global(.ops-brand-block p),
+:global(.ops-sidebar-copy h2),
+:global(.ops-sidebar-footer span) {
+  color: rgba(255, 255, 255, 0.68);
+}
+:global(.ops-brand-block strong) {
+  display: block;
+  margin-top: 0.15rem;
+  color: #ffffff;
+}
+:global(.ops-sidebar-copy) {
+  padding: 0 0.65rem;
+}
+:global(.ops-sidebar-copy h2) {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+:global(.ops-nav) {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+}
+:global(.ops-nav-link),
+:global(.ops-logout-btn) {
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.8rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 700;
+  text-align: left;
+}
+:global(.ops-nav-link:hover),
+:global(.ops-nav-link.active),
+:global(.ops-logout-btn:hover) {
+  background: var(--ops-sidebar-active);
+  color: #ffffff;
+}
+:global(.ops-sidebar-footer) {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  min-width: 0;
+}
+:global(.ops-sidebar-footer span) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.86rem;
+}
+:global(.ops-main) {
+  min-width: 0;
+  min-height: 0;
+  height: 100dvh;
+  overflow: auto;
+  padding: 1.2rem;
+  background: var(--ops-bg);
+  scrollbar-width: thin;
+}
+:global(.ops-main .dashboard-page),
+:global(.ops-main .workspace-page),
+:global(.ops-main .help-page) {
+  width: min(1380px, 100%);
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+}
+:global(.auth-shell) {
+  background: #f3f6f9;
+}
+:global(.auth-portal-inner),
+:global(.auth-card) {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dfe6ee;
+  box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:global(.auth-portal-inner) {
+  grid-template-columns: 1fr auto;
+}
+:global(.auth-page) {
+  padding: 1.25rem;
+}
+:global(.auth-content-grid),
+:global(.reverse-layout) {
+  gap: 0;
+}
+:global(.auth-panel) {
+  padding: 0.5rem;
+}
+:global(.auth-panel input),
+:global(.auth-panel select),
+:global(.verification-card input) {
+  border-radius: 8px;
+  border: 1px solid #dfe6ee;
+  background: #ffffff;
+}
+:global(.auth-panel .primary-btn),
+:global(.verification-card .primary-btn) {
+  border-radius: 8px;
+  background: #2f73d9;
+  box-shadow: none;
+}
+:global(.auth-panel .secondary-btn),
+:global(.verification-card .secondary-btn) {
+  border-radius: 8px;
+  box-shadow: none;
+}
+:global(.placeholder-art-frame),
+:global(.scene-card) {
+  border-radius: 8px;
+  box-shadow: none;
+}
+:global(.placeholder-art-glow) {
+  display: none;
+}
+:global(.verification-card) {
+  border-radius: 8px;
+}

@@ -7,6 +7,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
+import styles from "./OrdersPage.module.css";
 
 export function OrdersPage() {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ export function OrdersPage() {
   const inTransitCount = useMemo(() => currentOrders.filter((order) => order.status === "in_transit").length, [currentOrders]);
 
   return (
-    <section className="workspace-page ops-page">
+    <section className={`workspace-page ops-page customer-orders-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Customer Orders</p>
@@ -49,13 +50,13 @@ export function OrdersPage() {
         </div>
       </header>
 
-      <div className="customer-workspace-grid">
+      <div className="customer-workspace-grid compact-customer-grid">
         <div className="customer-order-column">
           <SectionCard title="Current Orders" description="Live deliveries that still need attention.">
             {status === "loading" ? (
               <p className="helper-text">Loading current orders from the backend...</p>
             ) : currentOrders.length ? (
-              <div className="order-card-list">
+              <div className="order-card-list compact-order-list">
                 {currentOrders.map((order) => (
                   <article key={order.id} className="order-card current-order-card">
                     <div className="order-card-top">
@@ -72,15 +73,15 @@ export function OrdersPage() {
                       </div>
                     </div>
 
-                    <div className="route-chip-row">
-                      <div className="route-chip">
+                    <div className="customer-card-route" aria-label={`Route for order ${order.id}`}>
+                      <div className="customer-route-stop">
                         <span>P</span>
-                        <strong>{order.pickupLocation}</strong>
+                        <strong title={order.pickupLocation}>{order.pickupLocation}</strong>
                       </div>
                       <i aria-hidden="true"></i>
-                      <div className="route-chip">
+                      <div className="customer-route-stop">
                         <span>D</span>
-                        <strong>{order.destination}</strong>
+                        <strong title={order.destination}>{order.destination}</strong>
                       </div>
                     </div>
 
@@ -110,42 +111,12 @@ export function OrdersPage() {
 
         <aside className="customer-side-stack">
           {featuredOrder ? (
-            <>
-              <RouteMapCard
-                origin={featuredOrder.pickupLocation}
-                destination={featuredOrder.destination}
-                distanceKm={featuredOrder.distanceKm}
-                durationMinutes={featuredOrder.durationMinutes}
-              />
-
-              <section className="ops-insight-card latest-order-card">
-                <div className="order-card-top">
-                  <div>
-                    <p className="card-label">Latest Order</p>
-                    <h2>{featuredOrder.parcelName}</h2>
-                  </div>
-                  <StatusBadge>{featuredOrder.status.replaceAll("_", " ")}</StatusBadge>
-                </div>
-                <div className="route-chip-row compact">
-                  <div className="route-chip">
-                    <span>P</span>
-                    <strong>{featuredOrder.pickupLocation}</strong>
-                  </div>
-                  <i aria-hidden="true"></i>
-                  <div className="route-chip">
-                    <span>D</span>
-                    <strong>{featuredOrder.destination}</strong>
-                  </div>
-                </div>
-                <div className="order-bottom-row">
-                  <div className="order-price-block">
-                    <small>Rider</small>
-                    <strong>{featuredOrder.assignedRider?.email || "Not assigned"}</strong>
-                  </div>
-                  <Link to={`/orders/${featuredOrder.id}`} className="primary-btn compact-order-btn">Track</Link>
-                </div>
-              </section>
-            </>
+            <RouteMapCard
+              origin={featuredOrder.pickupLocation}
+              destination={featuredOrder.destination}
+              distanceKm={featuredOrder.distanceKm}
+              durationMinutes={featuredOrder.durationMinutes}
+            />
           ) : (
             <section className="ops-insight-card">
               <p className="card-label">Tracking</p>
