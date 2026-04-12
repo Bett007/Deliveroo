@@ -101,6 +101,7 @@
   display: grid;
   grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
   gap: 1rem;
+  align-items: start;
   min-height: 0;
   overflow: auto;
   scrollbar-width: thin;
@@ -108,31 +109,34 @@
 :global(.admin-dispatch-side) {
   display: grid;
   gap: 1rem;
+  align-content: start;
+  align-self: start;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
   scrollbar-width: thin;
 }
 :global(.dispatch-map-surface) {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr);
-  gap: 0.75rem;
+  display: block;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 :global(.dispatch-map-surface .route-map-card) {
-  min-height: 0;
-  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  min-height: auto;
+  overflow: visible;
 }
 :global(.dispatch-map-surface .section-header) {
-  margin-bottom: 0.7rem;
+  margin-bottom: 0;
 }
 :global(.dispatch-map-surface .map-meta-grid) {
   display: none;
 }
 :global(.dispatch-map-surface .fake-map),
 :global(.dispatch-map-surface .map-embed) {
-  height: 100%;
-  min-height: 330px;
+  height: clamp(260px, 40vh, 380px);
+  min-height: 0;
 }
 :global(.dispatch-edit-toggle) {
   justify-self: start;
