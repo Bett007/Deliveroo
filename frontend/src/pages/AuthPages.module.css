@@ -1,0 +1,67 @@
+.scope {
+  display: contents;
+}
+
+:global(.auth-page.auth-page-split) {
+  min-height: calc(100vh - 120px);
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  overflow: auto;
+}
+
+:global(.auth-page-split .auth-card.auth-card-wide) {
+  width: min(1180px, calc(100vw - 2.5rem));
+  max-width: 1180px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+:global(.auth-card-wide .auth-content-grid) {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+:global(.auth-card-wide .auth-content-grid.reverse-layout) {
+  grid-template-columns: minmax(360px, 1.1fr) minmax(320px, 0.9fr);
+}
+
+:global(.auth-card-wide .auth-panel) {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.5rem;
+}
+
+:global(.auth-card-wide .placeholder-art) {
+  min-width: 0;
+}
+
+:global(.auth-card-wide .placeholder-art-frame) {
+  min-height: 100%;
+}
+
+@media (max-width: 1024px) {
+  :global(.auth-card-wide .auth-content-grid),
+  :global(.auth-card-wide .auth-content-grid.reverse-layout) {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.auth-card-wide .placeholder-art) {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 640px) {
+  :global(.auth-page.auth-page-split) {
+    padding: 1rem;
+  }
+
+  :global(.auth-page-split .auth-card.auth-card-wide) {
+    width: 100%;
+    padding: 1rem;
+  }
+}

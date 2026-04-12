@@ -7,6 +7,7 @@ import { FormField } from "../components/ui/FormField";
 import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
 import { validateLoginForm } from "../features/auth/authValidators";
+import styles from "./AuthPages.module.css";
 
 function getRoleRoute(role) {
   if (role === "admin") return "/dashboard";
@@ -55,7 +56,7 @@ export function LoginPage() {
   }
 
   return (
-    <section className="auth-page auth-page-split">
+    <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid">
           <div className="auth-panel">

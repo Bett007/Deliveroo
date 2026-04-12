@@ -3,47 +3,14 @@
 }
 
 
-:global(.auth-card),
 :global(.notfound-card) {
   max-width: 520px;
 }
-:global(.auth-header h1),
 :global(.notfound-card h1) {
   margin-bottom: 0.5rem;
 }
-:global(.auth-header p),
 :global(.notfound-card p) {
   margin-bottom: 1.5rem;
-}
-:global(.auth-form) {
-  display: grid;
-  gap: 1rem;
-}
-:global(.form-group) {
-  display: grid;
-  gap: 0.45rem;
-}
-:global(.form-group label) {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-:global(.form-group input),
-:global(.search-input) {
-  width: 100%;
-  padding: 0.95rem 1rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.6);
-  outline: none;
-}
-:global(.form-group input:focus),
-:global(.search-input:focus) {
-  border-color: rgba(30, 200, 255, 0.7);
-  box-shadow: 0 0 0 4px rgba(30, 200, 255, 0.12);
-}
-:global(.auth-footer a) {
-  color: var(--accent-dark);
-  font-weight: 700;
 }
 :global(.notfound-card) {
   text-align: center;
