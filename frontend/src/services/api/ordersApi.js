@@ -5,6 +5,7 @@ function mapOrder(order) {
   const pickupLocation = order.pickup_location ?? {};
   const deliveryLocation = order.delivery_location ?? {};
   const currentLocation = order.current_location ?? {};
+  const assignedRider = order.assigned_rider ?? null;
 
   return {
     id: String(order.id),
@@ -17,12 +18,24 @@ function mapOrder(order) {
     destination: deliveryLocation.address ?? `Location #${order.delivery_location_id}`,
     currentLocationId: order.current_location_id,
     currentLocation: currentLocation.address ?? (order.current_location_id ? `Location #${order.current_location_id}` : "Awaiting rider update"),
+    assignedRiderId: order.assigned_rider_id,
+    assignedRider: assignedRider
+      ? {
+          id: assignedRider.id,
+          email: assignedRider.email,
+          role: assignedRider.role,
+        }
+      : null,
     quotedPrice: order.quoted_price,
     distanceKm: order.distance_km ?? 0,
     durationMinutes: order.estimated_duration_minutes ?? 0,
     status: order.status,
     createdAt: order.created_at,
     updatedAt: order.updated_at,
+    assignedAt: order.assigned_at,
+    pickedUpAt: order.picked_up_at,
+    deliveredAt: order.delivered_at,
+    cancelledAt: order.cancelled_at,
     weightCategory: parcel.weight_category_name ?? `Category #${parcel.weight_category_id ?? ""}`,
     description: parcel.special_instructions ?? parcel.description ?? "",
     parcel: {
@@ -117,6 +130,45 @@ export async function createOrderRequest(token, payload) {
 
 export async function updateOrderDestinationRequest(token, orderId, payload) {
   const response = await apiRequest(`/orders/${orderId}/destination`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function updateOrderStatusRequest(token, orderId, payload) {
+  const response = await apiRequest(`/orders/${orderId}/status`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function updateOrderLocationRequest(token, orderId, payload) {
+  const response = await apiRequest(`/orders/${orderId}/location`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function assignOrderRequest(token, orderId, payload = {}) {
+  const response = await apiRequest(`/orders/${orderId}/assign`, {
     method: "PATCH",
     token,
     body: payload,

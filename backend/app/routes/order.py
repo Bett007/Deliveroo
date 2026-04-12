@@ -1,6 +1,7 @@
 from flask import Blueprint, g, request
 
 from app.services.order_service import (
+    assign_order_to_rider,
     cancel_order,
     create_order,
     get_order,
@@ -10,7 +11,7 @@ from app.services.order_service import (
     admin_update_order_status,
     update_order_destination,
 )
-from app.utils.auth import admin_required, auth_required
+from app.utils.auth import auth_required
 from app.utils.responses import success_response
 
 order_bp = Blueprint("order", __name__)
@@ -82,8 +83,19 @@ def cancel(order_id: int):
     )
 
 
+@order_bp.patch("/<int:order_id>/assign")
+@auth_required
+def assign_rider(order_id: int):
+    payload = request.get_json(silent=True)
+    order = assign_order_to_rider(g.current_user, order_id, payload)
+    return success_response(
+        message="Order rider assignment updated successfully.",
+        data={"order": order},
+    )
+
+
 @order_bp.patch("/<int:order_id>/status")
-@admin_required
+@auth_required
 def update_status(order_id: int):
     payload = request.get_json(silent=True)
     order = admin_update_order_status(g.current_user, order_id, payload)
@@ -94,7 +106,7 @@ def update_status(order_id: int):
 
 
 @order_bp.patch("/<int:order_id>/location")
-@admin_required
+@auth_required
 def update_location(order_id: int):
     payload = request.get_json(silent=True)
     order = admin_update_order_location(g.current_user, order_id, payload)

@@ -1,0 +1,485 @@
+.scope {
+  display: contents;
+}
+
+
+:global(.ops-page),
+:global(.ops-main .workspace-page),
+:global(.ops-main .dashboard-page) {
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: visible;
+}
+:global(.dashboard-page) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+:global(.ops-topbar),
+:global(.ops-main .workspace-hero),
+:global(.ops-main .workspace-panel),
+:global(.ops-main .map-card),
+:global(.summary-card),
+:global(.ops-insight-card) {
+  background: var(--ops-panel);
+  border: 1px solid var(--ops-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:global(.ops-topbar),
+:global(.ops-main .workspace-hero) {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+:global(.ops-topbar h1),
+:global(.ops-main .workspace-hero h1) {
+  color: var(--ops-ink);
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+}
+:global(.ops-main .eyebrow),
+:global(.ops-main .workspace-copy),
+:global(.ops-main .card-label),
+:global(.ops-main .section-header p),
+:global(.ops-main .helper-text),
+:global(.ops-main .order-route),
+:global(.ops-main .summary-card span) {
+  color: var(--ops-muted);
+}
+:global(.ops-main .topbar-actions) {
+  justify-content: flex-end;
+}
+:global(.ops-main .user-chip),
+:global(.ops-main .mini-badge),
+:global(.ops-main .status-badge) {
+  border-radius: 8px;
+}
+:global(.ops-main .user-chip) {
+  background: #eef4fb;
+  color: var(--ops-ink);
+}
+:global(.ops-main .primary-btn),
+:global(.ops-main .secondary-btn),
+:global(.auth-main .primary-btn),
+:global(.auth-main .secondary-btn) {
+  border-radius: 8px;
+  box-shadow: none;
+}
+:global(.ops-main .primary-btn) {
+  background: var(--ops-blue);
+  color: #ffffff;
+}
+:global(.ops-main .secondary-btn) {
+  background: #ffffff;
+  border: 1px solid var(--ops-border);
+  color: var(--ops-ink);
+}
+:global(.ops-main .primary-btn:hover),
+:global(.ops-main .secondary-btn:hover) {
+  transform: none;
+  filter: brightness(0.98);
+}
+:global(.ops-summary-grid) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 0;
+}
+:global(.ops-summary-grid:has(.admin-action-icon)) {
+  gap: 0.75rem;
+}
+:global(.ops-summary-grid .summary-card) {
+  min-height: 104px;
+  padding: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+:global(.ops-summary-grid .summary-card h3) {
+  color: var(--ops-ink);
+  font-size: 1.7rem;
+}
+:global(.summary-icon),
+:global(.delivery-icon),
+:global(.delivery-ownership span) {
+  width: 42px;
+  height: 42px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: rgba(45, 130, 210, 0.12);
+  color: var(--ops-blue);
+  font-weight: 800;
+}
+:global(.ops-dashboard-grid),
+:global(.customer-workspace-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+:global(.rider-workspace-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 1rem;
+  align-items: start;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+:global(.rider-stats-strip) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+:global(.customer-stats-strip) {
+  align-items: center;
+}
+:global(.rider-stats-strip span) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  background: #eef4fb;
+  color: var(--ops-muted);
+  font-weight: 700;
+}
+:global(.rider-stats-strip strong) {
+  color: var(--ops-ink);
+  font-size: 1.05rem;
+}
+:global(.customer-order-column),
+:global(.customer-side-stack),
+:global(.ops-side-stack),
+:global(.rider-order-column),
+:global(.rider-side-stack) {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  min-height: 0;
+  overflow: hidden;
+  scrollbar-width: thin;
+}
+:global(.ops-main .workspace-panel),
+:global(.ops-main .map-card),
+:global(.ops-insight-card) {
+  padding: 1rem;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+:global(.ops-main .order-card),
+:global(.ops-main .feature-item),
+:global(.ops-main .notification-item),
+:global(.ops-main .map-meta-card) {
+  border-radius: 8px;
+  background: #f7f9fb;
+  border: 1px solid var(--ops-border);
+}
+:global(.ops-main .orders-table) {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px;
+}
+:global(.ops-main .orders-table th),
+:global(.ops-main .orders-table td) {
+  border-bottom: 1px solid var(--ops-border);
+  padding: 0.85rem 0.75rem;
+  vertical-align: middle;
+}
+:global(.ops-main .orders-table th) {
+  background: #f7f9fb;
+  color: var(--ops-muted);
+}
+:global(.ops-main .status-badge),
+:global(.ops-main .mini-badge) {
+  background: rgba(40, 184, 168, 0.13);
+  color: #0f786f;
+}
+:global(.ops-main .inline-link) {
+  color: var(--ops-blue);
+}
+:global(.ops-main .fake-map),
+:global(.ops-main .map-embed) {
+  border-radius: 8px;
+}
+:global(.ops-main .fake-map) {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.64)),
+    repeating-linear-gradient(0deg, #dce5ee 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(90deg, #dce5ee 0 1px, transparent 1px 34px),
+    #eef3f7;
+  border: 1px solid var(--ops-border);
+}
+:global(.ops-main .map-route-line) {
+  height: 5px;
+  background: var(--ops-blue);
+}
+:global(.ops-main .map-stop) {
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(20, 35, 55, 0.12);
+}
+:global(.ops-insight-card) {
+  display: grid;
+  gap: 0.9rem;
+}
+:global(.ops-main input),
+:global(.ops-main textarea),
+:global(.ops-main select),
+:global(.ops-main .form-select),
+:global(.ops-main .form-textarea) {
+  border-radius: 8px;
+  border-color: var(--ops-border);
+  background: #ffffff;
+}
+:global(.ops-main .danger-btn) {
+  background: #d84a5f;
+}
+:global(.order-icon) {
+  width: 42px;
+  height: 42px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(40, 184, 168, 0.14);
+  color: #0f786f;
+  font-weight: 800;
+}
+:global(.single-screen-grid),
+:global(.ops-main .workspace-grid) {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+:global(.single-screen-grid) {
+  display: grid;
+}
+:global(.ops-main .workspace-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 0;
+}
+:global(.helper-text.compact) {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+@media (max-height: 760px) {
+  :global(.ops-main) {
+    padding: 0.85rem;
+  }
+
+  :global(.ops-page),
+  :global(.ops-main .workspace-page),
+  :global(.ops-main .dashboard-page) {
+    gap: 0.7rem;
+  }
+
+  :global(.ops-topbar),
+  :global(.ops-main .workspace-hero) {
+    padding: 0.8rem;
+  }
+
+  :global(.ops-main .workspace-copy) {
+    display: none;
+  }
+
+  :global(.ops-summary-grid) {
+    grid-template-columns: repeat(3, minmax(112px, 1fr));
+    gap: 0.65rem;
+  }
+
+  :global(.ops-summary-grid .summary-card) {
+    min-height: 82px;
+    padding: 0.7rem;
+  }
+
+  :global(.summary-icon),
+  :global(.delivery-icon),
+  :global(.delivery-ownership span) {
+    width: 34px;
+    height: 34px;
+  }
+
+  :global(.ops-summary-grid .summary-card h3) {
+    font-size: 1.35rem;
+    margin-bottom: 0.1rem;
+  }
+
+  :global(.admin-home-tile),
+  :global(.admin-action-icon),
+  :global(.admin-stat-panel) {
+    min-height: 104px;
+    padding: 0.8rem;
+  }
+
+  :global(.admin-stat-accordion) {
+    gap: 0.65rem;
+  }
+
+  :global(.admin-stat-main strong) {
+    font-size: 1.45rem;
+  }
+
+  :global(.dispatch-map-surface .fake-map),
+  :global(.dispatch-map-surface .map-embed) {
+    min-height: 240px;
+  }
+
+  :global(.dispatch-controls-popover) {
+    max-height: min(42vh, 300px);
+  }
+}
+
+@media (max-height: 640px) {
+  :global(.dashboard-page) {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  :global(.admin-stat-detail span) {
+    display: none;
+  }
+}
+
+@media (max-width: 1320px) {
+  :global(.ops-summary-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  :global(.admin-home-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :global(.admin-stat-panel.expanded) {
+    flex: 1.8 1 0;
+  }
+}
+
+@media (max-width: 1120px) {
+  :global(.ops-shell) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  :global(.ops-sidebar) {
+    height: auto;
+    min-height: auto;
+    grid-template-rows: auto auto auto;
+    gap: 0.75rem;
+  }
+
+  :global(.ops-nav) {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  }
+
+  :global(.ops-sidebar-copy),
+  :global(.ops-sidebar-footer) {
+    display: none;
+  }
+
+  :global(.ops-main) {
+    height: auto;
+    min-height: 0;
+  }
+
+  :global(.ops-dashboard-grid),
+  :global(.customer-workspace-grid),
+  :global(.rider-workspace-grid),
+  :global(.admin-dispatch-grid),
+  :global(.ops-summary-grid),
+  :global(.admin-home-grid),
+  :global(.profile-grid),
+  :global(.create-order-grid),
+  :global(.order-details-grid),
+  :global(.ops-main .workspace-grid) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  :global(.ops-main) {
+    padding: 1rem;
+  }
+
+  :global(.ops-topbar),
+  :global(.ops-main .workspace-hero),
+  :global(.ops-main .topbar-actions) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :global(.ops-main .workspace-copy),
+  :global(.ops-main .section-header p) {
+    display: none;
+  }
+
+  :global(.rider-stats-strip) {
+    justify-content: stretch;
+  }
+
+  :global(.rider-stats-strip span) {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  :global(.ops-nav),
+  :global(.order-detail-list),
+  :global(.delivery-progress),
+  :global(.mini-route),
+  :global(.route-chip-row),
+  :global(.order-bottom-row),
+  :global(.history-card),
+  :global(.admin-queue-card),
+  :global(.admin-order-item),
+  :global(.admin-home-tile),
+  :global(.admin-action-icon),
+  :global(.admin-stat-panel),
+  :global(.admin-stat-panel.expanded),
+  :global(.admin-order-select),
+  :global(.rider-delivery-select),
+  :global(.profile-facts),
+  :global(.dispatch-control-summary),
+  :global(.dispatch-control-grid),
+  :global(.dispatch-mini-facts) {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.admin-stat-accordion) {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  :global(.mini-route i) {
+    width: 2px;
+    height: 22px;
+  }
+
+  :global(.route-chip-row i) {
+    width: 2px;
+    height: 22px;
+    margin-left: 17px;
+  }
+
+  :global(.order-status-stack),
+  :global(.history-card),
+  :global(.admin-queue-card),
+  :global(.admin-order-item),
+  :global(.rider-delivery-item),
+  :global(.admin-queue-meta) {
+    justify-items: start;
+  }
+
+  :global(.dispatch-edit-toggle) {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}

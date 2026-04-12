@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000/api").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001/api").replace(/\/$/, "");
 const REQUEST_TIMEOUT_MS = 15000;
 
 function isLocalApiUrl(url) {
@@ -67,7 +67,7 @@ export async function apiRequest(path, options = {}) {
 
     throw {
       status: 0,
-      message: "Unable to reach the backend. Please confirm the backend is running and accessible from the deployed frontend.",
+      message: `Unable to reach the backend at ${API_BASE_URL}. Please confirm the API server is running.`,
       errors: {},
     };
   }

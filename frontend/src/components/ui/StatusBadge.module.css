@@ -1,0 +1,17 @@
+.scope {
+  display: contents;
+}
+
+
+:global(.status-badge),
+:global(.mini-badge) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(30, 200, 255, 0.18);
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-size: 0.8rem;
+}

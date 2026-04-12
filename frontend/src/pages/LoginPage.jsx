@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
 import { validateLoginForm } from "../features/auth/authValidators";
+import styles from "./AuthPages.module.css";
+
+function getRoleRoute(role) {
+  if (role === "admin") return "/dashboard";
+  if (role === "rider") return "/rider";
+  return "/orders";
+}
 
 export function LoginPage() {
   const dispatch = useDispatch();
@@ -19,13 +27,23 @@ export function LoginPage() {
     dispatch(clearAuthError());
   }, [dispatch]);
 
+    if (user) {
+      navigate(getRoleRoute(user.role), { replace: true });
+>>>>>>> dev
+    }
+  }, [navigate, user]);
+
+=======
   useEffect(() => {
-    if (user?.role === "admin") {
-      navigate("/admin/dashboard", { replace: true });
-    } else if (user?.role === "rider") {
-      navigate("/rider/dashboard", { replace: true });
-    } else if (user) {
-      navigate("/dashboard", { replace: true });
+    if (user) {
+      navigate(getRoleRoute(user.role), { replace: true });
+    }
+  }, [navigate, user]);
+
+=======
+    if (user) {
+      navigate(getRoleRoute(user.role), { replace: true });
+>>>>>>> dev
     }
   }, [navigate, user]);
 
@@ -44,29 +62,35 @@ export function LoginPage() {
       return;
     }
 
+      navigate(getRoleRoute(result.payload.user.role), { replace: true });
+>>>>>>> dev
+    }
+  }
+
+=======
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
-      const role = result.payload.user.role;
-      if (role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "rider") {
-        navigate("/rider/dashboard", { replace: true });
-      } else {
-        navigate("/dashboard", { replace: true });
-      }
+      navigate(getRoleRoute(result.payload.user.role), { replace: true });
+    }
+  }
+
+=======
+      navigate(getRoleRoute(result.payload.user.role), { replace: true });
+>>>>>>> dev
     }
   }
 
   return (
-    <section className="auth-page auth-page-split">
+    <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid">
           <div className="auth-panel">
+            <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
             <div className="auth-header">
               <p className="eyebrow">Sign In First</p>
-              <h1>Access your role-specific workspace</h1>
-              <p>Admins go to the operations portal. Customers and riders go to the parcel workspace.</p>
+              <h1>Welcome back</h1>
+              <p>One sign-in, the right workspace.</p>
               {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
               {error ? <p className="form-status error">{error}</p> : null}
             </div>
@@ -90,9 +114,9 @@ export function LoginPage() {
 
           <PlaceholderArtwork
             variant="auth"
-            label="Auth Preview"
-            title="A clean sign-in surface ready for real photography"
-            caption="This placeholder block can later hold branded delivery photography, rider portraits, or onboarding illustrations."
+            label="Fast Access"
+            title="Dispatch, delivery, and tracking in one place"
+            caption="Sign in to continue from the exact role your account belongs to."
           />
         </div>
       </div>

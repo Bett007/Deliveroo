@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models import User
 from app.utils.validators import (
     validate_login_payload,
+    validate_profile_payload,
     validate_registration_payload,
     validate_verification_payload,
     validate_verification_resend_payload,
@@ -126,6 +127,18 @@ def resend_verification_code(payload: Optional[dict] = None) -> User:
         )
 
     _refresh_verification_code(user)
+    db.session.commit()
+
+    return user
+
+
+def update_user_profile(user: User, payload: Optional[dict] = None) -> User:
+    data = validate_profile_payload(payload)
+
+    user.first_name = data["first_name"]
+    user.last_name = data["last_name"]
+    user.phone = data["phone"]
+    user.avatar_url = data["avatar_url"]
     db.session.commit()
 
     return user

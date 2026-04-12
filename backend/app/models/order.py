@@ -12,10 +12,15 @@ class Order(db.Model):
     pickup_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=False, index=True)
     delivery_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=False, index=True)
     current_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True, index=True)
+    assigned_rider_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
     quoted_price = db.Column(db.Numeric(10, 2), nullable=False)
     distance_km = db.Column(db.Numeric(10, 2), nullable=True)
     estimated_duration_minutes = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(30), nullable=False, default="pending")
+    assigned_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    picked_up_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    delivered_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    cancelled_at = db.Column(db.DateTime(timezone=True), nullable=True)
     created_at = db.Column(
         db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
@@ -23,7 +28,8 @@ class Order(db.Model):
         db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
-    user = db.relationship("User", back_populates="orders")
+    user = db.relationship("User", back_populates="orders", foreign_keys=[user_id])
+    assigned_rider = db.relationship("User", foreign_keys=[assigned_rider_id])
     parcel = db.relationship("Parcel", back_populates="orders")
     pickup_location = db.relationship("Location", foreign_keys=[pickup_location_id])
     delivery_location = db.relationship("Location", foreign_keys=[delivery_location_id])
@@ -38,6 +44,7 @@ class Order(db.Model):
             "pickup_location_id": self.pickup_location_id,
             "delivery_location_id": self.delivery_location_id,
             "current_location_id": self.current_location_id,
+            "assigned_rider_id": self.assigned_rider_id,
             "quoted_price": float(self.quoted_price),
             "distance_km": float(self.distance_km) if self.distance_km is not None else None,
             "estimated_duration_minutes": self.estimated_duration_minutes,
@@ -46,6 +53,11 @@ class Order(db.Model):
             "pickup_location": self.pickup_location.to_dict() if self.pickup_location else None,
             "delivery_location": self.delivery_location.to_dict() if self.delivery_location else None,
             "current_location": self.current_location.to_dict() if self.current_location else None,
+            "assigned_rider": self.assigned_rider.to_dict() if self.assigned_rider else None,
+            "assigned_at": self.assigned_at.isoformat() if self.assigned_at else None,
+            "picked_up_at": self.picked_up_at.isoformat() if self.picked_up_at else None,
+            "delivered_at": self.delivered_at.isoformat() if self.delivered_at else None,
+            "cancelled_at": self.cancelled_at.isoformat() if self.cancelled_at else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

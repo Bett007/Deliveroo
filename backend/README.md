@@ -16,6 +16,14 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
+If `python` is not found because of `pyenv`, set and verify your global version first:
+
+```bash
+pyenv global 3.10.14
+python --version
+which python
+```
+
 ## Install Dependencies
 
 ```bash
@@ -118,9 +126,19 @@ Current implemented endpoints:
 
 - `GET /api/health`
 - `POST /api/auth/register`
+- `POST /api/auth/verify`
+- `POST /api/auth/resend-verification`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `GET /api/auth/admin-check`
+- `GET /api/orders/`
+- `POST /api/orders/`
+- `GET /api/orders/<order_id>`
+- `PATCH /api/orders/<order_id>/destination`
+- `PATCH /api/orders/<order_id>/cancel`
+- `PATCH /api/orders/<order_id>/status`
+- `PATCH /api/orders/<order_id>/location`
+- `GET /api/tracking/<order_id>`
 - `GET /api/docs/swagger.json`
 
 ## Render Notes
@@ -173,8 +191,11 @@ The backend currently includes:
 - Flask app factory setup
 - Flask-SQLAlchemy and Flask-Migrate wiring
 - CORS setup for the frontend
-- one health-check route
-- one basic pytest test
+- role-based auth and JWT protection
+- email verification demo endpoints
+- orders and tracking endpoints
+- Swagger JSON docs endpoint
+- pytest setup for backend tests
 
 ## Auth API Reference
 

@@ -1,0 +1,23 @@
+.scope {
+  display: contents;
+}
+
+
+:global(.notfound-card) {
+  max-width: 520px;
+}
+:global(.notfound-card h1) {
+  margin-bottom: 0.5rem;
+}
+:global(.notfound-card p) {
+  margin-bottom: 1.5rem;
+}
+:global(.notfound-card) {
+  text-align: center;
+}
+:global(.notfound-card h1) {
+  font-size: 4rem;
+}
+:global(.notfound-card h2) {
+  margin-bottom: 0.75rem;
+}
