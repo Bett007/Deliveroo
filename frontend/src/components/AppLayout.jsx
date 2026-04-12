@@ -4,8 +4,8 @@ import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
-import "../pages/OpsShared.module.css";
-import "./AppLayout.module.css";
+import opsSharedStyles from "../pages/OpsShared.module.css";
+import styles from "./AppLayout.module.css";
 
 function NavIcon({ name }) {
   const icons = {
@@ -160,7 +160,7 @@ export function AppLayout() {
 
   if (!isAuthenticated) {
     return (
-      <div className="app-shell auth-shell">
+      <div className={`app-shell auth-shell ${styles.scope}`}>
         {isAuthRoute ? <AuthHeader /> : null}
         <main className="main-content auth-main">
           <Outlet />
@@ -190,7 +190,7 @@ export function AppLayout() {
         ];
 
   return (
-    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}>
+    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"} ${styles.scope} ${opsSharedStyles.scope}`}>
       <RoleSidebar
         title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
         subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}

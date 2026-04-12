@@ -7,7 +7,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
-import "./OrdersPage.module.css";
+import styles from "./OrdersPage.module.css";
 
 export function OrdersPage() {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ export function OrdersPage() {
   const inTransitCount = useMemo(() => currentOrders.filter((order) => order.status === "in_transit").length, [currentOrders]);
 
   return (
-    <section className="workspace-page ops-page">
+    <section className={`workspace-page ops-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Customer Orders</p>

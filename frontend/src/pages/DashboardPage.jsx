@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../features/orders/ordersSlice";
-import "./DashboardPage.module.css";
+import styles from "./DashboardPage.module.css";
 
 export function DashboardPage() {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export function DashboardPage() {
   }, [currentOrders, orderHistory]);
 
   return (
-    <section className="dashboard-page ops-page">
+    <section className={`dashboard-page ops-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Admin Dashboard</p>

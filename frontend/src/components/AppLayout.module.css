@@ -1,6 +1,10 @@
-:global {
+.scope {
+  display: contents;
+}
+
+
 /* Remediation pass: authenticated app shell and dashboard surfaces. */
-.ops-shell {
+:global(.ops-shell) {
   --ops-bg: #f3f6f9;
   --ops-panel: #ffffff;
   --ops-ink: #182233;
@@ -20,13 +24,11 @@
   background: var(--ops-bg);
   color: var(--ops-ink);
 }
-
-.ops-shell.admin-shell,
-.ops-shell.customer-shell {
+:global(.ops-shell.admin-shell),
+:global(.ops-shell.customer-shell) {
   background: var(--ops-bg);
 }
-
-.ops-sidebar {
+:global(.ops-sidebar) {
   min-height: 0;
   height: 100dvh;
   padding: 1.15rem 1rem;
@@ -36,22 +38,19 @@
   grid-template-rows: auto auto 1fr auto;
   gap: 1.25rem;
 }
-
-.ops-brand-block,
-.ops-nav-link,
-.ops-sidebar-footer,
-.ops-logout-btn {
+:global(.ops-brand-block),
+:global(.ops-nav-link),
+:global(.ops-sidebar-footer),
+:global(.ops-logout-btn) {
   border-radius: 8px;
 }
-
-.ops-brand-block {
+:global(.ops-brand-block) {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.65rem;
 }
-
-.ops-brand-mark {
+:global(.ops-brand-mark) {
   width: 38px;
   height: 38px;
   border-radius: 8px;
@@ -61,56 +60,47 @@
   color: #062c34;
   font-weight: 900;
 }
-
-.ops-brand-logo,
-.auth-header-logo {
+:global(.ops-brand-logo),
+:global(.auth-header-logo) {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
   object-fit: contain;
 }
-
-.ops-brand-logo {
+:global(.ops-brand-logo) {
   border-radius: 8px;
   background: #ffffff;
 }
-
-.auth-form-logo {
+:global(.auth-form-logo) {
   width: min(210px, 100%);
   height: auto;
   object-fit: contain;
   margin-bottom: 0.25rem;
 }
-
-.ops-brand-block p,
-.ops-sidebar-copy h2,
-.ops-sidebar-footer span {
+:global(.ops-brand-block p),
+:global(.ops-sidebar-copy h2),
+:global(.ops-sidebar-footer span) {
   color: rgba(255, 255, 255, 0.68);
 }
-
-.ops-brand-block strong {
+:global(.ops-brand-block strong) {
   display: block;
   margin-top: 0.15rem;
   color: #ffffff;
 }
-
-.ops-sidebar-copy {
+:global(.ops-sidebar-copy) {
   padding: 0 0.65rem;
 }
-
-.ops-sidebar-copy h2 {
+:global(.ops-sidebar-copy h2) {
   font-size: 0.95rem;
   line-height: 1.5;
 }
-
-.ops-nav {
+:global(.ops-nav) {
   display: grid;
   align-content: start;
   gap: 0.35rem;
 }
-
-.ops-nav-link,
-.ops-logout-btn {
+:global(.ops-nav-link),
+:global(.ops-logout-btn) {
   width: 100%;
   min-height: 42px;
   display: flex;
@@ -122,30 +112,26 @@
   font-weight: 700;
   text-align: left;
 }
-
-.ops-nav-link:hover,
-.ops-nav-link.active,
-.ops-logout-btn:hover {
+:global(.ops-nav-link:hover),
+:global(.ops-nav-link.active),
+:global(.ops-logout-btn:hover) {
   background: var(--ops-sidebar-active);
   color: #ffffff;
 }
-
-.ops-sidebar-footer {
+:global(.ops-sidebar-footer) {
   display: grid;
   gap: 0.65rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.08);
   min-width: 0;
 }
-
-.ops-sidebar-footer span {
+:global(.ops-sidebar-footer span) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.86rem;
 }
-
-.ops-main {
+:global(.ops-main) {
   min-width: 0;
   min-height: 0;
   height: 100dvh;
@@ -154,23 +140,20 @@
   background: var(--ops-bg);
   scrollbar-width: thin;
 }
-
-.ops-main .dashboard-page,
-.ops-main .workspace-page,
-.ops-main .help-page {
+:global(.ops-main .dashboard-page),
+:global(.ops-main .workspace-page),
+:global(.ops-main .help-page) {
   width: min(1380px, 100%);
   height: 100%;
   min-height: 0;
   margin: 0 auto;
   padding: 0;
 }
-
-.auth-shell {
+:global(.auth-shell) {
   background: #f3f6f9;
 }
-
-.auth-portal-inner,
-.auth-card {
+:global(.auth-portal-inner),
+:global(.auth-card) {
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #dfe6ee;
@@ -178,56 +161,45 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-
-.auth-portal-inner {
+:global(.auth-portal-inner) {
   grid-template-columns: 1fr auto;
 }
-
-.auth-page {
+:global(.auth-page) {
   padding: 1.25rem;
 }
-
-.auth-content-grid,
-.reverse-layout {
+:global(.auth-content-grid),
+:global(.reverse-layout) {
   gap: 0;
 }
-
-.auth-panel {
+:global(.auth-panel) {
   padding: 0.5rem;
 }
-
-.auth-panel input,
-.auth-panel select,
-.verification-card input {
+:global(.auth-panel input),
+:global(.auth-panel select),
+:global(.verification-card input) {
   border-radius: 8px;
   border: 1px solid #dfe6ee;
   background: #ffffff;
 }
-
-.auth-panel .primary-btn,
-.verification-card .primary-btn {
+:global(.auth-panel .primary-btn),
+:global(.verification-card .primary-btn) {
   border-radius: 8px;
   background: #2f73d9;
   box-shadow: none;
 }
-
-.auth-panel .secondary-btn,
-.verification-card .secondary-btn {
+:global(.auth-panel .secondary-btn),
+:global(.verification-card .secondary-btn) {
   border-radius: 8px;
   box-shadow: none;
 }
-
-.placeholder-art-frame,
-.scene-card {
+:global(.placeholder-art-frame),
+:global(.scene-card) {
   border-radius: 8px;
   box-shadow: none;
 }
-
-.placeholder-art-glow {
+:global(.placeholder-art-glow) {
   display: none;
 }
-
-.verification-card {
+:global(.verification-card) {
   border-radius: 8px;
-}
 }

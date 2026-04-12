@@ -1,8 +1,8 @@
-import "./PlaceholderArtwork.module.css";
+import styles from "./PlaceholderArtwork.module.css";
 
 export function PlaceholderArtwork({ variant = "customer", label = "Preview", title, caption }) {
   return (
-    <aside className={`placeholder-art placeholder-art-${variant}`} aria-label={label}>
+    <aside className={`placeholder-art placeholder-art-${variant} ${styles.scope}`} aria-label={label}>
       <div className="placeholder-art-glow"></div>
       <div className="placeholder-art-frame glass-card">
         <div className="placeholder-art-hero">

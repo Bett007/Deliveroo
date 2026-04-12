@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, updateProfile } from "../features/auth/authSlice";
-import "./ProfilePage.module.css";
+import styles from "./ProfilePage.module.css";
 
 function getInitials(user) {
   const first = user?.first_name?.trim()?.[0];
@@ -62,7 +62,7 @@ export function ProfilePage() {
   }
 
   return (
-    <section className="workspace-page ops-page profile-page">
+    <section className={`workspace-page ops-page profile-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Profile</p>

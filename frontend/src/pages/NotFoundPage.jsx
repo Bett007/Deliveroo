@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import "./NotFoundPage.module.css";
+import styles from "./NotFoundPage.module.css";
 
 export function NotFoundPage() {
   return (
-    <section className="notfound-page">
+    <section className={`notfound-page ${styles.scope}`}>
       <div className="glass-card notfound-card">
         <h1>404</h1>
         <h2>Page Not Found</h2>

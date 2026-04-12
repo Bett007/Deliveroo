@@ -1,36 +1,34 @@
-:global {
-.auth-card,
-.notfound-card {
+.scope {
+  display: contents;
+}
+
+
+:global(.auth-card),
+:global(.notfound-card) {
   max-width: 520px;
 }
-
-.auth-header h1,
-.notfound-card h1 {
+:global(.auth-header h1),
+:global(.notfound-card h1) {
   margin-bottom: 0.5rem;
 }
-
-.auth-header p,
-.notfound-card p {
+:global(.auth-header p),
+:global(.notfound-card p) {
   margin-bottom: 1.5rem;
 }
-
-.auth-form {
+:global(.auth-form) {
   display: grid;
   gap: 1rem;
 }
-
-.form-group {
+:global(.form-group) {
   display: grid;
   gap: 0.45rem;
 }
-
-.form-group label {
+:global(.form-group label) {
   font-weight: 600;
   font-size: 0.95rem;
 }
-
-.form-group input,
-.search-input {
+:global(.form-group input),
+:global(.search-input) {
   width: 100%;
   padding: 0.95rem 1rem;
   border-radius: 16px;
@@ -38,27 +36,21 @@
   background: rgba(255, 255, 255, 0.6);
   outline: none;
 }
-
-.form-group input:focus,
-.search-input:focus {
+:global(.form-group input:focus),
+:global(.search-input:focus) {
   border-color: rgba(30, 200, 255, 0.7);
   box-shadow: 0 0 0 4px rgba(30, 200, 255, 0.12);
 }
-
-.auth-footer a {
+:global(.auth-footer a) {
   color: var(--accent-dark);
   font-weight: 700;
 }
-
-.notfound-card {
+:global(.notfound-card) {
   text-align: center;
 }
-
-.notfound-card h1 {
+:global(.notfound-card h1) {
   font-size: 4rem;
 }
-
-.notfound-card h2 {
+:global(.notfound-card h2) {
   margin-bottom: 0.75rem;
-}
 }

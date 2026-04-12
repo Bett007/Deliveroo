@@ -1,10 +1,13 @@
-:global {
-.help-item {
+.scope {
+  display: contents;
+}
+
+
+:global(.help-item) {
   position: relative;
   padding-left: 4rem;
 }
-
-.help-icon {
+:global(.help-icon) {
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -16,5 +19,4 @@
   background: rgba(45, 130, 210, 0.12);
   color: var(--ops-blue);
   font-weight: 800;
-}
 }
