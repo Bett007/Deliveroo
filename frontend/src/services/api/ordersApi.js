@@ -1,27 +1,52 @@
 import { apiRequest } from "./client";
 
-function normalizeOrder(order) {
+function mapOrder(order) {
+  const parcel = order.parcel ?? {};
+  const pickupLocation = order.pickup_location ?? {};
+  const deliveryLocation = order.delivery_location ?? {};
+  const currentLocation = order.current_location ?? {};
+  const assignedRider = order.assigned_rider ?? null;
+
   return {
-    id: order.id,
+    id: String(order.id),
+    backendId: order.id,
     parcelId: order.parcel_id,
-    parcelName: order.parcel_id ? `Parcel #${order.parcel_id}` : `Order #${order.id}`,
+    parcelName: parcel.description ?? `Order ${order.id}`,
     pickupLocationId: order.pickup_location_id,
-    pickupLocation: order.pickup_location_id ? `Location #${order.pickup_location_id}` : "Unassigned",
+    pickupLocation: pickupLocation.address ?? `Location #${order.pickup_location_id}`,
     deliveryLocationId: order.delivery_location_id,
-    destination: order.delivery_location_id ? `Location #${order.delivery_location_id}` : "Unassigned",
+    destination: deliveryLocation.address ?? `Location #${order.delivery_location_id}`,
     currentLocationId: order.current_location_id,
-    currentLocation: order.current_location_id ? `Location #${order.current_location_id}` : "Awaiting rider update",
+    currentLocation: currentLocation.address ?? (order.current_location_id ? `Location #${order.current_location_id}` : "Awaiting rider update"),
+    assignedRiderId: order.assigned_rider_id,
+    assignedRider: assignedRider
+      ? {
+          id: assignedRider.id,
+          email: assignedRider.email,
+          role: assignedRider.role,
+        }
+      : null,
     quotedPrice: order.quoted_price,
-    distanceKm: order.distance_km,
-    durationMinutes: order.estimated_duration_minutes,
+    distanceKm: order.distance_km ?? 0,
+    durationMinutes: order.estimated_duration_minutes ?? 0,
     status: order.status,
     createdAt: order.created_at,
     updatedAt: order.updated_at,
-    description: order.parcel_id ? `Parcel record #${order.parcel_id} is attached to this order.` : "Parcel details are available after creation.",
+    assignedAt: order.assigned_at,
+    pickedUpAt: order.picked_up_at,
+    deliveredAt: order.delivered_at,
+    cancelledAt: order.cancelled_at,
+    weightCategory: parcel.weight_category_name ?? `Category #${parcel.weight_category_id ?? ""}`,
+    description: parcel.special_instructions ?? parcel.description ?? "",
+    parcel: {
+      ...parcel,
+      specialInstructions: parcel.special_instructions ?? null,
+      weightCategoryName: parcel.weight_category_name ?? null,
+    },
   };
 }
 
-function normalizeTrackingUpdate(update) {
+function mapTrackingUpdate(update) {
   return {
     id: update.id,
     status: update.status,
@@ -32,11 +57,28 @@ function normalizeTrackingUpdate(update) {
   };
 }
 
+function splitOrders(orders) {
+  return orders.reduce(
+    (groups, order) => {
+      if (["delivered", "cancelled"].includes(order.status)) {
+        groups.orderHistory.push(order);
+      } else {
+        groups.currentOrders.push(order);
+      }
+
+      return groups;
+    },
+    { currentOrders: [], orderHistory: [] },
+  );
+}
+
 export async function listOrders(token, { page = 1, limit = 20 } = {}) {
-  const response = await apiRequest(`/orders?page=${page}&limit=${limit}`, { token });
+  const response = await apiRequest(`/orders/?page=${page}&limit=${limit}`, { token });
+  const items = (response.data.items || []).map(mapOrder);
 
   return {
-    items: (response.data.items || []).map(normalizeOrder),
+    items,
+    ...splitOrders(items),
     page: response.data.page,
     limit: response.data.limit,
     total: response.data.total,
@@ -48,8 +90,28 @@ export async function getOrderRequest(token, orderId) {
   const response = await apiRequest(`/orders/${orderId}`, { token });
 
   return {
-    order: normalizeOrder(response.data.order),
+    order: mapOrder(response.data.order),
     message: response.message,
+  };
+}
+
+export async function fetchOrderReferenceData(token) {
+  const response = await apiRequest("/orders/reference-data", { token });
+
+  return {
+    locations: response.data.locations.map((location) => ({
+      id: location.id,
+      label: `${location.address}${location.city ? `, ${location.city}` : ""}`,
+      city: location.city,
+      country: location.country,
+    })),
+    weightCategories: response.data.weight_categories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      minWeight: category.min_weight,
+      maxWeight: category.max_weight,
+      basePrice: category.base_price,
+    })),
   };
 }
 
@@ -61,7 +123,7 @@ export async function createOrderRequest(token, payload) {
   });
 
   return {
-    order: normalizeOrder(response.data.order),
+    order: mapOrder(response.data.order),
     message: response.message,
   };
 }
@@ -74,12 +136,51 @@ export async function updateOrderDestinationRequest(token, orderId, payload) {
   });
 
   return {
-    order: normalizeOrder(response.data.order),
+    order: mapOrder(response.data.order),
     message: response.message,
   };
 }
 
-export async function cancelOrderRequest(token, orderId, payload) {
+export async function updateOrderStatusRequest(token, orderId, payload) {
+  const response = await apiRequest(`/orders/${orderId}/status`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function updateOrderLocationRequest(token, orderId, payload) {
+  const response = await apiRequest(`/orders/${orderId}/location`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function assignOrderRequest(token, orderId, payload = {}) {
+  const response = await apiRequest(`/orders/${orderId}/assign`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+
+  return {
+    order: mapOrder(response.data.order),
+    message: response.message,
+  };
+}
+
+export async function cancelOrderRequest(token, orderId, payload = {}) {
   const response = await apiRequest(`/orders/${orderId}/cancel`, {
     method: "PATCH",
     token,
@@ -87,7 +188,7 @@ export async function cancelOrderRequest(token, orderId, payload) {
   });
 
   return {
-    order: normalizeOrder(response.data.order),
+    order: mapOrder(response.data.order),
     message: response.message,
   };
 }
@@ -96,7 +197,7 @@ export async function listTrackingUpdatesRequest(token, orderId) {
   const response = await apiRequest(`/tracking/${orderId}`, { token });
 
   return {
-    updates: (response.data.updates || []).map(normalizeTrackingUpdate),
+    updates: (response.data.updates || []).map(mapTrackingUpdate),
     message: response.message,
   };
 }

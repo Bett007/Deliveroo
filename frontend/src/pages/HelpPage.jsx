@@ -1,15 +1,22 @@
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
+import styles from "./HelpPage.module.css";
+
 const helpTopics = [
   {
+    icon: "D",
     title: "Order delays",
-    description: "Share your order number, expected destination, and what changed so the team can investigate faster.",
+    description: "Order number, destination, current status.",
   },
   {
+    icon: "A",
     title: "Account and access issues",
-    description: "Tell us whether the issue affects sign in, registration, or account verification so we route it correctly.",
+    description: "Email, role, sign-in or verification step.",
   },
   {
+    icon: "B",
     title: "Billing or parcel concerns",
-    description: "Include the parcel ID, charge details, and a short summary of the issue in your email.",
+    description: "Parcel ID, charge details, short summary.",
   },
 ];
 
@@ -19,38 +26,65 @@ const faqItems = [
   "For urgent delivery problems, mention the current status and destination in the first sentence.",
 ];
 
+const roleCopy = {
+  customer: {
+    heading: "Get support faster",
+    subtitle: "Parcel, account, and billing help in one place.",
+    chip: "Customer queue",
+  },
+  rider: {
+    heading: "Rider support center",
+    subtitle: "Route, assignment, and account help in one place.",
+    chip: "Rider queue",
+  },
+  admin: {
+    heading: "Operations support",
+    subtitle: "Dispatch, account, and escalation help in one place.",
+    chip: "Admin queue",
+  },
+};
+
 export function HelpPage() {
+  const { user } = useSelector((state) => state.auth);
+  const copy = useMemo(() => roleCopy[user?.role] || roleCopy.customer, [user?.role]);
+
   return (
-    <section className="workspace-page help-page">
-      <header className="workspace-hero glass-card help-hero">
+    <section className={`workspace-page help-page ops-page compact-help-page ${styles.scope}`}>
+      <header className="ops-topbar help-topbar">
         <div>
           <p className="eyebrow">Help & Support</p>
-          <h1>Need help with an order? Email the team directly.</h1>
-          <p className="workspace-copy">
-            Instead of an automated bot, this support flow encourages users to email the team with the details we need to help quickly.
-          </p>
+          <h1>{copy.heading}</h1>
+          <p className="workspace-copy">{copy.subtitle}</p>
         </div>
 
-        <a
-          className="primary-btn"
-          href="mailto:support@deliveroo-app.com?subject=Deliveroo%20Support%20Request"
-        >
-          Email Support
-        </a>
+        <div className="topbar-actions">
+          <div className="rider-stats-strip customer-stats-strip" aria-label="Support summary">
+            <span><strong>24h</strong> first reply</span>
+            <span><strong>1</strong> shared inbox</span>
+            <span><strong>{copy.chip}</strong></span>
+          </div>
+          <a
+            className="primary-btn"
+            href="mailto:support@deliveroo-app.com?subject=Deliveroo%20Support%20Request"
+          >
+            Email Support
+          </a>
+        </div>
       </header>
 
-      <div className="workspace-grid">
-        <section className="glass-card workspace-panel">
+      <div className="help-layout-grid">
+        <section className="glass-card workspace-panel help-issue-panel">
           <div className="section-header">
             <div>
-              <h2>What to include in your email</h2>
-              <p>Giving the right context helps the team resolve issues faster.</p>
+              <h2>Choose your issue</h2>
+              <p>Pick one, then send your note.</p>
             </div>
           </div>
 
-          <div className="feature-list">
+          <div className="help-topic-list">
             {helpTopics.map((topic) => (
-              <article key={topic.title} className="feature-item help-item">
+              <article key={topic.title} className="feature-item help-item compact-help-item">
+                <span className="help-icon" aria-hidden="true">{topic.icon}</span>
                 <h3>{topic.title}</h3>
                 <p>{topic.description}</p>
               </article>
@@ -58,25 +92,25 @@ export function HelpPage() {
           </div>
         </section>
 
-        <section className="glass-card workspace-panel">
+        <section className="glass-card workspace-panel help-contact-panel">
           <div className="section-header">
             <div>
-              <h2>Support details</h2>
-              <p>Simple contact information for customers and admins.</p>
+              <h2>Contact</h2>
+              <p>One support inbox for every role.</p>
             </div>
           </div>
 
-          <div className="support-card-stack">
+          <div className="support-card-stack compact-support-stack">
             <div className="support-card">
               <p className="card-label">Support Email</p>
               <h3>support@deliveroo-app.com</h3>
-              <p>Use this address for delivery issues, account concerns, and escalations.</p>
+              <p>Orders, accounts, parcels, escalations.</p>
             </div>
 
             <div className="support-card">
               <p className="card-label">Expected response</p>
               <h3>Within one business day</h3>
-              <p>Urgent active-order issues should be marked clearly in the subject line.</p>
+              <p>Mark urgent active orders in the subject.</p>
             </div>
 
             <div className="support-card faq-card">

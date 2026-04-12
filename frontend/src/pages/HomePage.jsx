@@ -1,3 +1,5 @@
+import styles from "./HomePage.module.css";
+
 const customerHighlights = [
   {
     title: "Book parcel delivery fast",
@@ -24,7 +26,7 @@ const adminHighlights = [
 
 export function HomePage() {
   return (
-    <section className="landing-page">
+    <section className={`landing-page ${styles.scope}`}>
       <div className="landing-glow landing-glow-1"></div>
       <div className="landing-glow landing-glow-2"></div>
 

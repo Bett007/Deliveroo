@@ -1,0 +1,10 @@
+.scope {
+  display: contents;
+}
+
+
+:global(.empty-state) {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem;
+}

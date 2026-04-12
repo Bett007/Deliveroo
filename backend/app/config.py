@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _parse_client_origins(value: str):
+    return [origin.strip() for origin in value.split(",") if origin.strip()]
+
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
@@ -17,6 +21,7 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CLIENT_ORIGIN = os.getenv("CLIENT_ORIGIN", "http://localhost:5173")
+    CLIENT_ORIGINS = _parse_client_origins(CLIENT_ORIGIN)
     TESTING = False
     DEBUG = False
 

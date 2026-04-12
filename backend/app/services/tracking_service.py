@@ -8,8 +8,37 @@ def _ensure_order_access(user, order):
     if order is None:
         raise NotFoundError("Order not found.")
 
-    if user.role != "admin" and order.user_id != user.id:
+    if user.role == "admin":
+        return order
+
+    if (
+        user.role == "rider"
+        and order.status not in {"delivered", "cancelled"}
+        and order.assigned_rider_id in {None, user.id}
+    ):
+        return order
+
+    if order.user_id != user.id:
         raise AuthorizationError("You do not have permission to access this order.")
+
+    return order
+
+
+def _ensure_tracking_update_access(user, order):
+    if order is None:
+        raise NotFoundError("Order not found.")
+
+    if user.role == "admin":
+        return order
+
+    if user.role != "rider":
+        raise AuthorizationError("You do not have permission to access this resource.")
+
+    if order.status in {"delivered", "cancelled"}:
+        raise ValidationError("Completed orders cannot be updated.")
+
+    if order.assigned_rider_id != user.id:
+        raise AuthorizationError("Accept this delivery before updating it.")
 
     return order
 
@@ -18,14 +47,14 @@ def _validate_location_exists(location_id):
     if location_id is None:
         return None
 
-    location = Location.query.get(location_id)
+    location = db.session.get(Location, location_id)
     if location is None:
         raise NotFoundError("Location not found.")
     return location
 
 
 def get_tracking_updates(user, order_id):
-    order = Order.query.get(order_id)
+    order = db.session.get(Order, order_id)
     _ensure_order_access(user, order)
 
     updates = TrackingUpdate.query.filter_by(order_id=order.id).order_by(TrackingUpdate.created_at.desc()).all()
@@ -34,8 +63,8 @@ def get_tracking_updates(user, order_id):
 
 def add_tracking_update(user, order_id, payload):
     data = validate_tracking_payload(payload)
-    order = Order.query.get(order_id)
-    _ensure_order_access(user, order)
+    order = db.session.get(Order, order_id)
+    _ensure_tracking_update_access(user, order)
     _validate_location_exists(data["location_id"])
 
     update = TrackingUpdate(

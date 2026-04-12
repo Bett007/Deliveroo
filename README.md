@@ -1,13 +1,13 @@
 # Deliveroo
 
-Deliveroo is a team capstone project for a courier delivery platform. This repo currently contains the basic frontend and backend setup so the team can start building on a clean shared foundation.
+Deliveroo is a team capstone courier-delivery platform with role-based workspaces for customers, riders, and admins.
 
 ## Stack
 
 - Frontend: React, Vite, React Router, Redux Toolkit
 - Backend: Flask, Flask-SQLAlchemy, Flask-Migrate
 - Database: PostgreSQL
-- Testing: Pytest now, frontend testing can be added once the first real UI behavior needs coverage
+- Testing: Pytest (backend), frontend build verification with Vite
 
 ## Repo Structure
 
@@ -17,6 +17,24 @@ Deliveroo/
 ├── backend/
 └── README.md
 ```
+
+## Current Product Scope
+
+- JWT auth with role-based routing (`customer`, `rider`, `admin`)
+- Email verification demo flow (`register -> verify -> login`)
+- Customer flow:
+  - create order
+  - view active orders
+  - track order route/details
+  - view order history
+- Rider flow:
+  - rider board for assignment and route updates
+- Admin flow:
+  - operations dashboard
+  - dispatch queue and order controls
+- Shared pages:
+  - profile management
+  - help/support center
 
 ## Branch Workflow
 
@@ -48,22 +66,18 @@ cp .env.example .env
 python run.py
 ```
 
-The backend runs on `http://127.0.0.1:5000` by default. The starter API check is available at `GET /api/health`.
+The backend runs on `http://127.0.0.1:5001` by default. The starter API check is available at `GET /api/health`.
+
+If `python` is not available in your shell (common with `pyenv`), configure and confirm first:
+
+```bash
+pyenv global 3.10.14
+python --version
+which python
+```
 
 ## Environment Notes
 
 - Frontend values should go in `frontend/.env`.
 - Backend values should go in `backend/.env`.
 - Do not commit real environment files or secrets.
-
-## Current Scope
-
-This setup only covers the project foundation:
-
-- basic React app shell and routing
-- Redux store wiring
-- Flask app factory and health endpoint
-- PostgreSQL-ready environment configuration
-- basic backend test setup
-
-Feature work like auth, parcel flows, Swagger, SendGrid, Cloudinary, deployment, and CI/CD is intentionally left for later.
