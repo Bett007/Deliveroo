@@ -3,9 +3,7 @@
 }
 
 
-:global(.landing-page),
-:global(.auth-page),
-:global(.notfound-page) {
+:global(.landing-page) {
   min-height: 100vh;
   display: grid;
   place-items: center;
@@ -13,9 +11,7 @@
   position: relative;
   overflow: hidden;
 }
-:global(.landing-card),
-:global(.auth-card),
-:global(.notfound-card) {
+:global(.landing-card) {
   width: min(1120px, 100%);
   padding: 2rem;
   position: relative;
@@ -96,9 +92,7 @@
 :global(.feature-item p),
 :global(.support-card p),
 :global(.role-summary-item p),
-:global(.order-route),
-:global(.auth-header p),
-:global(.notfound-card p) {
+:global(.order-route) {
   color: var(--text-secondary);
   line-height: 1.7;
 }
