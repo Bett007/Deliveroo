@@ -17,7 +17,7 @@ import {
 } from "../features/orders/ordersSlice";
 import { validateDestination } from "../features/orders/orderValidators";
 import { formatReadableDate } from "../utils/formatters/date";
-import "./OrderDetailsPage.module.css";
+import styles from "./OrderDetailsPage.module.css";
 
 const lifecycleSteps = [
   { key: "pending", label: "Placed" },
@@ -75,7 +75,7 @@ export function OrderDetailsPage() {
 
   if (detailsStatus === "loading" && !order) {
     return (
-      <section className="workspace-page">
+      <section className={`workspace-page ${styles.scope}`}>
         <EmptyState title="Loading order" description="Fetching order details from the backend..." />
       </section>
     );
@@ -83,7 +83,7 @@ export function OrderDetailsPage() {
 
   if (!order) {
     return (
-      <section className="workspace-page">
+      <section className={`workspace-page ${styles.scope}`}>
         <EmptyState title="Order not found" description="We could not find that order in the backend response for your account." action={<Link to="/orders" className="primary-btn">Back to Orders</Link>} />
       </section>
     );
@@ -131,7 +131,7 @@ export function OrderDetailsPage() {
   }
 
   return (
-    <section className="workspace-page ops-page">
+    <section className={`workspace-page ops-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Order Details</p>

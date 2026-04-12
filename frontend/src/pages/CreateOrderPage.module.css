@@ -1,39 +1,38 @@
-:global {
-.mini-route,
-.route-preview {
+.scope {
+  display: contents;
+}
+
+
+:global(.mini-route),
+:global(.route-preview) {
   display: grid;
   gap: 0.55rem;
 }
-
-.mini-route {
+:global(.mini-route) {
   grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
   align-items: center;
   color: var(--ops-muted);
 }
-
-.mini-route i,
-.route-preview i {
+:global(.mini-route i),
+:global(.route-preview i) {
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(90deg, #28b8a8, #2f73d9);
 }
-
-.mini-route span {
+:global(.mini-route span) {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.order-builder-progress,
-.metric-pills {
+:global(.order-builder-progress),
+:global(.metric-pills) {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
 }
-
-.order-builder-progress span,
-.metric-pills span {
+:global(.order-builder-progress span),
+:global(.metric-pills span) {
   min-height: 34px;
   display: inline-flex;
   align-items: center;
@@ -45,33 +44,28 @@
   color: var(--ops-muted);
   font-weight: 700;
 }
-
-.order-builder-progress span.complete {
+:global(.order-builder-progress span.complete) {
   background: rgba(40, 184, 168, 0.13);
   border-color: rgba(40, 184, 168, 0.32);
   color: #0f786f;
 }
-
-.metric-pills strong {
+:global(.metric-pills strong) {
   color: var(--ops-ink);
 }
-
-.route-preview {
+:global(.route-preview) {
   padding: 0.8rem;
   border-radius: 8px;
   border: 1px solid var(--ops-border);
   background: #f7f9fb;
 }
-
-.route-preview div {
+:global(.route-preview div) {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.6rem;
   align-items: center;
   min-width: 0;
 }
-
-.route-preview span {
+:global(.route-preview span) {
   width: 32px;
   height: 32px;
   display: inline-grid;
@@ -81,15 +75,13 @@
   color: var(--ops-blue);
   font-weight: 800;
 }
-
-.route-preview strong {
+:global(.route-preview strong) {
   min-width: 0;
   color: var(--ops-ink);
   line-height: 1.35;
 }
-
-.create-order-grid,
-.order-details-grid {
+:global(.create-order-grid),
+:global(.order-details-grid) {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
   gap: 1rem;
@@ -98,11 +90,10 @@
   overflow: auto;
   scrollbar-width: thin;
 }
-
-.create-order-panel,
-.create-order-aside,
-.order-details-main,
-.order-details-side {
+:global(.create-order-panel),
+:global(.create-order-aside),
+:global(.order-details-main),
+:global(.order-details-side) {
   display: grid;
   gap: 1rem;
   align-content: start;
@@ -110,17 +101,13 @@
   overflow: auto;
   scrollbar-width: thin;
 }
-
-.create-order-panel .auth-form {
+:global(.create-order-panel .auth-form) {
   gap: 0.75rem;
 }
-
-.create-order-aside {
+:global(.create-order-aside) {
   max-height: 100%;
 }
-
-.quote-card h2 {
+:global(.quote-card h2) {
   font-size: 2.1rem;
   color: var(--ops-ink);
-}
 }

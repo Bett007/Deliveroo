@@ -1,10 +1,13 @@
-:global {
-.history-card-list {
+.scope {
+  display: contents;
+}
+
+
+:global(.history-card-list) {
   display: grid;
   gap: 0.65rem;
 }
-
-.history-card {
+:global(.history-card) {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -14,29 +17,24 @@
   border-radius: 8px;
   background: #f7f9fb;
 }
-
-.history-card:hover {
+:global(.history-card:hover) {
   border-color: var(--ops-blue);
   background: #edf4ff;
 }
-
-.history-card span:not(.order-icon) {
+:global(.history-card span:not(.order-icon)) {
   display: grid;
   min-width: 0;
   gap: 0.18rem;
 }
-
-.history-card small,
-.history-card em {
+:global(.history-card small),
+:global(.history-card em) {
   color: var(--ops-muted);
   font-style: normal;
   font-weight: 700;
 }
-
-.history-card strong {
+:global(.history-card strong) {
   overflow: hidden;
   color: var(--ops-ink);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
 }

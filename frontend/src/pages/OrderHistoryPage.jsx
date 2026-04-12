@@ -6,7 +6,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
-import "./OrderHistoryPage.module.css";
+import styles from "./OrderHistoryPage.module.css";
 
 export function OrderHistoryPage() {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ export function OrderHistoryPage() {
   );
 
   return (
-    <section className="workspace-page ops-page history-page">
+    <section className={`workspace-page ops-page history-page ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Order History</p>

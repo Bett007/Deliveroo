@@ -1,4 +1,4 @@
-import "./HelpPage.module.css";
+import styles from "./HelpPage.module.css";
 
 const helpTopics = [
   {
@@ -26,7 +26,7 @@ const faqItems = [
 
 export function HelpPage() {
   return (
-    <section className="workspace-page help-page">
+    <section className={`workspace-page help-page ${styles.scope}`}>
       <header className="workspace-hero glass-card help-hero">
         <div>
           <p className="eyebrow">Help & Support</p>

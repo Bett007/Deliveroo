@@ -1,5 +1,5 @@
 import { formatDistance, formatDuration } from "../../utils/formatters/distance";
-import "./RouteMapCard.module.css";
+import styles from "./RouteMapCard.module.css";
 
 function buildDirectionsUrl(origin, destination) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY;
@@ -22,7 +22,7 @@ export function RouteMapCard({ origin, destination, distanceKm, durationMinutes 
   const directionsUrl = buildDirectionsUrl(origin, destination);
 
   return (
-    <section className="glass-card map-card route-map-card">
+    <section className={`glass-card map-card route-map-card ${styles.scope}`}>
       <div className="section-header">
         <div>
           <h2>Delivery Map</h2>

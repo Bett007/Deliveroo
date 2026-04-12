@@ -1,11 +1,14 @@
-:global {
-.delivery-progress {
+.scope {
+  display: contents;
+}
+
+
+:global(.delivery-progress) {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.5rem;
 }
-
-.delivery-progress div {
+:global(.delivery-progress div) {
   position: relative;
   display: grid;
   gap: 0.45rem;
@@ -14,8 +17,7 @@
   border: 1px solid var(--ops-border);
   background: #f7f9fb;
 }
-
-.delivery-progress span {
+:global(.delivery-progress span) {
   width: 32px;
   height: 32px;
   display: inline-grid;
@@ -25,35 +27,28 @@
   color: var(--ops-muted);
   font-weight: 800;
 }
-
-.delivery-progress strong {
+:global(.delivery-progress strong) {
   color: var(--ops-muted);
 }
-
-.delivery-progress div.complete {
+:global(.delivery-progress div.complete) {
   border-color: rgba(40, 184, 168, 0.32);
   background: rgba(40, 184, 168, 0.1);
 }
-
-.delivery-progress div.complete span {
+:global(.delivery-progress div.complete span) {
   background: #28b8a8;
   color: #ffffff;
 }
-
-.delivery-progress div.complete strong {
+:global(.delivery-progress div.complete strong) {
   color: var(--ops-ink);
 }
-
-.delivery-progress.cancelled div {
+:global(.delivery-progress.cancelled div) {
   border-color: rgba(216, 74, 95, 0.24);
   background: rgba(216, 74, 95, 0.08);
 }
-
-.order-detail-list {
+:global(.order-detail-list) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
-.order-detail-list div {
+:global(.order-detail-list div) {
   display: grid;
   gap: 0.25rem;
   padding: 0.8rem;
@@ -61,13 +56,10 @@
   border-radius: 8px;
   background: #f7f9fb;
 }
-
-.order-detail-list span {
+:global(.order-detail-list span) {
   color: var(--ops-muted);
   font-size: 0.86rem;
 }
-
-.order-detail-list strong {
+:global(.order-detail-list strong) {
   color: var(--ops-ink);
-}
 }
