@@ -169,56 +169,6 @@ export function AppLayout() {
     );
   }
 
-        { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
-        { label: "Dispatch", path: "/dashboard/orders", icon: "dispatch" },
-        { label: "Profile", path: "/profile", icon: "profile" },
-        { label: "Help", path: "/help", icon: "help" },
-      ]
-    : isRider
-      ? [
-          { label: "Rider Board", path: "/rider", icon: "dashboard" },
-          { label: "Profile", path: "/profile", icon: "profile" },
-          { label: "Help", path: "/help", icon: "help" },
-        ]
-      : [
-          { label: "Orders", path: "/orders", icon: "orders" },
-          { label: "Create Order", path: "/orders/create", icon: "create" },
-          { label: "Profile", path: "/profile", icon: "profile" },
->>>>>>> dev
-          { label: "Help", path: "/help", icon: "help" },
-        ];
-
-  return (
-<<<<<<< HEAD
-    <div className={`app-shell role-shell ${isAdmin ? "admin-shell" : "customer-shell"}`}>
-      <PortalHeader
-        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-        subtitle={
-          isAdmin
-            ? "Operations, monitoring, and platform analytics"
-            : isRider
-              ? "Manage active deliveries, history, and route updates"
-              : "Parcel booking, tracking, and support"
-        }
-=======
-    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"} ${styles.scope} ${opsSharedStyles.scope}`}>
-      <RoleSidebar
-        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-        subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}
->>>>>>> dev
-        navItems={navItems}
-        userEmail={user.email}
-        onLogout={handleLogout}
-        shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
-      />
-
-      <main className={`main-content role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-        <Outlet />
-      </main>
-    </div>
-  );
-}
-=======
   const navItems = isAdmin
     ? [
         { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
@@ -233,7 +183,6 @@ export function AppLayout() {
           { label: "Help", path: "/help", icon: "help" },
         ]
       : [
-          { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
           { label: "Orders", path: "/orders", icon: "orders" },
           { label: "Create Order", path: "/orders/create", icon: "create" },
           { label: "Profile", path: "/profile", icon: "profile" },
@@ -245,56 +194,6 @@ export function AppLayout() {
       <RoleSidebar
         title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
         subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}
-        navItems={navItems}
-        userEmail={user.email}
-        onLogout={handleLogout}
-        shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
-      />
-
-      <main className={`main-content role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-        <Outlet />
-      </main>
-    </div>
-  );
-}
-=======
-        { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
-        { label: "Dispatch", path: "/dashboard/orders", icon: "dispatch" },
-        { label: "Profile", path: "/profile", icon: "profile" },
-        { label: "Help", path: "/help", icon: "help" },
-      ]
-    : isRider
-      ? [
-          { label: "Rider Board", path: "/rider", icon: "dashboard" },
-          { label: "Profile", path: "/profile", icon: "profile" },
-          { label: "Help", path: "/help", icon: "help" },
-        ]
-      : [
-          { label: "Orders", path: "/orders", icon: "orders" },
-          { label: "Create Order", path: "/orders/create", icon: "create" },
-          { label: "Profile", path: "/profile", icon: "profile" },
->>>>>>> dev
-          { label: "Help", path: "/help", icon: "help" },
-        ];
-
-  return (
-<<<<<<< HEAD
-    <div className={`app-shell role-shell ${isAdmin ? "admin-shell" : "customer-shell"}`}>
-      <PortalHeader
-        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-        subtitle={
-          isAdmin
-            ? "Operations, monitoring, and platform analytics"
-            : isRider
-              ? "Manage active deliveries, history, and route updates"
-              : "Parcel booking, tracking, and support"
-        }
-=======
-    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"} ${styles.scope} ${opsSharedStyles.scope}`}>
-      <RoleSidebar
-        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-        subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}
->>>>>>> dev
         navItems={navItems}
         userEmail={user.email}
         onLogout={handleLogout}

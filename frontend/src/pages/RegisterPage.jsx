@@ -65,21 +65,9 @@ export function RegisterPage() {
           <div className="auth-panel">
             <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
             <div className="auth-header">
-              <h1>Create your account</h1>
-              <p>Pick a role and verify your email to continue.</p>
->>>>>>> dev
-              {error ? <p className="form-status error">{error}</p> : null}
-
-=======
               <p className="eyebrow">Create Access</p>
               <h1>Create your account</h1>
               <p>Pick a role and verify your email to continue.</p>
-              {error ? <p className="form-status error">{error}</p> : null}
-
-=======
-              <h1>Create your account</h1>
-              <p>Pick a role and verify your email to continue.</p>
->>>>>>> dev
               {error ? <p className="form-status error">{error}</p> : null}
               {verificationEmail ? <p className="helper-text">Verification will continue for {verificationEmail} after registration.</p> : null}
             </div>
@@ -97,6 +85,7 @@ export function RegisterPage() {
                 <select id="register-role" name="role" value={formData.role} onChange={handleChange} className="form-select">
                   <option value="customer">Customer</option>
                   <option value="rider">Rider</option>
+                  <option value="admin">Admin</option>
                 </select>
               </FormField>
 

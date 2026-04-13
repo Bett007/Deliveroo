@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { token } = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.auth.token);
 
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
@@ -35,28 +35,6 @@ export function AdminRoute() {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-    return <Navigate to={user?.role === "rider" ? "/rider" : "/orders"} replace state={{ message: "Admin access only." }} />;
-  }
-
-  return <Outlet />;
-}
-
-export function RiderRoute() {
-  const location = useLocation();
-  const { token, user } = useSelector((state) => state.auth);
-
-  if (!token) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }
-
-  if (user?.role !== "rider") {
-    return <Navigate to={user?.role === "admin" ? "/dashboard" : "/orders"} replace state={{ message: "Rider access only." }} />;
-  }
-
-  return <Outlet />;
-}
->>>>>>> dev
-=======
   if (user?.role !== "admin") {
     return <Navigate to={user?.role === "rider" ? "/rider" : "/orders"} replace state={{ message: "Admin access only." }} />;
   }
@@ -78,25 +56,3 @@ export function RiderRoute() {
 
   return <Outlet />;
 }
-=======
-    return <Navigate to={user?.role === "rider" ? "/rider" : "/orders"} replace state={{ message: "Admin access only." }} />;
-  }
-
-  return <Outlet />;
-}
-
-export function RiderRoute() {
-  const location = useLocation();
-  const { token, user } = useSelector((state) => state.auth);
-
-  if (!token) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }
-
-  if (user?.role !== "rider") {
-    return <Navigate to={user?.role === "admin" ? "/dashboard" : "/orders"} replace state={{ message: "Rider access only." }} />;
-  }
-
-  return <Outlet />;
-}
->>>>>>> dev

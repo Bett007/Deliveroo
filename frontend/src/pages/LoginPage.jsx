@@ -27,23 +27,9 @@ export function LoginPage() {
     dispatch(clearAuthError());
   }, [dispatch]);
 
-    if (user) {
-      navigate(getRoleRoute(user.role), { replace: true });
->>>>>>> dev
-    }
-  }, [navigate, user]);
-
-=======
   useEffect(() => {
     if (user) {
       navigate(getRoleRoute(user.role), { replace: true });
-    }
-  }, [navigate, user]);
-
-=======
-    if (user) {
-      navigate(getRoleRoute(user.role), { replace: true });
->>>>>>> dev
     }
   }, [navigate, user]);
 
@@ -62,22 +48,10 @@ export function LoginPage() {
       return;
     }
 
-      navigate(getRoleRoute(result.payload.user.role), { replace: true });
->>>>>>> dev
-    }
-  }
-
-=======
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
       navigate(getRoleRoute(result.payload.user.role), { replace: true });
-    }
-  }
-
-=======
-      navigate(getRoleRoute(result.payload.user.role), { replace: true });
->>>>>>> dev
     }
   }
 
