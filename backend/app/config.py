@@ -1,4 +1,5 @@
 import os
+import re
 
 from dotenv import load_dotenv
 
@@ -6,7 +7,30 @@ load_dotenv()
 
 
 def _parse_client_origins(value: str):
-    return [origin.strip() for origin in value.split(",") if origin.strip()]
+    origins = []
+
+    for origin in value.split(","):
+        parsed = origin.strip()
+        if not parsed:
+            continue
+
+        # Allow wildcard entries such as https://*.vercel.app
+        if "*" in parsed:
+            wildcard_pattern = re.escape(parsed).replace(r"\*", r"[^/]+")
+            origins.append(re.compile(rf"^{wildcard_pattern}$"))
+            continue
+
+        # Optional escape hatch for fully custom regex values.
+        # Example: regex:^https://preview-[a-z0-9-]+\.example\.com$
+        if parsed.startswith("regex:"):
+            pattern = parsed.removeprefix("regex:").strip()
+            if pattern:
+                origins.append(re.compile(pattern))
+            continue
+
+        origins.append(parsed)
+
+    return origins
 
 
 class Config:
