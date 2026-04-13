@@ -1,15 +1,27 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 
 describe("HomePage", () => {
   it("renders landing title", () => {
-    render(<HomePage />);
-    expect(screen.getByText(/deliver parcels with a faster, clearer way/i)).toBeInTheDocument();
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+    expect(
+      screen.getByText(/move parcels with confidence from booking to delivery/i)
+    ).toBeInTheDocument();
   });
 
-  it("renders customer and admin sections", () => {
-    render(<HomePage />);
-    expect(screen.getByText(/customer experience/i)).toBeInTheDocument();
-    expect(screen.getByText(/admin workspace/i)).toBeInTheDocument();
+  it("renders role sections", () => {
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText(/built for delivery teams/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Customers" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Riders" })).toBeInTheDocument();
   });
 });

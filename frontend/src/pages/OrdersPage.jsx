@@ -71,9 +71,9 @@ export function OrdersPage() {
       <header className="workspace-hero workspace-hero-split glass-card">
         <div className="workspace-hero-copy">
           <p className="eyebrow">Customer Orders</p>
-          <h1>Your backend-connected order workspace</h1>
+          <h1>Manage your orders</h1>
           <p className="workspace-copy">
-            These cards read from the authenticated orders API, with search, filters, and sorting for faster order handling.
+            Track deliveries, manage orders, and review recent activity in one place.
           </p>
           {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
           {error ? <p className="form-status error">{error}</p> : null}
@@ -89,8 +89,8 @@ export function OrdersPage() {
         <PlaceholderArtwork
           variant="customer"
           label="Customer Preview"
-          title="A reserved visual area for parcel and delivery imagery"
-          caption="Use this space later for product shots, rider photography, route graphics, or branded customer illustrations."
+          title="Parcel visibility built into every order"
+          caption="Stay close to route progress, delivery support, and parcel handling updates while you manage current orders."
         />
       </header>
 
@@ -162,7 +162,7 @@ export function OrdersPage() {
           )}
         </SectionCard>
 
-        <SectionCard title="Order History" description="Delivered and cancelled orders returned by the orders API.">
+        <SectionCard title="Order History" description="Delivered and cancelled orders from your account.">
           {status === "loading" ? (
             <p className="helper-text">Loading order history...</p>
           ) : filteredOrderHistory.length ? (

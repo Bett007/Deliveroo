@@ -40,7 +40,7 @@ function renderLoginPage() {
 describe("LoginPage", () => {
   it("renders auth heading", () => {
     renderLoginPage();
-    expect(screen.getByText(/access your role-specific workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
   });
 
   it("renders email and password fields", () => {

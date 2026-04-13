@@ -1,20 +1,22 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import supportVisual from "../assets/images/parcel-support.jpg";
+import { AppIcon } from "../components/ui/AppIcon";
 import styles from "./HelpPage.module.css";
 
 const helpTopics = [
   {
-    icon: "D",
+    icon: "clock",
     title: "Order delays",
     description: "Order number, destination, current status.",
   },
   {
-    icon: "A",
+    icon: "shield",
     title: "Account and access issues",
     description: "Email, role, sign-in or verification step.",
   },
   {
-    icon: "B",
+    icon: "wallet",
     title: "Billing or parcel concerns",
     description: "Parcel ID, charge details, short summary.",
   },
@@ -47,6 +49,15 @@ const roleCopy = {
 export function HelpPage() {
   const { user } = useSelector((state) => state.auth);
   const copy = useMemo(() => roleCopy[user?.role] || roleCopy.customer, [user?.role]);
+  const [selectedTopic, setSelectedTopic] = useState(helpTopics[0]);
+  const supportHref = useMemo(() => {
+    const subject = encodeURIComponent(`Deliveroo Support: ${selectedTopic.title}`);
+    const body = encodeURIComponent(
+      `Issue type: ${selectedTopic.title}\n\nWhat happened:\n\nOrder or parcel reference:\n\nWhat help do you need next:\n`,
+    );
+
+    return `mailto:support@deliveroo-app.com?subject=${subject}&body=${body}`;
+  }, [selectedTopic]);
 
   return (
     <section className={`workspace-page help-page ops-page compact-help-page ${styles.scope}`}>
@@ -65,8 +76,9 @@ export function HelpPage() {
           </div>
           <a
             className="primary-btn"
-            href="mailto:support@deliveroo-app.com?subject=Deliveroo%20Support%20Request"
+            href={supportHref}
           >
+            <AppIcon name="support" size={18} />
             Email Support
           </a>
         </div>
@@ -83,11 +95,18 @@ export function HelpPage() {
 
           <div className="help-topic-list">
             {helpTopics.map((topic) => (
-              <article key={topic.title} className="feature-item help-item compact-help-item">
-                <span className="help-icon" aria-hidden="true">{topic.icon}</span>
+              <button
+                key={topic.title}
+                type="button"
+                className={`feature-item help-item compact-help-item help-topic-button ${selectedTopic.title === topic.title ? "active" : ""}`}
+                onClick={() => setSelectedTopic(topic)}
+              >
+                <span className="help-icon" aria-hidden="true">
+                  <AppIcon name={topic.icon} size={18} />
+                </span>
                 <h3>{topic.title}</h3>
                 <p>{topic.description}</p>
-              </article>
+              </button>
             ))}
           </div>
         </section>
@@ -96,11 +115,23 @@ export function HelpPage() {
           <div className="section-header">
             <div>
               <h2>Contact</h2>
-              <p>One support inbox for every role.</p>
+              <p>Choose an issue and open a ready-to-send support message.</p>
             </div>
           </div>
 
           <div className="support-card-stack compact-support-stack">
+            <div className="support-card">
+              <p className="card-label">Selected issue</p>
+              <h3>{selectedTopic.title}</h3>
+              <p>{selectedTopic.description}</p>
+            </div>
+
+            <a className="support-card support-card-link" href={supportHref}>
+              <p className="card-label">Open support draft</p>
+              <h3>support@deliveroo-app.com</h3>
+              <p>Open a prefilled message for this issue.</p>
+            </a>
+
             <div className="support-card">
               <p className="card-label">Support Email</p>
               <h3>support@deliveroo-app.com</h3>
@@ -114,6 +145,11 @@ export function HelpPage() {
             </div>
 
             <div className="support-card faq-card">
+              <img
+                src={supportVisual}
+                alt="Courier handing a parcel to a customer during support handoff"
+                className="support-illustration"
+              />
               <p className="card-label">Quick notes</p>
               {faqItems.map((item) => (
                 <div key={item} className="admin-check-item">

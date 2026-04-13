@@ -1,17 +1,38 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
+import supportVisual from "../assets/images/parcel-support.jpg";
 import { Button } from "../components/ui/Button";
+import { AuthValuePanel } from "../components/ui/AuthValuePanel";
 import { FormField } from "../components/ui/FormField";
-import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, registerUser } from "../features/auth/authSlice";
 import { validateRegisterForm } from "../features/auth/authValidators";
+import styles from "./AuthPages.module.css";
 
 const initialFormData = {
   email: "",
   password: "",
   role: "customer",
 };
+
+const registerHighlights = [
+  {
+    icon: "customer",
+    title: "Create your account",
+    description: "Pick the role that fits how you use Deliveroo and start with the right tools.",
+  },
+  {
+    icon: "shield",
+    title: "Verify your email",
+    description: "A quick verification step keeps account access secure and confirms your setup.",
+  },
+  {
+    icon: "route",
+    title: "Start using the platform",
+    description: "Customers book parcels and riders manage deliveries with the tools they need.",
+  },
+];
 
 export function RegisterPage() {
   const dispatch = useDispatch();
@@ -50,21 +71,25 @@ export function RegisterPage() {
   }
 
   return (
-    <section className="auth-page auth-page-split">
+    <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid reverse-layout">
-          <PlaceholderArtwork
-            variant="customer"
-            label="Signup Preview"
-            title="A flexible visual slot for onboarding graphics"
-            caption="Swap this placeholder with parcel lifestyle shots, delivery team artwork, or account setup storytelling later."
+          <AuthValuePanel
+            label="Get Started"
+            title="Set up the right account from the start"
+            description="Choose your role, verify your email, and move into the experience that fits you best."
+            items={registerHighlights}
+            tone="customer"
+            imageSrc={supportVisual}
+            imageAlt="Courier handing over a parcel while a customer signs for delivery"
           />
 
           <div className="auth-panel">
+            <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
             <div className="auth-header">
               <p className="eyebrow">Create Access</p>
-              <h1>Register for the right portal</h1>
-              <p>Choose the role you need so the app can route you into the matching customer or rider experience.</p>
+              <h1>Create your account</h1>
+              <p>Pick your role and verify your email to continue.</p>
               {error ? <p className="form-status error">{error}</p> : null}
               {verificationEmail ? <p className="helper-text">Verification will continue for {verificationEmail} after registration.</p> : null}
             </div>

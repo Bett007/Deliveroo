@@ -1,28 +1,40 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 
 describe("HomePage", () => {
   it("renders hero section", () => {
-    render(<HomePage />);
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
 
     expect(
-      screen.getByText(/deliver parcels with a faster/i)
+      screen.getByText(/move parcels with confidence from booking to delivery/i)
     ).toBeInTheDocument();
   });
 
-  it("renders customer section", () => {
-    render(<HomePage />);
+  it("renders key feature section", () => {
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
 
     expect(
-      screen.getByText(/customer experience/i)
+      screen.getByText(/built around the moments that matter most/i)
     ).toBeInTheDocument();
   });
 
-  it("renders admin section", () => {
-    render(<HomePage />);
+  it("renders call to action buttons", () => {
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
 
-    expect(
-      screen.getByText(/admin workspace/i)
-    ).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /sign in/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: /create account/i }).length).toBeGreaterThan(0);
   });
 });

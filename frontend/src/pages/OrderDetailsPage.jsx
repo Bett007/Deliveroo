@@ -118,7 +118,7 @@ export function OrderDetailsPage() {
           <p className="eyebrow">Order Details</p>
           <h1>Order #{order.id}</h1>
           <p className="workspace-copy">
-            Review the backend order record, fetch tracking updates, and manage only the actions the current API allows.
+            Check delivery progress, review parcel details, and manage available order actions.
           </p>
           {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
           {error ? <p className="form-status error">{error}</p> : null}
@@ -127,7 +127,7 @@ export function OrderDetailsPage() {
       </header>
 
       <div className="workspace-grid">
-        <SectionCard title="Order Summary" description="Values returned by the backend for this order.">
+        <SectionCard title="Order Summary" description="Key details for this order.">
           <div className="detail-list">
             <div><strong>Order ID:</strong> {order.id}</div>
             <div><strong>Parcel ID:</strong> {order.parcelId ?? "--"}</div>
@@ -144,7 +144,7 @@ export function OrderDetailsPage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Manage Delivery" description="The backend currently supports destination updates and cancellation for eligible orders.">
+        <SectionCard title="Manage Delivery" description="Update the destination or cancel this order when it is still eligible.">
           {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
           <form className="auth-form" onSubmit={handleUpdateDestination}>
             <FormField id="new-destination" label="New Delivery Location ID" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
@@ -192,7 +192,7 @@ export function OrderDetailsPage() {
       <div className="workspace-grid">
         <RouteMapCard origin={order.pickupLocation} destination={order.destination} distanceKm={order.distanceKm} durationMinutes={order.durationMinutes} />
 
-        <SectionCard title="Tracking Updates" description="Entries returned by GET /api/tracking/:orderId.">
+        <SectionCard title="Tracking Updates" description="Latest route and status updates for this order.">
           {trackingStatus === "loading" ? (
             <p className="helper-text">Loading tracking updates...</p>
           ) : orderTracking.length ? (
