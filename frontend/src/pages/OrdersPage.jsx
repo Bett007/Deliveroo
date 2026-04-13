@@ -112,7 +112,7 @@ export function OrdersPage() {
         <aside className="customer-side-stack">
           {featuredOrder ? (
             <RouteMapCard
-              origin={featuredOrder.pickupLocation}
+              origin={featuredOrder.currentLocation || featuredOrder.pickupLocation}
               destination={featuredOrder.destination}
               distanceKm={featuredOrder.distanceKm}
               durationMinutes={featuredOrder.durationMinutes}

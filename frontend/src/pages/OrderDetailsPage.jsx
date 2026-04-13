@@ -71,6 +71,19 @@ export function OrderDetailsPage() {
     );
   }, [currentOrders, orderHistory, orderId, selectedOrder]);
 
+  useEffect(() => {
+    if (!order || ["delivered", "cancelled"].includes(order.status)) {
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      dispatch(fetchOrderById(orderId));
+      dispatch(fetchTrackingUpdates(orderId));
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [dispatch, orderId, order]);
+
   const orderTracking = trackingUpdates[String(orderId)] || [];
 
   if (detailsStatus === "loading" && !order) {
@@ -89,6 +102,7 @@ export function OrderDetailsPage() {
     );
   }
 
+  const mapOrigin = order.currentLocationId ? order.currentLocation : order.pickupLocation;
   const canEditDestination = !["delivered", "cancelled"].includes(order.status);
   const canCancel = !["delivered", "cancelled"].includes(order.status);
   const activeStepIndex = order.status === "cancelled"
@@ -203,7 +217,7 @@ export function OrderDetailsPage() {
         </main>
 
         <aside className="order-details-side">
-          <RouteMapCard origin={order.pickupLocation} destination={order.destination} distanceKm={order.distanceKm} durationMinutes={order.durationMinutes} />
+          <RouteMapCard origin={mapOrigin} destination={order.destination} distanceKm={order.distanceKm} durationMinutes={order.durationMinutes} />
 
           <SectionCard title="Manage Delivery" description="Destination updates and cancellation are available for eligible orders.">
             {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}

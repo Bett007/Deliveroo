@@ -222,7 +222,7 @@ export function RiderDashboardPage() {
         <aside className="rider-side-stack">
           {selectedOrder ? (
             <RouteMapCard
-              origin={selectedOrder.pickupLocation}
+              origin={selectedOrder.currentLocation || selectedOrder.pickupLocation}
               destination={selectedOrder.destination}
               distanceKm={selectedOrder.distanceKm}
               durationMinutes={selectedOrder.durationMinutes}
