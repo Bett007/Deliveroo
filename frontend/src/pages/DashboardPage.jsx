@@ -1,94 +1,167 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders } from "../features/orders/ordersSlice";
-import styles from "./DashboardPage.module.css";
+import { useSelector } from "react-redux";
+import { RouteMapCard } from "../components/ui/RouteMapCard";
+import { SectionCard } from "../components/ui/SectionCard";
+import { StatusBadge } from "../components/ui/StatusBadge";
+import { NotificationBell } from "../components/ui/NotificationBell";
+import { AppIcon } from "../components/ui/AppIcon";
+import { formatReadableDate } from "../utils/formatters/date";
 
 export function DashboardPage() {
-  const dispatch = useDispatch();
-  const [expandedStat, setExpandedStat] = useState("open");
   const { user } = useSelector((state) => state.auth);
-  const {
-    currentOrders,
-    orderHistory,
-    status,
-  } = useSelector((state) => state.orders);
-
-  useEffect(() => {
-    dispatch(fetchOrders());
-  }, [dispatch]);
+  const { currentOrders, orderHistory, status } = useSelector((state) => state.orders);
+  const featuredOrder = currentOrders[0] || orderHistory[0];
+  const inTransit = currentOrders.filter((order) => order.status === "in_transit").length;
+  const customerModules = [
+    {
+      title: "Current Orders",
+      description: `${currentOrders.length} active deliveries`,
+      path: "/orders",
+      badge: "Orders",
+    },
+    {
+      title: "Order History",
+      description: `${orderHistory.length} completed or cancelled`,
+      path: "/orders/history",
+      badge: "History",
+    },
+    {
+      title: "Create Order",
+      description: "Start a new parcel delivery",
+      path: "/orders/create",
+      badge: "New",
+    },
+    {
+      title: "Track Parcel",
+      description: featuredOrder ? `Open tracking for order #${featuredOrder.id}` : "View route and rider progress",
+      path: featuredOrder ? `/orders/${featuredOrder.id}` : "/orders",
+      badge: "Map",
+    },
+  ];
 
   const summaryCards = useMemo(() => {
     const totalOrders = currentOrders.length + orderHistory.length;
-    const inFlight = currentOrders.filter((order) => order.status === "in_transit").length;
-    const delivered = orderHistory.filter((order) => order.status === "delivered").length;
-    const unassigned = currentOrders.filter((order) => !order.assignedRiderId).length;
+
+    const spend = [...currentOrders, ...orderHistory].reduce(
+      (sum, order) => sum + Number(order.quotedPrice || 0),
+      0,
+    );
 
     return [
-      { id: "open", title: "Open Queue", value: String(unassigned), sub: "No rider yet", detail: "Assign riders or let riders accept available work.", icon: "Q" },
-      { id: "active", title: "Active", value: String(currentOrders.length), sub: "Needs dispatch", detail: "Pending, confirmed, and in-transit orders.", icon: "A" },
-      { id: "moving", title: "In Transit", value: String(inFlight), sub: "Moving now", detail: "Orders currently on route.", icon: "T" },
-      { id: "delivered", title: "Delivered", value: String(delivered), sub: "Completed", detail: "Completed deliveries in the current data set.", icon: "D" },
-      { id: "total", title: "Total", value: String(totalOrders), sub: "All orders", detail: "All records returned for this admin account.", icon: "O" },
+      { title: "Total Orders", value: totalOrders, sub: "+12% this week" },
+      { title: "Active Deliveries", value: currentOrders.length, sub: "+8% this week" },
+      { title: "Spend", value: `KES ${Math.round(spend)}`, sub: "+15% this week" },
     ];
   }, [currentOrders, orderHistory]);
 
   return (
-    <section className={`dashboard-page ops-page ${styles.scope}`}>
+    <section className="dashboard-page ops-page">
       <header className="ops-topbar">
         <div>
-          <p className="eyebrow">Admin Dashboard</p>
-          <h1>Operations overview</h1>
-          <p className="workspace-copy">Monitor the floor. Jump into Dispatch when action is needed.</p>
+          <h1>Welcome back, {user?.email?.split("@")[0] || "Customer"}!</h1>
         </div>
-
-        <div className="topbar-actions">
-          <span className="user-chip">{user?.email || "Signed-in admin"}</span>
-          <Link to="/dashboard/orders" className="primary-btn">Manage Dispatch</Link>
+        <div className="topbar-actions dashboard-user-meta">
+          <NotificationBell label="Notifications" minimumCount={Math.max(1, inTransit)} />
+          <div className="dashboard-account-card">
+            <span className="dashboard-avatar" aria-hidden="true">C</span>
+            <span className="dashboard-account-copy">
+              <strong>{user?.email?.split("@")[0] || "Customer"}</strong>
+              <small>{user?.email || "customer@deliveroo.app"}</small>
+            </span>
+          </div>
         </div>
       </header>
 
       <section className="summary-grid ops-summary-grid">
-        <Link to="/dashboard/orders" className="admin-action-icon" aria-label="Open dispatch">
-          <span className="summary-icon" aria-hidden="true">D</span>
-          <strong>Dispatch</strong>
-        </Link>
-        <button type="button" className="admin-action-icon" onClick={() => dispatch(fetchOrders())} disabled={status === "loading"} aria-label="Refresh orders">
-          <span className="summary-icon" aria-hidden="true">F</span>
-          <strong>{status === "loading" ? "Refreshing" : "Refresh"}</strong>
-        </button>
-        <Link to="/help" className="admin-action-icon" aria-label="Open help">
-          <span className="summary-icon" aria-hidden="true">H</span>
-          <strong>Help</strong>
-        </Link>
+        {summaryCards.map((card) => (
+          <div key={card.title} className="summary-card">
+            <span className="summary-icon" aria-hidden="true">
+              <AppIcon
+                name={card.title === "Total Orders" ? "package" : card.title === "Active Deliveries" ? "route" : "wallet"}
+                size={22}
+              />
+            </span>
+            <div className="summary-copy">
+              <p className="card-label">{card.title}</p>
+              <h3>{card.value}</h3>
+              <span>{card.sub}</span>
+            </div>
+          </div>
+        ))}
       </section>
 
-      <div className="admin-stat-accordion" aria-label="Operations metrics">
-        {summaryCards.map((card) => {
-          const isExpanded = expandedStat === card.id;
+      <section className="dashboard-module-grid" aria-label="Customer modules">
+        {customerModules.map((module) => (
+          <Link key={`${module.title}-${module.path}`} to={module.path} className="dashboard-module-card">
+            <div className="dashboard-module-head">
+              <span className="dashboard-module-badge">{module.badge}</span>
+              <span className="dashboard-module-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h3>{module.title}</h3>
+            <p>{module.description}</p>
+          </Link>
+        ))}
+      </section>
 
-          return (
-            <button
-              key={card.id}
-              type="button"
-              className={`admin-stat-panel ${isExpanded ? "expanded" : ""}`}
-              onClick={() => setExpandedStat(card.id)}
-              aria-expanded={isExpanded}
-            >
-              <span className="summary-icon" aria-hidden="true">{card.icon}</span>
-              <span className="admin-stat-main">
-                <small>{card.title}</small>
-                <strong>{card.value}</strong>
-              </span>
-              {isExpanded ? (
-                <span className="admin-stat-detail">
-                  <em>{card.sub}</em>
-                  <span>{card.detail}</span>
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
+      <div className="ops-dashboard-grid">
+        <SectionCard title="Recent Orders" description="Latest active deliveries for this customer account.">
+          {status === "loading" ? (
+            <p className="helper-text">Loading orders...</p>
+          ) : currentOrders.length ? (
+            <div className="table-wrapper">
+              <table className="orders-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Parcel</th>
+                    <th>Destination</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentOrders.slice(0, 6).map((order) => (
+                    <tr key={order.id}>
+                      <td>
+                        <Link to={`/orders/${order.id}`} className="inline-link">#{order.id}</Link>
+                      </td>
+                      <td>{order.parcelName}</td>
+                      <td>{order.destination}</td>
+                      <td>KES {Number(order.quotedPrice || 0).toFixed(2)}</td>
+                      <td><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
+                      <td>{formatReadableDate(order.updatedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="helper-text">No active customer orders found yet.</p>
+          )}
+
+          <div className="topbar-actions">
+            <Link className="primary-btn" to="/orders/create">Create Order</Link>
+            <Link className="secondary-btn" to="/orders">Open Orders</Link>
+          </div>
+        </SectionCard>
+
+        <aside className="ops-side-stack">
+          {featuredOrder ? (
+            <RouteMapCard
+              origin={featuredOrder.pickupLocation}
+              destination={featuredOrder.destination}
+              distanceKm={featuredOrder.distanceKm}
+              durationMinutes={featuredOrder.durationMinutes}
+            />
+          ) : (
+            <section className="ops-insight-card">
+              <h2>Deliveries Map</h2>
+              <p className="helper-text">Create an order to see route mapping here.</p>
+            </section>
+          )}
+        </aside>
       </div>
     </section>
   );

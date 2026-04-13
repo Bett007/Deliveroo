@@ -9,20 +9,23 @@
   --ops-panel: #ffffff;
   --ops-ink: #182233;
   --ops-muted: #687587;
-  --ops-sidebar: #162a4b;
-  --ops-sidebar-strong: #0f1f3a;
-  --ops-sidebar-active: #25436e;
+  --ops-sidebar: #58abff;
+  --ops-sidebar-strong: #8dccff;
+  --ops-sidebar-active: rgba(255, 255, 255, 0.24);
   --ops-border: #dfe6ee;
   --ops-blue: #2f73d9;
   --ops-teal: #28b8a8;
   --ops-orange: #f0a43a;
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
-  height: 100dvh;
   min-height: 100dvh;
-  overflow: hidden;
+  overflow: visible;
   background: var(--ops-bg);
   color: var(--ops-ink);
+  transition: grid-template-columns 0.25s ease;
+}
+:global(.ops-shell.sidebar-collapsed) {
+  grid-template-columns: 84px minmax(0, 1fr);
 }
 :global(.ops-shell.admin-shell),
 :global(.ops-shell.customer-shell) {
@@ -30,19 +33,21 @@
 }
 :global(.ops-sidebar) {
   min-height: 0;
-  height: 100dvh;
-  padding: 1.15rem 1rem;
+  height: 100%;
+  padding: 1.25rem 1rem 1rem;
   background: linear-gradient(180deg, var(--ops-sidebar), var(--ops-sidebar-strong));
   color: #ffffff;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 1.25rem;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.25s ease, padding 0.25s ease;
 }
 :global(.ops-brand-block),
 :global(.ops-nav-link),
 :global(.ops-sidebar-footer),
 :global(.ops-logout-btn) {
-  border-radius: 8px;
+  border-radius: 14px;
 }
 :global(.ops-brand-block) {
   display: flex;
@@ -68,8 +73,8 @@
   object-fit: contain;
 }
 :global(.ops-brand-logo) {
-  border-radius: 8px;
-  background: #ffffff;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
 }
 :global(.auth-form-logo) {
   width: min(210px, 100%);
@@ -80,7 +85,7 @@
 :global(.ops-brand-block p),
 :global(.ops-sidebar-copy h2),
 :global(.ops-sidebar-footer span) {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.85);
 }
 :global(.ops-brand-block strong) {
   display: block;
@@ -99,6 +104,27 @@
   align-content: start;
   gap: 0.35rem;
 }
+:global(.ops-shell.sidebar-collapsed .ops-sidebar) {
+  padding-inline: 0.65rem;
+}
+:global(.ops-shell.sidebar-collapsed .ops-sidebar-copy),
+:global(.ops-shell.sidebar-collapsed .ops-sidebar-footer span),
+:global(.ops-shell.sidebar-collapsed .ops-brand-block p),
+:global(.ops-shell.sidebar-collapsed .ops-brand-block strong),
+:global(.ops-shell.sidebar-collapsed .ops-nav-link span),
+:global(.ops-shell.sidebar-collapsed .ops-logout-btn span) {
+  display: none;
+}
+:global(.ops-shell.sidebar-collapsed .ops-brand-block),
+:global(.ops-shell.sidebar-collapsed .ops-nav-link),
+:global(.ops-shell.sidebar-collapsed .ops-logout-btn),
+:global(.ops-shell.sidebar-collapsed .ops-sidebar-footer) {
+  justify-content: center;
+  padding-inline: 0;
+}
+:global(.ops-shell.sidebar-collapsed .ops-sidebar-footer) {
+  background: transparent;
+}
 :global(.ops-nav-link),
 :global(.ops-logout-btn) {
   width: 100%;
@@ -108,7 +134,7 @@
   gap: 0.75rem;
   padding: 0 0.8rem;
   background: transparent;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.95);
   font-weight: 700;
   text-align: left;
 }
@@ -122,7 +148,7 @@
   display: grid;
   gap: 0.65rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.14);
   min-width: 0;
 }
 :global(.ops-sidebar-footer span) {
@@ -134,18 +160,35 @@
 :global(.ops-main) {
   min-width: 0;
   min-height: 0;
-  height: 100dvh;
-  overflow: auto;
-  padding: 1.2rem;
-  background: var(--ops-bg);
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1.35rem;
+  background: #ffffff;
+  border-left: 1px solid rgba(223, 230, 238, 0.95);
+  box-shadow: inset 12px 0 24px rgba(20, 35, 55, 0.02);
   scrollbar-width: thin;
+}
+:global(.ops-shell-toggle) {
+  position: sticky;
+  top: 0.35rem;
+  z-index: 6;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid var(--ops-border);
+  background: #ffffff;
+  color: var(--ops-ink);
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
 }
 :global(.ops-main .dashboard-page),
 :global(.ops-main .workspace-page),
 :global(.ops-main .help-page) {
   width: min(1380px, 100%);
-  height: 100%;
-  min-height: 0;
+  height: auto;
+  min-height: auto;
   margin: 0 auto;
   padding: 0;
 }
@@ -202,4 +245,27 @@
 }
 :global(.verification-card) {
   border-radius: 8px;
+}
+
+@media (max-width: 1120px) {
+  :global(.ops-shell) {
+    grid-template-columns: 1fr;
+    background: #ffffff;
+  }
+
+  :global(.ops-sidebar) {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 248px;
+    z-index: 20;
+    box-shadow: 18px 0 40px rgba(20, 35, 55, 0.16);
+  }
+
+  :global(.ops-shell.sidebar-collapsed .ops-sidebar) {
+    transform: translateX(-100%);
+  }
+
+  :global(.ops-main) {
+    padding: 1rem;
+  }
 }

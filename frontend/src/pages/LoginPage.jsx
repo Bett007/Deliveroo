@@ -2,18 +2,26 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
+import authCourierImage from "../assets/images/auth-courier.jpg";
 import { Button } from "../components/ui/Button";
+import { AuthValuePanel } from "../components/ui/AuthValuePanel";
 import { FormField } from "../components/ui/FormField";
-import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
 import { validateLoginForm } from "../features/auth/authValidators";
 import styles from "./AuthPages.module.css";
 
-function getRoleRoute(role) {
-  if (role === "admin") return "/dashboard";
-  if (role === "rider") return "/rider";
-  return "/orders";
-}
+const authHighlights = [
+  {
+    icon: "package",
+    title: "For customers",
+    description: "Create parcel orders, track deliveries, and get help quickly when something changes.",
+  },
+  {
+    icon: "rider",
+    title: "For riders",
+    description: "Check assigned deliveries, follow route details, and keep updates moving smoothly.",
+  },
+];
 
 export function LoginPage() {
   const dispatch = useDispatch();
@@ -28,8 +36,12 @@ export function LoginPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (user) {
-      navigate(getRoleRoute(user.role), { replace: true });
+    if (user?.role === "admin") {
+      navigate("/admin/dashboard", { replace: true });
+    } else if (user?.role === "rider") {
+      navigate("/rider/dashboard", { replace: true });
+    } else if (user) {
+      navigate("/dashboard", { replace: true });
     }
   }, [navigate, user]);
 
@@ -51,7 +63,14 @@ export function LoginPage() {
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
-      navigate(getRoleRoute(result.payload.user.role), { replace: true });
+      const role = result.payload.user.role;
+      if (role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else if (role === "rider") {
+        navigate("/rider/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     }
   }
 
@@ -64,7 +83,7 @@ export function LoginPage() {
             <div className="auth-header">
               <p className="eyebrow">Sign In First</p>
               <h1>Welcome back</h1>
-              <p>One sign-in, the right workspace.</p>
+              <p>Sign in once and continue with the tools that match your role.</p>
               {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
               {error ? <p className="form-status error">{error}</p> : null}
             </div>
@@ -86,11 +105,14 @@ export function LoginPage() {
             <p className="auth-footer">Need an account? <Link to="/register">Create one</Link></p>
           </div>
 
-          <PlaceholderArtwork
-            variant="auth"
-            label="Fast Access"
-            title="Dispatch, delivery, and tracking in one place"
-            caption="Sign in to continue from the exact role your account belongs to."
+          <AuthValuePanel
+            label="Why Deliveroo"
+            title="One sign-in, the right experience"
+            description="Use one secure account to place orders, track deliveries, or manage assigned delivery work."
+            items={authHighlights}
+            tone="customer"
+            imageSrc={authCourierImage}
+            imageAlt="Customer confirming a parcel delivery on a phone"
           />
         </div>
       </div>

@@ -36,11 +36,13 @@
   padding: 0.5rem;
 }
 
-:global(.auth-card-wide .placeholder-art) {
+:global(.auth-card-wide .placeholder-art),
+:global(.auth-card-wide .auth-value-panel) {
   min-width: 0;
 }
 
-:global(.auth-card-wide .placeholder-art-frame) {
+:global(.auth-card-wide .placeholder-art-frame),
+:global(.auth-card-wide .auth-value-shell) {
   min-height: 100%;
 }
 
@@ -50,7 +52,8 @@
     grid-template-columns: 1fr;
   }
 
-  :global(.auth-card-wide .placeholder-art) {
+  :global(.auth-card-wide .placeholder-art),
+  :global(.auth-card-wide .auth-value-panel) {
     min-height: 360px;
   }
 }
@@ -63,5 +66,18 @@
   :global(.auth-page-split .auth-card.auth-card-wide) {
     width: 100%;
     padding: 1rem;
+  }
+
+  :global(.auth-card-wide .auth-content-grid),
+  :global(.auth-card-wide .auth-content-grid.reverse-layout) {
+    gap: 1rem;
+  }
+
+  :global(.auth-card-wide .auth-panel) {
+    padding: 0;
+  }
+
+  :global(.auth-form-logo) {
+    width: min(180px, 100%);
   }
 }
