@@ -46,6 +46,7 @@ Main variables used right now:
 - `JWT_ACCESS_TOKEN_EXPIRES_MINUTES` for auth token lifetime
 - `DATABASE_URL` for the PostgreSQL connection string
 - `CLIENT_ORIGIN` for frontend CORS access. You can provide a comma-separated list for multiple frontend origins.
+  Wildcards are supported (for example `https://*.vercel.app`).
 
 ## PostgreSQL Setup
 
@@ -161,7 +162,7 @@ Recommended Render environment variables:
 Example with local and deployed frontend origins:
 
 ```text
-CLIENT_ORIGIN=http://localhost:5173,https://deliveroo-tan.vercel.app
+CLIENT_ORIGIN=http://localhost:5173,https://*.vercel.app
 ```
 
 ## Run Tests
