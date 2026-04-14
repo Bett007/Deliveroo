@@ -5,6 +5,9 @@ import { FormField } from "../components/ui/FormField";
 import { clearAuthError, updateProfile } from "../features/auth/authSlice";
 import styles from "./ProfilePage.module.css";
 
+const MAX_AVATAR_DIMENSION = 640;
+const MAX_AVATAR_BASE64_LENGTH = 1_500_000;
+
 function getInitials(user) {
   const first = user?.first_name?.trim()?.[0];
   const last = user?.last_name?.trim()?.[0];
@@ -12,28 +15,99 @@ function getInitials(user) {
   return `${first || email || "U"}${last || ""}`.toUpperCase();
 }
 
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Could not read selected image."));
+      image.src = String(reader.result || "");
+    };
+    reader.onerror = () => reject(new Error("Could not read selected image."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function canvasToJpegDataUrl(canvas, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Could not process selected image."));
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Could not process selected image."));
+        reader.readAsDataURL(blob);
+      },
+      "image/jpeg",
+      quality,
+    );
+  });
+}
+
+async function optimizeAvatarToDataUrl(file) {
+  const image = await loadImage(file);
+  const scale = Math.min(1, MAX_AVATAR_DIMENSION / Math.max(image.width, image.height));
+  const targetWidth = Math.max(1, Math.round(image.width * scale));
+  const targetHeight = Math.max(1, Math.round(image.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("Could not process selected image.");
+  }
+
+  context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+  const qualities = [0.85, 0.75, 0.65, 0.55];
+  for (const quality of qualities) {
+    const dataUrl = await canvasToJpegDataUrl(canvas, quality);
+    if (dataUrl.length <= MAX_AVATAR_BASE64_LENGTH) {
+      return dataUrl;
+    }
+  }
+
+  throw new Error("Selected image is too large. Please choose a smaller image.");
+}
+
 export function ProfilePage() {
   const dispatch = useDispatch();
   const { error, fieldErrors, profileStatus, user } = useSelector((state) => state.auth);
-  const [formData, setFormData] = useState({
+  const [profileData, setProfileData] = useState({
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
     phone: user?.phone || "",
-    avatar_url: user?.avatar_url || "",
   });
+  const [avatarDraft, setAvatarDraft] = useState(user?.avatar_url || "");
+  const [isAvatarDirty, setIsAvatarDirty] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isSavingPhoto, setIsSavingPhoto] = useState(false);
+  const [avatarClientError, setAvatarClientError] = useState("");
+  const isSaving = profileStatus === "loading";
 
   useEffect(() => {
     dispatch(clearAuthError());
   }, [dispatch]);
 
   useEffect(() => {
-    setFormData({
+    setProfileData({
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
       phone: user?.phone || "",
-      avatar_url: user?.avatar_url || "",
     });
-  }, [user]);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!isAvatarDirty) {
+      setAvatarDraft(user?.avatar_url || "");
+    }
+  }, [isAvatarDirty, user?.avatar_url]);
 
   const displayName = useMemo(() => {
     const name = [user?.first_name, user?.last_name].filter(Boolean).join(" ");
@@ -42,23 +116,42 @@ export function ProfilePage() {
 
   function handleChange(event) {
     const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
+    setProfileData((current) => ({ ...current, [name]: value }));
   }
 
   function handleAvatarUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
+    setAvatarClientError("");
+    dispatch(clearAuthError());
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormData((current) => ({ ...current, avatar_url: String(reader.result || "") }));
-    };
-    reader.readAsDataURL(file);
+    optimizeAvatarToDataUrl(file)
+      .then((optimizedDataUrl) => {
+        setAvatarDraft(optimizedDataUrl);
+        setIsAvatarDirty(true);
+      })
+      .catch((uploadError) => {
+        setAvatarClientError(uploadError.message || "Unable to process selected image.");
+      });
+
+    event.target.value = "";
   }
 
-  async function handleSubmit(event) {
+  async function handleProfileSubmit(event) {
     event.preventDefault();
-    await dispatch(updateProfile(formData));
+    setIsSavingProfile(true);
+    await dispatch(updateProfile(profileData));
+    setIsSavingProfile(false);
+  }
+
+  async function handleAvatarSave() {
+    if (!isAvatarDirty) return;
+    setIsSavingPhoto(true);
+    const result = await dispatch(updateProfile({ avatar_url: avatarDraft }));
+    if (updateProfile.fulfilled.match(result)) {
+      setIsAvatarDirty(false);
+    }
+    setIsSavingPhoto(false);
   }
 
   return (
@@ -77,8 +170,8 @@ export function ProfilePage() {
       <div className="profile-grid">
         <section className="profile-card">
           <div className="profile-avatar">
-            {formData.avatar_url ? (
-              <img src={formData.avatar_url} alt="" />
+            {avatarDraft ? (
+              <img src={avatarDraft} alt="" />
             ) : (
               <span>{getInitials(user)}</span>
             )}
@@ -89,22 +182,34 @@ export function ProfilePage() {
             Upload Photo
             <input type="file" accept="image/*" onChange={handleAvatarUpload} />
           </label>
+          {avatarClientError ? <p className="form-status error">{avatarClientError}</p> : null}
+          {fieldErrors.avatar_url?.[0] ? <p className="form-status error">{fieldErrors.avatar_url[0]}</p> : null}
+          {isAvatarDirty ? (
+            <Button
+              type="button"
+              className="primary-btn"
+              onClick={handleAvatarSave}
+              disabled={(isSaving && !isSavingPhoto) || isSavingPhoto}
+            >
+              {(isSaving && isSavingPhoto) || isSavingPhoto ? "Saving photo..." : "Save Photo"}
+            </Button>
+          ) : null}
         </section>
 
         <section className="workspace-panel profile-form-panel">
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className="auth-form" onSubmit={handleProfileSubmit}>
             <div className="form-grid-two">
               <FormField id="first-name" label="First Name" error={fieldErrors.first_name?.[0]}>
-                <input id="first-name" name="first_name" value={formData.first_name} onChange={handleChange} />
+                <input id="first-name" name="first_name" value={profileData.first_name} onChange={handleChange} />
               </FormField>
 
               <FormField id="last-name" label="Last Name" error={fieldErrors.last_name?.[0]}>
-                <input id="last-name" name="last_name" value={formData.last_name} onChange={handleChange} />
+                <input id="last-name" name="last_name" value={profileData.last_name} onChange={handleChange} />
               </FormField>
             </div>
 
             <FormField id="phone" label="Phone" error={fieldErrors.phone?.[0]}>
-              <input id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="+254..." />
+              <input id="phone" name="phone" value={profileData.phone} onChange={handleChange} placeholder="+254..." />
             </FormField>
 
             <div className="profile-facts">
@@ -112,8 +217,8 @@ export function ProfilePage() {
               <span><strong>Role</strong>{user?.role}</span>
             </div>
 
-            <Button type="submit" className="primary-btn full-width" disabled={profileStatus === "loading"}>
-              {profileStatus === "loading" ? "Saving..." : "Save Profile"}
+            <Button type="submit" className="primary-btn full-width" disabled={(isSaving && !isSavingProfile) || isSavingProfile}>
+              {(isSaving && isSavingProfile) || isSavingProfile ? "Saving..." : "Save Profile"}
             </Button>
           </form>
         </section>
