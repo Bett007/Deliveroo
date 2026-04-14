@@ -11,6 +11,8 @@ import { validateRegisterForm } from "../features/auth/authValidators";
 import styles from "./AuthPages.module.css";
 
 const initialFormData = {
+  first_name: "",
+  last_name: "",
   email: "",
   password: "",
   role: "customer",
@@ -95,6 +97,14 @@ export function RegisterPage() {
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit}>
+              <FormField id="register-first-name" label="First Name" error={clientErrors.first_name || fieldErrors.first_name?.[0]}>
+                <input id="register-first-name" name="first_name" type="text" placeholder="Enter your first name" value={formData.first_name} onChange={handleChange} />
+              </FormField>
+
+              <FormField id="register-last-name" label="Last Name" error={clientErrors.last_name || fieldErrors.last_name?.[0]}>
+                <input id="register-last-name" name="last_name" type="text" placeholder="Enter your last name" value={formData.last_name} onChange={handleChange} />
+              </FormField>
+
               <FormField id="register-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
                 <input id="register-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
               </FormField>
@@ -107,6 +117,7 @@ export function RegisterPage() {
                 <select id="register-role" name="role" value={formData.role} onChange={handleChange} className="form-select">
                   <option value="customer">Customer</option>
                   <option value="rider">Rider</option>
+                  <option value="admin">Admin</option>
                 </select>
               </FormField>
 

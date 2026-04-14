@@ -62,9 +62,9 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass }) {
+function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass, onMouseEnter, onMouseLeave }) {
   return (
-    <aside className={`ops-sidebar ${shellClass}-sidebar`}>
+    <aside className={`ops-sidebar ${shellClass}-sidebar`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div className="ops-brand-block">
         <img src={deliverooLogoIcon} alt="Deliveroo" className="ops-brand-logo" />
         <div>
@@ -142,6 +142,9 @@ export function AppLayout() {
 
     return window.innerWidth > 1120;
   });
+  const [sidebarHover, setSidebarHover] = useState(false);
+  const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
+  const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
@@ -215,9 +218,16 @@ export function AppLayout() {
   return (
     <div className={`${shellStyles.scope} ${opsSharedStyles.scope}`}>
       <div
-        className={`role-shell ops-shell ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
+        className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
         <RoleSidebar
+          onMouseEnter={() => {
+            if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
+          }}
+          onMouseLeave={() => {
+            setSidebarHover(false);
+            setSidebarLockedClosed(false);
+          }}
           title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
           subtitle={
             isAdmin
@@ -233,14 +243,20 @@ export function AppLayout() {
         />
 
         <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-          <button
-            type="button"
-            className="ops-shell-toggle"
-            aria-label={sidebarOpen ? "Close menu" : "Open menu"}
-            onClick={() => setSidebarOpen((current) => !current)}
-          >
-            {sidebarOpen ? "×" : "☰"}
-          </button>
+          {effectiveSidebarOpen ? (
+            <button
+              type="button"
+              className="ops-shell-toggle"
+              aria-label="Close menu"
+              onClick={() => {
+                setSidebarOpen(false);
+                setSidebarHover(false);
+                setSidebarLockedClosed(true);
+              }}
+            >
+              ×
+            </button>
+          ) : null}
           <Outlet />
         </main>
       </div>

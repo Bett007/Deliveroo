@@ -15,6 +15,14 @@ export function validateLoginForm(values) {
 export function validateRegisterForm(values) {
   const errors = {};
 
+  if (!values.first_name?.trim()) {
+    errors.first_name = "First name is required.";
+  }
+
+  if (!values.last_name?.trim()) {
+    errors.last_name = "Last name is required.";
+  }
+
   if (!values.email.trim()) {
     errors.email = "Email is required.";
   }
