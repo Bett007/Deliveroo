@@ -1,1 +1,13 @@
-# Deliveroo - Reverted Changes\n\nNo changes made. Original files restored.\n\nTo fix errors:\n1. Keep legacy Router (warnings cosmetic).\n2. Main fix needed: Add VITE_API_BASE_URL=http://localhost:5000/api to .env or update config.py CLIENT_ORIGIN to include http://127.0.0.1:5173.\n3. Backend restart required after CORS.\n4. Redux: Errors now serializable? Test.
+# Git Conflict Resolution Plan - Deliveroo Frontend
+
+## Steps to Complete:
+- [x] Step 1: Resolve AppRouter.jsx conflicts (merge routes/imports)
+- [x] Step 2: Resolve ProtectedRoute.jsx (AdminRoute logic)
+- [x] Step 3: Resolve AppLayout.jsx (navItems, classes)
+- [x] Step 4: Resolve auth pages (Login/Register useEffect)
+- [x] Step 5: Resolve DashboardPage.jsx (summaryCards, accordion)
+- [x] Step 6: Resolve OrderDetailsPage.jsx (canEditDestination, header)
+- [x] Step 7: Resolve OrdersPage.jsx and remaining
+- [x] Step 8: git add, commit, pull, test
+
+Completed: All conflicts resolved, git pull successful. Test with cd frontend && npm run dev

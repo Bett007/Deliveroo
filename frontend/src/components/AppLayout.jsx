@@ -1,11 +1,12 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
+import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
-import styles from "./AppLayout.module.css";
 
 function NavIcon({ name }) {
   const icons = {
@@ -29,15 +30,6 @@ function NavIcon({ name }) {
         <path d="M4.5 18h.01" />
       </svg>
     ),
-    dispatch: (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 7h8" />
-        <path d="M5 12h5" />
-        <path d="M5 17h4" />
-        <path d="M15 8l4 4-4 4" />
-        <path d="M19 12h-7" />
-      </svg>
-    ),
     create: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 5v14" />
@@ -49,12 +41,6 @@ function NavIcon({ name }) {
         <circle cx="12" cy="12" r="9" />
         <path d="M9.75 9a2.25 2.25 0 1 1 3.75 1.68c-.87.73-1.5 1.23-1.5 2.57" />
         <path d="M12 17h.01" />
-      </svg>
-    ),
-    profile: (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="8" r="3.5" />
-        <path d="M5 20a7 7 0 0 1 14 0" />
       </svg>
     ),
     login: (
@@ -76,9 +62,9 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass }) {
+function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass, onMouseEnter, onMouseLeave }) {
   return (
-    <aside className={`ops-sidebar ${shellClass}-sidebar`}>
+    <aside className={`ops-sidebar ${shellClass}-sidebar`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div className="ops-brand-block">
         <img src={deliverooLogoIcon} alt="Deliveroo" className="ops-brand-logo" />
         <div>
@@ -120,7 +106,9 @@ function AuthHeader() {
     <header className="auth-portal-header">
       <div className="auth-portal-inner glass-card">
         <div className="portal-brand-block">
-          <img src={deliverooLogoIcon} alt="Deliveroo" className="auth-header-logo" />
+          <div className="portal-mark auth-mark">
+            <img src={deliverooLogoIcon} alt="" className="auth-header-logo" />
+          </div>
           <div>
             <p className="portal-kicker">Deliveroo Access</p>
             <h1>Authenticate before entering the workspace</h1>
@@ -147,10 +135,37 @@ export function AppLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") {
+      return true;
+    }
+
+    return window.innerWidth > 1120;
+  });
+  const [sidebarHover, setSidebarHover] = useState(false);
+  const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
+  const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
   const isRider = user?.role === "rider";
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth <= 1120) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 1120) {
+        setSidebarOpen(true);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -160,49 +175,91 @@ export function AppLayout() {
 
   if (!isAuthenticated) {
     return (
-      <div className={`app-shell auth-shell ${styles.scope}`}>
-        {isAuthRoute ? <AuthHeader /> : null}
-        <main className="main-content auth-main">
-          <Outlet />
-        </main>
+      <div className={shellStyles.scope}>
+        <div className="app-shell auth-shell">
+          {isAuthRoute ? <AuthHeader /> : null}
+          <main className="main-content auth-main">
+            <Outlet />
+          </main>
+        </div>
       </div>
     );
   }
 
   const navItems = isAdmin
     ? [
-        { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
-        { label: "Dispatch", path: "/dashboard/orders", icon: "dispatch" },
-        { label: "Profile", path: "/profile", icon: "profile" },
+        { label: "Dashboard", path: "/admin/dashboard", icon: "dashboard" },
+        { label: "Manage Orders", path: "/admin/orders", icon: "orders" },
+        { label: "Analytics", path: "/admin/analytics", icon: "orders" },
+        { label: "Monitoring", path: "/admin/monitoring", icon: "help" },
+        { label: "Activity", path: "/admin/activity", icon: "create" },
+        { label: "Profile", path: "/profile", icon: "register" },
         { label: "Help", path: "/help", icon: "help" },
       ]
     : isRider
       ? [
-          { label: "Rider Board", path: "/rider", icon: "dashboard" },
-          { label: "Profile", path: "/profile", icon: "profile" },
+          { label: "Dashboard", path: "/rider/dashboard", icon: "dashboard" },
+          { label: "Work Board", path: "/rider/board", icon: "orders" },
+          { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
+          { label: "Delivery History", path: "/deliveries/history", icon: "create" },
+          { label: "Route Map", path: "/map", icon: "help" },
+          { label: "Profile", path: "/profile", icon: "register" },
           { label: "Help", path: "/help", icon: "help" },
         ]
       : [
+          { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
           { label: "Orders", path: "/orders", icon: "orders" },
+          { label: "History", path: "/orders/history", icon: "create" },
           { label: "Create Order", path: "/orders/create", icon: "create" },
-          { label: "Profile", path: "/profile", icon: "profile" },
+          { label: "Profile", path: "/profile", icon: "register" },
           { label: "Help", path: "/help", icon: "help" },
         ];
 
   return (
-    <div className={`app-shell role-shell ops-shell ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"} ${styles.scope} ${opsSharedStyles.scope}`}>
-      <RoleSidebar
-        title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-        subtitle={isAdmin ? "Operations control" : isRider ? "Delivery queue" : "Parcel tracking"}
-        navItems={navItems}
-        userEmail={user.email}
-        onLogout={handleLogout}
-        shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
-      />
+    <div className={`${shellStyles.scope} ${opsSharedStyles.scope}`}>
+      <div
+        className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
+      >
+        <RoleSidebar
+          onMouseEnter={() => {
+            if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
+          }}
+          onMouseLeave={() => {
+            setSidebarHover(false);
+            setSidebarLockedClosed(false);
+          }}
+          title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+          subtitle={
+            isAdmin
+              ? "Operations, monitoring, and dispatch control"
+              : isRider
+                ? "Manage active deliveries, history, and route updates"
+                : "Parcel booking, tracking, and support"
+          }
+          navItems={navItems}
+          userEmail={user.email}
+          onLogout={handleLogout}
+          shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
+        />
 
-      <main className={`main-content role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-        <Outlet />
-      </main>
+        <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
+          {effectiveSidebarOpen ? (
+            <button
+              type="button"
+              className="ops-shell-toggle"
+              aria-label="Close menu"
+              onClick={() => {
+                setSidebarOpen(false);
+                setSidebarHover(false);
+                setSidebarLockedClosed(true);
+              }}
+            >
+              ×
+            </button>
+          ) : null}
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

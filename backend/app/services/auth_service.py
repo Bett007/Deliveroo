@@ -40,7 +40,7 @@ def serialize_verification_details(user: User) -> dict:
     }
 
 
-def _is_verification_code_expired(expires_at: datetime | None) -> bool:
+def _is_verification_code_expired(expires_at: Optional[datetime]) -> bool:
     if expires_at is None:
         return True
 
@@ -61,6 +61,8 @@ def register_user(payload: Optional[dict] = None) -> User:
 
     user = User(email=data["email"], role=data["role"])
     user.set_password(data["password"])
+    user.first_name = data["first_name"]
+    user.last_name = data["last_name"]
     _refresh_verification_code(user)
 
     db.session.add(user)

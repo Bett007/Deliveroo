@@ -2,17 +2,29 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { authReducer } from "../features/auth/authSlice";
 import { LoginPage } from "../pages/LoginPage";
 
-const renderWithStore = () => {
+function renderLoginPage() {
   const store = configureStore({
     reducer: {
-      auth: () => ({
+      auth: authReducer,
+    },
+    preloadedState: {
+      auth: {
+        user: null,
+        token: null,
+        verificationPending: false,
+        verificationEmail: "",
+        verificationCode: "",
+        verificationExpiresAt: null,
         status: "idle",
+        registerStatus: "idle",
+        verifyStatus: "idle",
+        resendStatus: "idle",
         error: null,
         fieldErrors: {},
-        user: null,
-      }),
+      },
     },
   });
 
@@ -21,31 +33,24 @@ const renderWithStore = () => {
       <MemoryRouter>
         <LoginPage />
       </MemoryRouter>
-    </Provider>
+    </Provider>,
   );
-};
+}
 
 describe("LoginPage", () => {
-  it("renders heading", () => {
-    renderWithStore();
-
-    expect(
-      screen.getByText(/access your role-specific workspace/i)
-    ).toBeInTheDocument();
+  it("renders auth heading", () => {
+    renderLoginPage();
+    expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
   });
 
-  it("renders email and password inputs", () => {
-    renderWithStore();
-
+  it("renders email and password fields", () => {
+    renderLoginPage();
     expect(screen.getByPlaceholderText(/enter your email/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/enter your password/i)).toBeInTheDocument();
   });
 
   it("renders sign in button", () => {
-    renderWithStore();
-
-    expect(
-      screen.getByRole("button", { name: /sign in/i })
-    ).toBeInTheDocument();
+    renderLoginPage();
+    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
   });
 });

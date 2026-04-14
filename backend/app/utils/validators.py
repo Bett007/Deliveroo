@@ -22,6 +22,8 @@ def validate_registration_payload(payload: Optional[dict] = None) -> dict:
     email = (data.get("email") or "").strip().lower()
     password = data.get("password") or ""
     role = (data.get("role") or "customer").strip().lower()
+    first_name = (data.get("first_name") or "").strip()
+    last_name = (data.get("last_name") or "").strip()
 
     if not email:
         errors["email"] = ["Email is required."]
@@ -42,10 +44,26 @@ def validate_registration_payload(payload: Optional[dict] = None) -> dict:
             f"Role must be one of: {', '.join(sorted(VALID_ROLES))}."
         ]
 
+    if not first_name:
+        errors["first_name"] = ["First name is required."]
+    elif len(first_name) > 120:
+        errors["first_name"] = ["First name must be 120 characters or less."]
+
+    if not last_name:
+        errors["last_name"] = ["Last name is required."]
+    elif len(last_name) > 120:
+        errors["last_name"] = ["Last name must be 120 characters or less."]
+
     if errors:
         raise ValidationError("Validation failed.", errors=errors)
 
-    return {"email": email, "password": password, "role": role}
+    return {
+        "email": email,
+        "password": password,
+        "role": role,
+        "first_name": first_name,
+        "last_name": last_name,
+    }
 
 
 def validate_login_payload(payload: Optional[dict] = None) -> dict:

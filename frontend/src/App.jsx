@@ -9,10 +9,21 @@ function App() {
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
+    let isActive = true;
+
     if (token) {
-      dispatch(hydrateSession());
-      dispatch(fetchOrders());
+      (async () => {
+        const result = await dispatch(hydrateSession());
+
+        if (isActive && hydrateSession.fulfilled.match(result)) {
+          dispatch(fetchOrders());
+        }
+      })();
     }
+
+    return () => {
+      isActive = false;
+    };
   }, [dispatch, token]);
 
   return <AppRouter />;

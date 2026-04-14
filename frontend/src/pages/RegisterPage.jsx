@@ -2,18 +2,39 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
+import supportVisual from "../assets/images/parcel-support.jpg";
 import { Button } from "../components/ui/Button";
+import { AuthValuePanel } from "../components/ui/AuthValuePanel";
 import { FormField } from "../components/ui/FormField";
-import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { clearAuthError, registerUser } from "../features/auth/authSlice";
 import { validateRegisterForm } from "../features/auth/authValidators";
 import styles from "./AuthPages.module.css";
 
 const initialFormData = {
+  first_name: "",
+  last_name: "",
   email: "",
   password: "",
   role: "customer",
 };
+
+const registerHighlights = [
+  {
+    icon: "customer",
+    title: "Create your account",
+    description: "Pick the role that fits how you use Deliveroo and start with the right tools.",
+  },
+  {
+    icon: "shield",
+    title: "Verify your email",
+    description: "A quick verification step keeps account access secure and confirms your setup.",
+  },
+  {
+    icon: "route",
+    title: "Start using the platform",
+    description: "Customers book parcels and riders manage deliveries with the tools they need.",
+  },
+];
 
 export function RegisterPage() {
   const dispatch = useDispatch();
@@ -55,11 +76,14 @@ export function RegisterPage() {
     <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid reverse-layout">
-          <PlaceholderArtwork
-            variant="customer"
-            label="New Account"
-            title="Start with the workspace you need"
-            caption="Customers place parcels, riders accept routes, admins coordinate the floor."
+          <AuthValuePanel
+            label="Get Started"
+            title="Set up the right account from the start"
+            description="Choose your role, verify your email, and move into the experience that fits you best."
+            items={registerHighlights}
+            tone="customer"
+            imageSrc={supportVisual}
+            imageAlt="Courier handing over a parcel while a customer signs for delivery"
           />
 
           <div className="auth-panel">
@@ -67,12 +91,20 @@ export function RegisterPage() {
             <div className="auth-header">
               <p className="eyebrow">Create Access</p>
               <h1>Create your account</h1>
-              <p>Pick a role and verify your email to continue.</p>
+              <p>Pick your role and verify your email to continue.</p>
               {error ? <p className="form-status error">{error}</p> : null}
               {verificationEmail ? <p className="helper-text">Verification will continue for {verificationEmail} after registration.</p> : null}
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit}>
+              <FormField id="register-first-name" label="First Name" error={clientErrors.first_name || fieldErrors.first_name?.[0]}>
+                <input id="register-first-name" name="first_name" type="text" placeholder="Enter your first name" value={formData.first_name} onChange={handleChange} />
+              </FormField>
+
+              <FormField id="register-last-name" label="Last Name" error={clientErrors.last_name || fieldErrors.last_name?.[0]}>
+                <input id="register-last-name" name="last_name" type="text" placeholder="Enter your last name" value={formData.last_name} onChange={handleChange} />
+              </FormField>
+
               <FormField id="register-email" label="Email Address" error={clientErrors.email || fieldErrors.email?.[0]}>
                 <input id="register-email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} />
               </FormField>
