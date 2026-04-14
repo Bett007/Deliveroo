@@ -40,7 +40,7 @@ def serialize_verification_details(user: User) -> dict:
     }
 
 
-def _is_verification_code_expired(expires_at: datetime | None) -> bool:
+def _is_verification_code_expired(expires_at: Optional[datetime]) -> bool:
     if expires_at is None:
         return True
 
