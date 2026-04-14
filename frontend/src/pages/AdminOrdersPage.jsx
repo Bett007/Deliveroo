@@ -202,6 +202,8 @@ export function AdminOrdersPage() {
               <RouteMapCard
                 origin={selectedOrder.currentLocation || selectedOrder.pickupLocation}
                 destination={selectedOrder.destination}
+                originCoords={selectedOrder.pickupCoords}
+                destinationCoords={selectedOrder.destinationCoords}
                 distanceKm={selectedOrder.distanceKm}
                 durationMinutes={selectedOrder.durationMinutes}
               />

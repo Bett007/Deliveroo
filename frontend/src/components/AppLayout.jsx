@@ -5,6 +5,7 @@ import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
+import { ErrorBoundary } from "./ErrorBoundary";
 import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
 
@@ -160,8 +161,15 @@ export function AppLayout() {
       }
     }
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
   }, []);
 
   function handleLogout() {
@@ -176,7 +184,9 @@ export function AppLayout() {
         <div className="app-shell auth-shell">
           {isAuthRoute ? <AuthHeader /> : null}
           <main className="main-content auth-main">
-            <Outlet />
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
           </main>
         </div>
       </div>
@@ -241,7 +251,9 @@ export function AppLayout() {
           >
             {sidebarOpen ? "←" : "☰"}
           </button>
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

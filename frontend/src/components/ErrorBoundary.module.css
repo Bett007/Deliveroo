@@ -1,0 +1,21 @@
+.errorBoundary {
+  padding: 2rem;
+  border: 1px solid rgba(255, 0, 0, 0.15);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  max-width: 720px;
+  margin: 1rem auto;
+}
+
+.errorBoundary h2 {
+  margin-bottom: 0.75rem;
+}
+
+.errorBoundary pre {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: 12px;
+  overflow-x: auto;
+}
