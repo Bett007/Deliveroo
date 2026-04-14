@@ -128,7 +128,16 @@ def validate_verification_resend_payload(payload: Optional[dict] = None) -> dict
 
 
 def validate_profile_payload(payload: Optional[dict] = None) -> dict:
-    data = payload or {}
+    if payload is None:
+        data = {}
+    elif not isinstance(payload, dict):
+        raise ValidationError(
+            "Validation failed.",
+            errors={"payload": ["Profile payload must be a JSON object."]},
+        )
+    else:
+        data = payload
+
     errors = {}
 
     first_name = data.get("first_name")
@@ -147,20 +156,21 @@ def validate_profile_payload(payload: Optional[dict] = None) -> dict:
             errors[field] = [f"{field.replace('_', ' ').title()} must be {max_length} characters or fewer."]
         return value or None
 
-    first_name = normalize_text(first_name, "first_name", 120)
-    last_name = normalize_text(last_name, "last_name", 120)
-    phone = normalize_text(phone, "phone", 40)
-    avatar_url = normalize_text(avatar_url, "avatar_url", 500000)
+    normalized_data = {}
+
+    if "first_name" in data:
+        normalized_data["first_name"] = normalize_text(first_name, "first_name", 120)
+    if "last_name" in data:
+        normalized_data["last_name"] = normalize_text(last_name, "last_name", 120)
+    if "phone" in data:
+        normalized_data["phone"] = normalize_text(phone, "phone", 40)
+    if "avatar_url" in data:
+        normalized_data["avatar_url"] = normalize_text(avatar_url, "avatar_url", 2_000_000)
 
     if errors:
         raise ValidationError("Validation failed.", errors=errors)
 
-    return {
-        "first_name": first_name,
-        "last_name": last_name,
-        "phone": phone,
-        "avatar_url": avatar_url,
-    }
+    return normalized_data
 
 
 def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
