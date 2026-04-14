@@ -236,10 +236,10 @@ export function AppLayout() {
           <button
             type="button"
             className="ops-shell-toggle"
-            aria-label={sidebarOpen ? "Hide menu" : "Show menu"}
+            aria-label={sidebarOpen ? "Close menu" : "Open menu"}
             onClick={() => setSidebarOpen((current) => !current)}
           >
-            {sidebarOpen ? "←" : "☰"}
+            {sidebarOpen ? "×" : "☰"}
           </button>
           <Outlet />
         </main>

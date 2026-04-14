@@ -176,12 +176,23 @@
   width: 42px;
   height: 42px;
   margin-bottom: 0.85rem;
-  border-radius: 14px;
-  border: 1px solid var(--ops-border);
-  background: #ffffff;
+  border-radius: 50%;
+  border: 1px solid rgba(47, 115, 217, 0.16);
+  background: rgba(255, 255, 255, 0.95);
   color: var(--ops-ink);
   font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
   box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+:global(.ops-shell-toggle:hover),
+:global(.ops-shell-toggle:focus-visible) {
+  transform: scale(1.02);
+  border-color: rgba(47, 115, 217, 0.28);
+  background: #ffffff;
 }
 :global(.ops-main .dashboard-page),
 :global(.ops-main .workspace-page),
