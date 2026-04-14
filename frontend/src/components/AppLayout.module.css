@@ -221,6 +221,10 @@
 }
 :global(.auth-page) {
   padding: 1.25rem;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #f3f6f9 0%, #eef2f7 100%);
 }
 :global(.auth-content-grid),
 :global(.reverse-layout) {
@@ -256,7 +260,14 @@
   display: none;
 }
 :global(.verification-card) {
-  border-radius: 8px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(223, 230, 238, 0.6);
+  box-shadow: 0 20px 60px rgba(20, 35, 55, 0.12);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  backdrop-filter: blur(10px);
 }
 
 @media (max-width: 1120px) {
