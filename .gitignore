@@ -21,3 +21,11 @@ htmlcov/
 .venv/
 venv/
 env/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Instance folder (Flask)
+instance/

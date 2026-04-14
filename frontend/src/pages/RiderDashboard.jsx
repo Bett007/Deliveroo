@@ -9,6 +9,8 @@ import { AppIcon } from "../components/ui/AppIcon";
 export function RiderDashboard() {
   const { user } = useSelector((state) => state.auth);
   const { currentOrders, orderHistory } = useSelector((state) => state.orders);
+  const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Rider";
+  const avatarUrl = user?.avatar_url;
 
   const riderActiveOrders = currentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status));
   const inTransit = riderActiveOrders.filter((order) => order.status === "in_transit").length;
@@ -48,15 +50,17 @@ export function RiderDashboard() {
     <section className="dashboard-page ops-page">
       <header className="ops-topbar">
         <div>
-          <h1>Welcome back, {user?.email?.split("@")[0] || "Rider"}!</h1>
+          <h1 className="dashboard-greeting">Welcome back, {dashboardName}</h1>
           <p className="workspace-copy">Manage assigned deliveries and keep each route moving.</p>
         </div>
         <div className="topbar-actions dashboard-user-meta">
           <NotificationBell label="Dispatch alerts" minimumCount={Math.max(1, riderActiveOrders.length)} />
           <div className="dashboard-account-card">
-            <span className="dashboard-avatar" aria-hidden="true">R</span>
+            <span className="dashboard-avatar" aria-hidden="true">
+              {avatarUrl ? <img src={avatarUrl} alt={`${dashboardName} avatar`} /> : dashboardName?.[0]?.toUpperCase() || "R"}
+            </span>
             <span className="dashboard-account-copy">
-              <strong>{user?.email?.split("@")[0] || "Rider"}</strong>
+              <strong>{dashboardName}</strong>
               <small>{user?.email || "rider@deliveroo.app"}</small>
             </span>
           </div>

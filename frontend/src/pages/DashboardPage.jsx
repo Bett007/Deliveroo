@@ -13,6 +13,8 @@ export function DashboardPage() {
   const { currentOrders, orderHistory, status } = useSelector((state) => state.orders);
   const featuredOrder = currentOrders[0] || orderHistory[0];
   const inTransit = currentOrders.filter((order) => order.status === "in_transit").length;
+  const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Customer";
+  const avatarUrl = user?.avatar_url;
   const customerModules = [
     {
       title: "Current Orders",
@@ -59,14 +61,16 @@ export function DashboardPage() {
     <section className="dashboard-page ops-page">
       <header className="ops-topbar">
         <div>
-          <h1>Welcome back, {user?.email?.split("@")[0] || "Customer"}!</h1>
+          <h1 className="dashboard-greeting">Welcome back, {dashboardName}</h1>
         </div>
         <div className="topbar-actions dashboard-user-meta">
           <NotificationBell label="Notifications" minimumCount={Math.max(1, inTransit)} />
           <div className="dashboard-account-card">
-            <span className="dashboard-avatar" aria-hidden="true">C</span>
+            <span className="dashboard-avatar" aria-hidden="true">
+              {avatarUrl ? <img src={avatarUrl} alt={`${dashboardName} avatar`} /> : dashboardName?.[0]?.toUpperCase() || "C"}
+            </span>
             <span className="dashboard-account-copy">
-              <strong>{user?.email?.split("@")[0] || "Customer"}</strong>
+              <strong>{dashboardName}</strong>
               <small>{user?.email || "customer@deliveroo.app"}</small>
             </span>
           </div>
