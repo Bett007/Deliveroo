@@ -46,6 +46,7 @@ export function CreateOrderPage() {
   const [routeStatus, setRouteStatus] = useState("idle");
   const [routeError, setRouteError] = useState("");
 
+
   useEffect(() => {
     dispatch(clearOrderError());
     if (referenceStatus === "idle") {
@@ -66,7 +67,7 @@ export function CreateOrderPage() {
     let active = true;
 
     async function loadPickupSuggestions() {
-      if (!formData.pickupCounty || formData.pickupStreet.trim().length < 3) {
+      if (!formData.pickupCounty || formData.pickupStreet.trim().length < 2) {
         setPickupSuggestions([]);
         return;
       }
@@ -77,15 +78,20 @@ export function CreateOrderPage() {
           setPickupSuggestions(results);
         }
       } catch (suggestionError) {
+        console.warn("Pickup autocomplete error:", suggestionError);
         if (active) {
           setPickupSuggestions([]);
         }
       }
     }
 
-    loadPickupSuggestions();
+    const timer = setTimeout(() => {
+      loadPickupSuggestions();
+    }, 300);
+
     return () => {
       active = false;
+      clearTimeout(timer);
     };
   }, [formData.pickupCounty, formData.pickupStreet]);
 
@@ -93,7 +99,7 @@ export function CreateOrderPage() {
     let active = true;
 
     async function loadDestinationSuggestions() {
-      if (!formData.destinationCounty || formData.destinationStreet.trim().length < 3) {
+      if (!formData.destinationCounty || formData.destinationStreet.trim().length < 2) {
         setDestinationSuggestions([]);
         return;
       }
@@ -104,15 +110,20 @@ export function CreateOrderPage() {
           setDestinationSuggestions(results);
         }
       } catch (suggestionError) {
+        console.warn("Destination autocomplete error:", suggestionError);
         if (active) {
           setDestinationSuggestions([]);
         }
       }
     }
 
-    loadDestinationSuggestions();
+    const timer = setTimeout(() => {
+      loadDestinationSuggestions();
+    }, 300);
+
     return () => {
       active = false;
+      clearTimeout(timer);
     };
   }, [formData.destinationCounty, formData.destinationStreet]);
 
@@ -129,12 +140,15 @@ export function CreateOrderPage() {
 
     const timer = setTimeout(async () => {
       if (!active) return;
+      console.log('Pickup geocode query:', query);
       try {
         const location = await geocodeAddress(query);
+        console.log('Pickup location:', location);
         if (active) {
           setPickupLiveCoords(location);
         }
-      } catch {
+      } catch (err) {
+        console.error('Pickup geocode error:', err);
         if (active) {
           setPickupLiveCoords(null);
         }
@@ -160,12 +174,15 @@ export function CreateOrderPage() {
 
     const timer = setTimeout(async () => {
       if (!active) return;
+      console.log('Destination geocode query:', query);
       try {
         const location = await geocodeAddress(query);
+        console.log('Destination location:', location);
         if (active) {
           setDestinationLiveCoords(location);
         }
-      } catch {
+      } catch (err) {
+        console.error('Destination geocode error:', err);
         if (active) {
           setDestinationLiveCoords(null);
         }
@@ -177,6 +194,39 @@ export function CreateOrderPage() {
       clearTimeout(timer);
     };
   }, [formData.destinationCounty, formData.destinationStreet]);
+
+  // Auto-preview route when both live coords ready
+  useEffect(() => {
+    let cancelled = false;
+
+    async function autoPreview() {
+      if (pickupLiveCoords && destinationLiveCoords && routeStatus !== "loading") {
+        console.log('Auto-previewing live route...');
+        setRouteStatus("loading");
+        try {
+          const preview = await fetchRoutePreview(pickupLiveCoords, destinationLiveCoords);
+          if (!cancelled) {
+            setPickupCoords(pickupLiveCoords);
+            setDestinationCoords(destinationLiveCoords);
+            setRoutePreview(preview);
+            setRouteStatus("success");
+          }
+        } catch (err) {
+          console.error('Live route preview error:', err);
+          if (!cancelled) {
+            setRouteStatus("error");
+            setRouteError(err.message || "Live route preview failed");
+          }
+        }
+      }
+    }
+
+    autoPreview();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pickupLiveCoords, destinationLiveCoords, routeStatus]);
 
   const selectedWeightCategory = useMemo(
     () => referenceData.weightCategories.find((item) => String(item.id) === String(formData.weightCategoryId)),
@@ -206,9 +256,10 @@ export function CreateOrderPage() {
       return `${countyText}, Kenya`;
     }
 
+    // Better for businesses: always append county if not included
     return streetText.toLowerCase().includes(countyText.toLowerCase())
       ? `${streetText}, Kenya`
-      : `${streetText}, ${countyText}, Kenya`;
+      : `${streetText}, ${countyText}`;
   }
 
   function buildAddress(street, county) {
@@ -368,6 +419,7 @@ export function CreateOrderPage() {
               <input id="parcel-name" name="parcelName" value={formData.parcelName} onChange={handleChange} placeholder="e.g. Office documents" />
             </FormField>
 
+            {/* Counties side by side */}
             <div className="form-grid-two">
               <FormField id="pickup-county" label="Pickup County" error={errors.pickupCounty}>
                 <select id="pickup-county" name="pickupCounty" className="form-select" value={formData.pickupCounty} onChange={handleChange}>
@@ -378,25 +430,6 @@ export function CreateOrderPage() {
                 </select>
               </FormField>
 
-              <FormField id="pickup-street" label="Pickup Street or Location" error={errors.pickupStreet}>
-                <input
-                  id="pickup-street"
-                  name="pickupStreet"
-                  value={formData.pickupStreet}
-                  onChange={handleChange}
-                  list="pickup-street-suggestions"
-                  placeholder="Start typing a street or landmark"
-                  disabled={!formData.pickupCounty}
-                />
-                <datalist id="pickup-street-suggestions">
-                  {pickupSuggestions.map((suggestion) => (
-                    <option key={suggestion.id} value={suggestion.label} />
-                  ))}
-                </datalist>
-              </FormField>
-            </div>
-
-            <div className="form-grid-two">
               <FormField id="destination-county" label="Destination County" error={errors.destinationCounty}>
                 <select id="destination-county" name="destinationCounty" className="form-select" value={formData.destinationCounty} onChange={handleChange}>
                   <option value="">Choose county</option>
@@ -405,24 +438,43 @@ export function CreateOrderPage() {
                   ))}
                 </select>
               </FormField>
-
-              <FormField id="destination-street" label="Destination Street or Location" error={errors.destinationStreet}>
-                <input
-                  id="destination-street"
-                  name="destinationStreet"
-                  value={formData.destinationStreet}
-                  onChange={handleChange}
-                  list="destination-street-suggestions"
-                  placeholder="Start typing a street or landmark"
-                  disabled={!formData.destinationCounty}
-                />
-                <datalist id="destination-street-suggestions">
-                  {destinationSuggestions.map((suggestion) => (
-                    <option key={suggestion.id} value={suggestion.label} />
-                  ))}
-                </datalist>
-              </FormField>
             </div>
+
+            {/* Pickup street */}
+            <FormField id="pickup-street" label="Pickup Street or Location" error={errors.pickupStreet}>
+              <input
+                id="pickup-street"
+                name="pickupStreet"
+                value={formData.pickupStreet}
+                onChange={handleChange}
+                list="pickup-street-suggestions"
+                placeholder="Start typing a street or landmark"
+                disabled={!formData.pickupCounty}
+              />
+              <datalist id="pickup-street-suggestions">
+                {pickupSuggestions.map((suggestion) => (
+                  <option key={suggestion.id} value={suggestion.label} />
+                ))}
+              </datalist>
+            </FormField>
+
+            {/* Destination street */}
+            <FormField id="destination-street" label="Destination Street or Location" error={errors.destinationStreet}>
+              <input
+                id="destination-street"
+                name="destinationStreet"
+                value={formData.destinationStreet}
+                onChange={handleChange}
+                list="destination-street-suggestions"
+                placeholder="Start typing a street or landmark"
+                disabled={!formData.destinationCounty}
+              />
+              <datalist id="destination-street-suggestions">
+                {destinationSuggestions.map((suggestion) => (
+                  <option key={suggestion.id} value={suggestion.label} />
+                ))}
+              </datalist>
+            </FormField>
 
             <div className="form-grid-two">
               <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
@@ -475,7 +527,9 @@ export function CreateOrderPage() {
               {createStatus === "loading" ? "Creating Order..." : "Create Order"}
             </Button>
           </form>
+        </section>
 
+        <aside className="create-order-aside">
           <section className="workspace-panel route-summary-panel">
             <div className="section-header">
               <div>
@@ -519,9 +573,7 @@ export function CreateOrderPage() {
               </div>
             )}
           </section>
-        </section>
 
-        <aside className="create-order-aside">
           <section className="ops-insight-card quote-card">
             <p className="card-label">Quoted Price</p>
             <h2>{selectedWeightCategory ? `KES ${selectedWeightCategory.basePrice}` : "KES --"}</h2>

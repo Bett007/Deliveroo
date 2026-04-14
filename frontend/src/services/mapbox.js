@@ -47,7 +47,7 @@ export async function autocompleteAddress(text, county) {
     : normalized;
 
   const encoded = encodeURIComponent(query);
-  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=6&country=ke&types=address,poi,place`;
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=6&country=ke&types=poi,address`;
   const payload = await fetchJson(url);
 
   return (payload.features || []).map((feature) => ({
@@ -79,3 +79,47 @@ export async function fetchRoutePreview(originCoords, destinationCoords) {
     geometry: route.geometry,
   };
 }
+
+export async function searchPOIs(query, county, poiType = null) {
+  assertToken();
+  const normalized = String(query || "").trim();
+  if (!normalized) {
+    return [];
+  }
+
+  const region = county ? String(county || "").trim() : "";
+  const searchQuery = region && !normalized.toLowerCase().includes(region.toLowerCase())
+    ? `${normalized}, ${region}, Kenya`
+    : normalized;
+
+  const encoded = encodeURIComponent(searchQuery);
+  const types = poiType ? `poi.${poiType}` : "poi,place";
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=10&country=ke&types=${types}`;
+  const payload = await fetchJson(url);
+
+  return (payload.features || []).map((feature) => {
+    const [longitude, latitude] = feature.center || [];
+    const category = feature.properties?.category || feature.properties?.short_code?.split("_")[1] || "place";
+    return {
+      id: feature.id,
+      name: feature.text || feature.place_name,
+      label: feature.place_name,
+      latitude,
+      longitude,
+      category,
+      address: feature.place_name,
+      relevance: feature.relevance,
+      poiCategory: feature.properties?.category || null,
+    };
+  });
+}
+
+export const POI_CATEGORIES = [
+  { value: "restaurant", label: "Restaurants" },
+  { value: "cafe", label: "Cafés" },
+  { value: "store", label: "Shops & Malls" },
+  { value: "bank", label: "Banks" },
+  { value: "park", label: "Parks" },
+  { value: "hospital", label: "Hospitals" },
+  { value: "hotel", label: "Hotels" },
+];

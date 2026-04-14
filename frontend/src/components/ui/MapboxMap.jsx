@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./MapboxMap.module.css";
 
-export function MapboxMap({ origin, destination, originCoords, destinationCoords, routeGeoJson }) {
+export function MapboxMap({ origin, destination, originCoords, destinationCoords, routeGeoJson, onPOISelect, poiFilter }) {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const mapboxglRef = useRef(null);
@@ -140,12 +140,33 @@ export function MapboxMap({ origin, destination, originCoords, destinationCoords
             .addTo(mapRef.current);
         }
 
-        if (!routeGeoJson && originCoords && destinationCoords) {
-          const bounds = new mapboxgl.LngLatBounds();
-          bounds.extend([originCoords.longitude, originCoords.latitude]);
-          bounds.extend([destinationCoords.longitude, destinationCoords.latitude]);
-          mapRef.current.fitBounds(bounds, { padding: 40, maxZoom: 14 });
-        }
+        mapRef.current.on("click", (event) => {
+          const features = mapRef.current.queryRenderedFeatures({ layers: ["poi-layer"], point: event.point });
+          if (features.length > 0) {
+            const feature = features[0];
+            const poiData = {
+              name: feature.properties.name || "Unnamed POI",
+              category: feature.properties.category || "location",
+              latitude: feature.geometry.coordinates[1],
+              longitude: feature.geometry.coordinates[0],
+              address: feature.properties.address || feature.place_name || "Address unavailable",
+            };
+
+            if (onPOISelect) {
+              const popupContent = `
+                <div style="padding: 8px; font-family: system-ui; font-size: 14px;">
+                  <strong>${poiData.name}</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">${poiData.category}</p>
+                  <p style="margin: 4px 0 0 0; font-size: 12px;">${poiData.address}</p>
+                </div>
+              `;
+              new mapboxgl.Popup()
+                .setLngLat(feature.geometry.coordinates)
+                .setHTML(popupContent)
+                .addTo(mapRef.current);
+            }
+          }
+        });
       });
     } catch (error) {
       console.error("Failed to initialize Mapbox map:", error);
@@ -162,7 +183,7 @@ export function MapboxMap({ origin, destination, originCoords, destinationCoords
         mapRef.current = null;
       }
     };
-  }, [canRenderMap, origin, destination, originCoords, destinationCoords, routeGeoJson]);
+  }, [canRenderMap, origin, destination, originCoords, destinationCoords, routeGeoJson, poiFilter, onPOISelect]);
 
   if (!canRenderMap || mapError) {
     return <div className={styles.mapboxStatic}>Map preview unavailable</div>;
