@@ -94,7 +94,7 @@ export function AdminOrdersPage() {
             <span><strong>{currentOrders.length}</strong> active</span>
             <span><strong>{allOrders.length}</strong> total</span>
           </div>
-          <Link to="/dashboard" className="secondary-btn">Back</Link>
+          <Link to="/admin/dashboard" className="secondary-btn">Back</Link>
         </div>
       </header>
 

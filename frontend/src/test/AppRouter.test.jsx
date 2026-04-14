@@ -4,6 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "../features/auth/authSlice";
 import { ordersReducer } from "../features/orders/ordersSlice";
 import { adminReducer } from "../features/admin/adminSlice";
+import { notificationsReducer } from "../features/notifications/notificationsSlice";
 import { AppRouter } from "../routes/AppRouter";
 
 function createTestStore(preloadedAuth = {}) {
@@ -12,6 +13,7 @@ function createTestStore(preloadedAuth = {}) {
       auth: authReducer,
       orders: ordersReducer,
       admin: adminReducer,
+      notifications: notificationsReducer,
     },
     preloadedState: {
       auth: {
@@ -34,6 +36,19 @@ function createTestStore(preloadedAuth = {}) {
 }
 
 describe("AppRouter", () => {
+  it("renders landing page on /", () => {
+    window.history.pushState({}, "", "/");
+    const store = createTestStore();
+
+    render(
+      <Provider store={store}>
+        <AppRouter />
+      </Provider>,
+    );
+
+    expect(screen.getByText(/move parcels with confidence from booking to delivery/i)).toBeInTheDocument();
+  });
+
   it("renders login route on /login", () => {
     window.history.pushState({}, "", "/login");
     const store = createTestStore();
@@ -44,7 +59,7 @@ describe("AppRouter", () => {
       </Provider>,
     );
 
-    expect(screen.getByText(/access your role-specific workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
   });
 
   it("renders not found page on unknown route", () => {
