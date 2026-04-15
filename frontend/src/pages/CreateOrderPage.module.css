@@ -158,6 +158,18 @@
   display: grid;
   gap: 0.5rem;
 }
+:global(.row) {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+:global(.half) {
+  width: 50%;
+}
+:global(.half input),
+:global(.half select) {
+  width: 100%;
+}
 :global(.input-actions-row) {
   display: flex;
   gap: 0.45rem;
@@ -190,4 +202,14 @@
 }
 :global(.location-suggestions li button:hover) {
   background: #f2f6fb;
+}
+
+@media (max-width: 768px) {
+  :global(.row) {
+    flex-direction: column;
+  }
+
+  :global(.half) {
+    width: 100%;
+  }
 }

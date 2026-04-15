@@ -612,32 +612,38 @@ export function CreateOrderPage() {
 
             <FormField id="pickup-location" label="Pickup Location" error={errors.pickupLocation}>
               <div className="location-input-wrap">
-                <select
-                  id="pickup-area"
-                  name="pickupArea"
-                  className="form-select"
-                  value={pickupAreaName}
-                  onChange={(event) => handleAreaSelect("pickup", event.target.value)}
-                  onFocus={() => setActiveLocationField("pickup")}
-                >
-                  <option value="">Select pickup area in Nairobi</option>
-                  {NAIROBI_AREAS.map((area) => (
-                    <option key={area.name} value={area.name}>{area.name}</option>
-                  ))}
-                </select>
-                <input
-                  id="pickup-location"
-                  name="pickupLocation"
-                  value={formData.pickupLocation}
-                  onChange={handleChange}
-                  onFocus={() => {
-                    setShowPickupSuggestions(true);
-                    setActiveLocationField("pickup");
-                  }}
-                  onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 120)}
-                  placeholder="Search for a place..."
-                  readOnly={Boolean(pickupAreaName)}
-                />
+                <div className="row">
+                  <div className="half">
+                    <select
+                      id="pickup-area"
+                      name="pickupArea"
+                      className="form-select"
+                      value={pickupAreaName}
+                      onChange={(event) => handleAreaSelect("pickup", event.target.value)}
+                      onFocus={() => setActiveLocationField("pickup")}
+                    >
+                      <option value="">Select pickup area in Nairobi</option>
+                      {NAIROBI_AREAS.map((area) => (
+                        <option key={area.name} value={area.name}>{area.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="half">
+                    <input
+                      id="pickup-location"
+                      name="pickupLocation"
+                      value={formData.pickupLocation}
+                      onChange={handleChange}
+                      onFocus={() => {
+                        setShowPickupSuggestions(true);
+                        setActiveLocationField("pickup");
+                      }}
+                      onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 120)}
+                      placeholder="Search for a place..."
+                      readOnly={Boolean(pickupAreaName)}
+                    />
+                  </div>
+                </div>
                 <div className="input-actions-row">
                   <button type="button" className="secondary-btn tiny-btn" onClick={handleUseMyLocation} disabled={isLocatingPickup}>
                     {isLocatingPickup ? "Locating..." : "Use my location"}
@@ -661,32 +667,38 @@ export function CreateOrderPage() {
 
             <FormField id="destination-location" label="Destination Location" error={errors.destinationLocation}>
               <div className="location-input-wrap">
-                <select
-                  id="destination-area"
-                  name="destinationArea"
-                  className="form-select"
-                  value={destinationAreaName}
-                  onChange={(event) => handleAreaSelect("destination", event.target.value)}
-                  onFocus={() => setActiveLocationField("destination")}
-                >
-                  <option value="">Select destination area in Nairobi</option>
-                  {NAIROBI_AREAS.map((area) => (
-                    <option key={area.name} value={area.name}>{area.name}</option>
-                  ))}
-                </select>
-                <input
-                  id="destination-location"
-                  name="destinationLocation"
-                  value={formData.destinationLocation}
-                  onChange={handleChange}
-                  onFocus={() => {
-                    setShowDestinationSuggestions(true);
-                    setActiveLocationField("destination");
-                  }}
-                  onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 120)}
-                  placeholder="Search for a place..."
-                  readOnly={Boolean(destinationAreaName)}
-                />
+                <div className="row">
+                  <div className="half">
+                    <select
+                      id="destination-area"
+                      name="destinationArea"
+                      className="form-select"
+                      value={destinationAreaName}
+                      onChange={(event) => handleAreaSelect("destination", event.target.value)}
+                      onFocus={() => setActiveLocationField("destination")}
+                    >
+                      <option value="">Select destination area in Nairobi</option>
+                      {NAIROBI_AREAS.map((area) => (
+                        <option key={area.name} value={area.name}>{area.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="half">
+                    <input
+                      id="destination-location"
+                      name="destinationLocation"
+                      value={formData.destinationLocation}
+                      onChange={handleChange}
+                      onFocus={() => {
+                        setShowDestinationSuggestions(true);
+                        setActiveLocationField("destination");
+                      }}
+                      onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 120)}
+                      placeholder="Search for a place..."
+                      readOnly={Boolean(destinationAreaName)}
+                    />
+                  </div>
+                </div>
                 <div className="input-actions-row">
                   <button type="button" className="secondary-btn tiny-btn" onClick={handleClearDestination}>Reset destination</button>
                 </div>
@@ -705,30 +717,33 @@ export function CreateOrderPage() {
               </div>
             </FormField>
 
-            <div className="form-grid-two">
-              <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
-                <select id="weight-category" name="weightCategoryId" className="form-select" value={formData.weightCategoryId} onChange={handleChange}>
-                  <option value="">Select weight category</option>
-                  {referenceData.weightCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name} ({category.minWeight}kg - {category.maxWeight}kg)
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-
-              <FormField id="weight-kg" label="Parcel Weight" error={errors.weightKg}>
-                <input
-                  id="weight-kg"
-                  name="weightKg"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.weightKg}
-                  onChange={handleChange}
-                  placeholder="e.g. 1.5"
-                />
-              </FormField>
+            <div className="row">
+              <div className="half">
+                <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
+                  <select id="weight-category" name="weightCategoryId" className="form-select" value={formData.weightCategoryId} onChange={handleChange}>
+                    <option value="">Select weight category</option>
+                    {referenceData.weightCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name} ({category.minWeight}kg - {category.maxWeight}kg)
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              </div>
+              <div className="half">
+                <FormField id="weight-kg" label="Parcel Weight" error={errors.weightKg}>
+                  <input
+                    id="weight-kg"
+                    name="weightKg"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.weightKg}
+                    onChange={handleChange}
+                    placeholder="e.g. 1.5"
+                  />
+                </FormField>
+              </div>
             </div>
 
             <FormField id="description" label="Parcel Description" error={errors.description}>
