@@ -2,9 +2,15 @@ import { formatDistance, formatDuration } from "../../utils/formatters/distance"
 import { MapboxMap } from "./MapboxMap";
 import styles from "./RouteMapCard.module.css";
 
-export function RouteMapCard({ origin, destination, originCoords, destinationCoords, distanceKm, durationMinutes }) {
+const TERMINAL_STATUSES = new Set(["delivered", "cancelled"]);
+
+export function RouteMapCard({ origin, destination, originCoords, destinationCoords, distanceKm, durationMinutes, status }) {
+  const isTerminalStatus = TERMINAL_STATUSES.has(String(status || "").toLowerCase());
+  const effectiveOriginCoords = isTerminalStatus ? null : originCoords;
+  const effectiveDestinationCoords = isTerminalStatus ? null : destinationCoords;
   const hasLocations = origin && destination;
-  const canRenderMap = Boolean(originCoords && destinationCoords);
+  const canRenderMap = Boolean(effectiveOriginCoords && effectiveDestinationCoords);
+  const shouldRenderMap = Boolean((hasLocations && canRenderMap) || isTerminalStatus);
 
   return (
     <section className={`glass-card map-card route-map-card ${styles.scope}`}>
@@ -16,8 +22,13 @@ export function RouteMapCard({ origin, destination, originCoords, destinationCoo
         <span className="mini-badge">Live</span>
       </div>
 
-      {hasLocations && canRenderMap ? (
-        <MapboxMap origin={origin} destination={destination} originCoords={originCoords} destinationCoords={destinationCoords} />
+      {shouldRenderMap ? (
+        <MapboxMap
+          origin={origin}
+          destination={destination}
+          originCoords={effectiveOriginCoords}
+          destinationCoords={effectiveDestinationCoords}
+        />
       ) : (
         <div className="fake-map route-map-fallback">
           <div className="map-route-line"></div>

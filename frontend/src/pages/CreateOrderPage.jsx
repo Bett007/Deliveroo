@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
@@ -50,14 +50,15 @@ function getAreaByName(areaName) {
   return NAIROBI_AREAS.find((area) => area.name === areaName) || null;
 }
 
-function calculatePrice(basePrice, distanceKm) {
-  const parsedBase = Number(basePrice || 0);
-  if (!Number.isFinite(parsedBase) || parsedBase <= 0) {
+function calculatePrice(weightKg, distanceKm) {
+  const parsedWeight = Number(weightKg || 0);
+  if (!Number.isFinite(parsedWeight) || parsedWeight <= 0) {
     return null;
   }
 
+  const weightFee = parsedWeight * 120;
   const deliveryFee = Number.isFinite(Number(distanceKm)) ? Number(distanceKm) * 15 : 0;
-  return Number((parsedBase + deliveryFee).toFixed(2));
+  return Number((weightFee + deliveryFee).toFixed(2));
 }
 
 export function CreateOrderPage() {
@@ -90,11 +91,6 @@ export function CreateOrderPage() {
   const [routeError, setRouteError] = useState("");
   const [nairobiSuggestions, setNairobiSuggestions] = useState([]);
   const [isLocatingPickup, setIsLocatingPickup] = useState(false);
-
-  const selectedWeightCategory = useMemo(
-    () => referenceData.weightCategories.find((item) => String(item.id) === String(formData.weightCategoryId)),
-    [referenceData.weightCategories, formData.weightCategoryId],
-  );
 
   useEffect(() => {
     dispatch(clearOrderError());
@@ -161,7 +157,7 @@ export function CreateOrderPage() {
       }
 
       try {
-        const results = await autocompleteAddress(formData.pickupLocation);
+        const results = await autocompleteAddress(formData.pickupLocation, pickupAreaName || "Nairobi");
         if (active) {
           setPickupSuggestions(results.map(normalizeSuggestion));
         }
@@ -177,7 +173,7 @@ export function CreateOrderPage() {
       active = false;
       clearTimeout(timer);
     };
-  }, [formData.pickupLocation, nairobiSuggestions]);
+  }, [formData.pickupLocation, nairobiSuggestions, pickupAreaName]);
 
   useEffect(() => {
     let active = true;
@@ -189,7 +185,7 @@ export function CreateOrderPage() {
       }
 
       try {
-        const results = await autocompleteAddress(formData.destinationLocation);
+        const results = await autocompleteAddress(formData.destinationLocation, destinationAreaName || "Nairobi");
         if (active) {
           setDestinationSuggestions(results.map(normalizeSuggestion));
         }
@@ -205,7 +201,7 @@ export function CreateOrderPage() {
       active = false;
       clearTimeout(timer);
     };
-  }, [formData.destinationLocation, nairobiSuggestions]);
+  }, [formData.destinationLocation, nairobiSuggestions, destinationAreaName]);
 
   useEffect(() => {
     let cancelled = false;
@@ -249,8 +245,8 @@ export function CreateOrderPage() {
   }, [pickup, destination]);
 
   useEffect(() => {
-    setPrice(calculatePrice(selectedWeightCategory?.basePrice, distance));
-  }, [selectedWeightCategory, distance]);
+    setPrice(calculatePrice(formData.weightKg, distance));
+  }, [formData.weightKg, distance]);
 
   function clearRouteState() {
     setRouteGeoJson(null);
@@ -263,14 +259,6 @@ export function CreateOrderPage() {
   function handleChange(event) {
     const { name, value } = event.target;
 
-    // When an area is selected, keep coordinates driven by the area selection.
-    if (name === "pickupLocation" && pickupAreaName) {
-      return;
-    }
-    if (name === "destinationLocation" && destinationAreaName) {
-      return;
-    }
-
     setFormData((current) => ({
       ...current,
       [name]: value,
@@ -280,15 +268,25 @@ export function CreateOrderPage() {
     dispatch(clearOrderError());
 
     if (name === "pickupLocation") {
-      setPickup(null);
+      // Keep area-based coordinates pinned while user types within a selected area.
+      if (!pickupAreaName) {
+        setPickup(null);
+      }
       setShowPickupSuggestions(true);
-      clearRouteState();
+      if (!pickupAreaName) {
+        clearRouteState();
+      }
     }
 
     if (name === "destinationLocation") {
-      setDestination(null);
+      // Keep area-based coordinates pinned while user types within a selected area.
+      if (!destinationAreaName) {
+        setDestination(null);
+      }
       setShowDestinationSuggestions(true);
-      clearRouteState();
+      if (!destinationAreaName) {
+        clearRouteState();
+      }
     }
   }
 
@@ -495,7 +493,7 @@ export function CreateOrderPage() {
     let pickupData = pickup;
     let destinationData = destination;
 
-    if (!pickupData && pickupAreaName) {
+    if (!pickupData && pickupAreaName && (!String(formData.pickupLocation || "").trim() || formData.pickupLocation === pickupAreaName)) {
       const area = getAreaByName(pickupAreaName);
       if (area) {
         pickupData = {
@@ -507,7 +505,7 @@ export function CreateOrderPage() {
       }
     }
 
-    if (!destinationData && destinationAreaName) {
+    if (!destinationData && destinationAreaName && (!String(formData.destinationLocation || "").trim() || formData.destinationLocation === destinationAreaName)) {
       const area = getAreaByName(destinationAreaName);
       if (area) {
         destinationData = {
@@ -545,9 +543,9 @@ export function CreateOrderPage() {
       return;
     }
 
-    const quotedPrice = calculatePrice(selectedWeightCategory?.basePrice, routePreview.distanceKm);
+    const quotedPrice = calculatePrice(formData.weightKg, routePreview.distanceKm);
     if (quotedPrice == null) {
-      setErrors((current) => ({ ...current, weightCategoryId: "Weight category is required." }));
+      setErrors((current) => ({ ...current, weightKg: "Parcel weight is required." }));
       return;
     }
 
@@ -640,7 +638,6 @@ export function CreateOrderPage() {
                       }}
                       onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 120)}
                       placeholder="Search for a place..."
-                      readOnly={Boolean(pickupAreaName)}
                     />
                   </div>
                 </div>
@@ -695,7 +692,6 @@ export function CreateOrderPage() {
                       }}
                       onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 120)}
                       placeholder="Search for a place..."
-                      readOnly={Boolean(destinationAreaName)}
                     />
                   </div>
                 </div>

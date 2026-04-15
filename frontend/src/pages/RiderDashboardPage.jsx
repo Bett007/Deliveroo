@@ -228,6 +228,7 @@ export function RiderDashboardPage() {
               destinationCoords={selectedOrder.destinationCoords}
               distanceKm={selectedOrder.distanceKm}
               durationMinutes={selectedOrder.durationMinutes}
+              status={selectedOrder.status}
             />
           ) : null}
         </aside>
