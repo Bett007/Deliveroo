@@ -105,6 +105,43 @@ def test_create_order_success(client, app):
     assert body["data"]["order"]["status"] == "pending"
 
 
+def test_create_order_with_custom_addresses(client, app):
+    reference_ids = create_reference_data(app)
+    register_user(client)
+    token = login_user(client)
+
+    payload = {
+        "quoted_price": 520,
+        "pickup_location": {
+            "address": "Lavington Business Center, Nairobi",
+            "latitude": -1.2750,
+            "longitude": 36.7850,
+        },
+        "delivery_location": {
+            "address": "Karen Mall, Nairobi",
+            "latitude": -1.3190,
+            "longitude": 36.7270,
+        },
+        "parcel": {
+            "description": "Garden tools",
+            "weight": 3.2,
+            "weight_category_id": reference_ids["weight_category_id"],
+            "special_instructions": "Stack with care",
+        },
+    }
+
+    response = create_order(client, token, payload)
+    body = response.get_json()
+
+    assert response.status_code == 201
+    assert body["success"] is True
+    assert body["data"]["order"]["pickup_location_id"] is not None
+    assert body["data"]["order"]["delivery_location_id"] is not None
+    assert body["data"]["order"]["distance_km"] is None
+    assert body["data"]["order"]["estimated_duration_minutes"] is None
+    assert body["data"]["order"]["status"] == "pending"
+
+
 def test_create_order_rejects_validation_errors(client, app):
     reference_ids = create_reference_data(app)
     register_user(client)
