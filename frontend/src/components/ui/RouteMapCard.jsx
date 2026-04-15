@@ -1,25 +1,10 @@
 import { formatDistance, formatDuration } from "../../utils/formatters/distance";
+import { MapboxMap } from "./MapboxMap";
 import styles from "./RouteMapCard.module.css";
 
-function buildDirectionsUrl(origin, destination) {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY;
-
-  if (!apiKey || !origin || !destination) {
-    return "";
-  }
-
-  const params = new URLSearchParams({
-    key: apiKey,
-    origin,
-    destination,
-    mode: "driving",
-  });
-
-  return `https://www.google.com/maps/embed/v1/directions?${params.toString()}`;
-}
-
-export function RouteMapCard({ origin, destination, distanceKm, durationMinutes }) {
-  const directionsUrl = buildDirectionsUrl(origin, destination);
+export function RouteMapCard({ origin, destination, originCoords, destinationCoords, distanceKm, durationMinutes }) {
+  const hasLocations = origin && destination;
+  const canRenderMap = Boolean(originCoords && destinationCoords);
 
   return (
     <section className={`glass-card map-card route-map-card ${styles.scope}`}>
@@ -31,14 +16,8 @@ export function RouteMapCard({ origin, destination, distanceKm, durationMinutes 
         <span className="mini-badge">Live</span>
       </div>
 
-      {directionsUrl ? (
-        <iframe
-          title="Delivery route map"
-          src={directionsUrl}
-          className="map-embed"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
+      {hasLocations && canRenderMap ? (
+        <MapboxMap origin={origin} destination={destination} originCoords={originCoords} destinationCoords={destinationCoords} />
       ) : (
         <div className="fake-map route-map-fallback">
           <div className="map-route-line"></div>

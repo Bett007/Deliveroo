@@ -5,6 +5,7 @@ import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
+import { ErrorBoundary } from "./ErrorBoundary";
 import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
 
@@ -163,8 +164,15 @@ export function AppLayout() {
       }
     }
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
   }, []);
 
   function handleLogout() {
@@ -179,7 +187,9 @@ export function AppLayout() {
         <div className="app-shell auth-shell">
           {isAuthRoute ? <AuthHeader /> : null}
           <main className="main-content auth-main">
-            <Outlet />
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
           </main>
         </div>
       </div>
@@ -243,21 +253,27 @@ export function AppLayout() {
         />
 
         <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-          {effectiveSidebarOpen ? (
-            <button
-              type="button"
-              className="ops-shell-toggle"
-              aria-label="Close menu"
-              onClick={() => {
+          <button
+            type="button"
+            className="ops-shell-toggle"
+            aria-label={effectiveSidebarOpen ? "Close menu" : "Open menu"}
+            onClick={() => {
+              if (effectiveSidebarOpen) {
                 setSidebarOpen(false);
                 setSidebarHover(false);
                 setSidebarLockedClosed(true);
-              }}
-            >
-              ×
-            </button>
-          ) : null}
-          <Outlet />
+                return;
+              }
+
+              setSidebarOpen(true);
+              setSidebarLockedClosed(false);
+            }}
+          >
+            {effectiveSidebarOpen ? "×" : "☰"}
+          </button>
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

@@ -1,0 +1,71 @@
+/* Mapbox Map Container */
+.mapboxContainer {
+  width: 100%;
+  height: 260px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Custom Marker Styles */
+.mapboxMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
+  transition: transform 0.2s ease;
+}
+
+.mapboxMarker:hover {
+  transform: scale(1.1);
+}
+
+.mapboxMarkerOrigin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.mapboxMarkerDestination {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.markerLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.mapboxStatic {
+  width: 100%;
+  height: 260px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.08);
+  display: grid;
+  place-items: center;
+  color: #334155;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* Responsive sizing */
+@media (max-width: 768px) {
+  .mapboxMarker {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .markerLabel {
+    font-size: 14px;
+  }
+}

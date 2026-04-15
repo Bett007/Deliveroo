@@ -33,6 +33,8 @@ export function RouteMap() {
           <RouteMapCard
             origin={selectedOrder.pickupLocation}
             destination={selectedOrder.destination}
+            originCoords={selectedOrder.pickupCoords}
+            destinationCoords={selectedOrder.destinationCoords}
             distanceKm={selectedOrder.distanceKm}
             durationMinutes={selectedOrder.durationMinutes}
           />
