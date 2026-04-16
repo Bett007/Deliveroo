@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
-import landingCourierImage from "../assets/images/landing-courier.jpg";
-import courierBikeImage from "../assets/images/courier-bike.jpg";
+import onlineShoppingDeliveryIllustration from "../assets/images/online-shopping-delivery-illustration.jpg";
+import redDeliveryTruckImage from "../assets/images/red-delivery-truck-3d.jpg";
+import scooterRiderIllustration from "../assets/images/scooter-rider-illustration.jpg";
+import warehouseForkliftAisleImage from "../assets/images/warehouse-forklift-aisle.jpg";
+import warehouseShelvesImage from "../assets/images/warehouse-shelves.jpg";
 import { AppIcon } from "../components/ui/AppIcon";
 import styles from "./HomePage.module.css";
 
@@ -39,6 +42,21 @@ const roleCards = [
   },
 ];
 
+const workflowCards = [
+  {
+    title: "Orders are prepared with care",
+    description: "Pickup details, parcel handling, and dispatch steps stay clear before a rider heads out.",
+    imageSrc: warehouseForkliftAisleImage,
+    imageAlt: "Forklift moving through a warehouse aisle during order preparation",
+  },
+  {
+    title: "Busy delivery days stay organized",
+    description: "Parcel volume, fulfillment flow, and delivery status stay easier to manage as orders grow.",
+    imageSrc: warehouseShelvesImage,
+    imageAlt: "Warehouse shelves filled with organized parcel stock",
+  },
+];
+
 const productPoints = [
   "Book deliveries without confusion",
   "Track progress without constant follow-up",
@@ -60,7 +78,7 @@ const footerLinks = [
 export function HomePage() {
   return (
     <main className={`landing-root ${styles.scope}`}>
-      <section className="landing-hero">
+      <section className="landing-hero" id="hero-auth">
         <div className="landing-nav">
           <Link to="/" className="landing-brand" aria-label="Deliveroo home">
             <img src={deliverooLogoFull} alt="Deliveroo" className="landing-brand-logo" />
@@ -106,55 +124,40 @@ export function HomePage() {
             <div className="hero-orb hero-orb-b"></div>
 
             <section className="hero-stage-card">
-              <div className="hero-stage-surface">
-                <div className="hero-panel hero-panel-primary">
-                  <img
-                    src={landingCourierImage}
-                    alt="Customer confirming a parcel delivery with a courier"
-                    className="hero-panel-image"
-                  />
-                  <div className="hero-panel-copy">
-                    <span className="hero-panel-tag">
-                      <AppIcon name="check" size={14} />
-                      Delivery confirmation
-                    </span>
-                    <h3>See the whole journey clearly</h3>
-                    <p>Follow each parcel from pickup to destination with updates that feel simple and useful.</p>
-                  </div>
-                </div>
+              <div className="hero-stage-media">
+                <img src={scooterRiderIllustration} alt="Illustration of a scooter rider navigating a delivery route" className="hero-stage-image" />
+              </div>
 
-                <div className="hero-panel hero-panel-secondary">
-                  <p className="hero-panel-label">Today&apos;s activity</p>
-                  <div className="hero-mini-stats">
-                    <div>
-                      <AppIcon name="package" size={18} className="hero-mini-icon" />
-                      <strong>42</strong>
-                      <span>active orders</span>
-                    </div>
-                    <div>
-                      <AppIcon name="rider" size={18} className="hero-mini-icon" />
-                      <strong>18</strong>
-                      <span>riders moving</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="hero-stage-copy">
+                <span className="hero-panel-tag">
+                  <AppIcon name="check" size={14} />
+                  Delivery confirmation
+                </span>
+                <h3>Clear progress from pickup to handoff</h3>
+                <p>See where a parcel is, what happens next, and who needs to act without digging through app screens.</p>
+              </div>
 
-                <div className="hero-panel hero-panel-tertiary">
-                  <div className="hero-support-grid">
-                    <img
-                      src={courierBikeImage}
-                      alt="Courier bike staged in an urban pickup area"
-                      className="hero-support-image"
-                    />
-                    <div className="hero-support-copy">
-                      <p className="hero-panel-label">Why teams stay on top of delivery flow</p>
-                      <ul className="hero-benefit-list">
-                        <li>Clear order status</li>
-                        <li>Role-based visibility</li>
-                        <li>Faster support follow-up</li>
-                      </ul>
-                    </div>
-                  </div>
+              <div className="hero-stage-stats" aria-label="Today's activity">
+                <div className="hero-stat-card">
+                  <AppIcon name="package" size={18} className="hero-mini-icon" />
+                  <strong>42</strong>
+                  <span>active orders</span>
+                </div>
+                <div className="hero-stat-card">
+                  <AppIcon name="rider" size={18} className="hero-mini-icon" />
+                  <strong>18</strong>
+                  <span>riders moving</span>
+                </div>
+              </div>
+
+              <div className="hero-stage-support">
+                <div className="hero-support-copy">
+                  <p className="hero-panel-label">Everything you need to manage deliveries clearly</p>
+                  <ul className="hero-benefit-list">
+                    <li>Track orders in one place</li>
+                    <li>See progress without guesswork</li>
+                    <li>Get help quickly when plans change</li>
+                  </ul>
                 </div>
               </div>
             </section>
@@ -173,10 +176,19 @@ export function HomePage() {
 
         <div className="landing-overview-grid">
           <article className="overview-card overview-card-large">
-            <h3>Everything important in one place</h3>
-            <p>
-              Customers can place and track orders while riders stay focused on active deliveries without losing the bigger picture.
-            </p>
+            <div className="overview-card-media">
+              <img
+                src={onlineShoppingDeliveryIllustration}
+                alt="Illustration of a customer placing an online delivery order while a rider heads out"
+                className="overview-card-image"
+              />
+            </div>
+            <div className="overview-card-content">
+              <h3>Everything important in one place</h3>
+              <p>
+                Customers can place and track orders while riders stay focused on active deliveries without losing the bigger picture.
+              </p>
+            </div>
           </article>
 
           <div className="overview-points">
@@ -187,6 +199,26 @@ export function HomePage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="landing-section">
+        <div className="landing-section-heading">
+          <span className="landing-section-kicker">Behind Every Delivery</span>
+          <h2>Preparation and parcel handling stay visible from the start.</h2>
+          <p>From packing to dispatch, the delivery flow stays easier to understand before a parcel goes on the road.</p>
+        </div>
+
+        <div className="landing-workflow-grid">
+          {workflowCards.map((card) => (
+            <article key={card.title} className="landing-workflow-card">
+              <img src={card.imageSrc} alt={card.imageAlt} className="landing-workflow-image" />
+              <div className="landing-workflow-copy">
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -239,6 +271,13 @@ export function HomePage() {
         </div>
 
         <div className="landing-trust-grid">
+          <article className="landing-trust-card landing-trust-card-image">
+            <img src={redDeliveryTruckImage} alt="3D red delivery truck representing fast and dependable shipping" className="landing-trust-image" />
+            <div className="landing-trust-copy">
+              <strong>Trusted handoffs</strong>
+              <span>Customers and riders both see a clearer delivery finish.</span>
+            </div>
+          </article>
           {trustStats.map((item) => (
             <article key={item.label} className="landing-trust-card">
               <strong>{item.value}</strong>
@@ -254,11 +293,9 @@ export function HomePage() {
             <span className="landing-section-kicker">Get Started</span>
             <h2>Start sending, tracking, and managing deliveries today.</h2>
             <p>Create an account to get started or sign in if you already use Deliveroo.</p>
-          </div>
-
-          <div className="landing-cta-row">
-            <Link to="/register" className="landing-primary-cta">Create Account</Link>
-            <Link to="/login" className="landing-secondary-cta">Sign In</Link>
+            <p className="landing-final-cta-note">
+              Ready to start? <a href="#hero-auth" className="landing-inline-link">Sign in or create an account above.</a>
+            </p>
           </div>
         </div>
       </section>

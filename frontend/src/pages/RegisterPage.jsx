@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
-import supportVisual from "../assets/images/parcel-support.jpg";
 import { Button } from "../components/ui/Button";
-import { AuthValuePanel } from "../components/ui/AuthValuePanel";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, registerUser } from "../features/auth/authSlice";
 import { validateRegisterForm } from "../features/auth/authValidators";
@@ -15,24 +13,6 @@ const initialFormData = {
   password: "",
   role: "customer",
 };
-
-const registerHighlights = [
-  {
-    icon: "customer",
-    title: "Create your account",
-    description: "Pick the role that fits how you use Deliveroo and start with the right tools.",
-  },
-  {
-    icon: "shield",
-    title: "Verify your email",
-    description: "A quick verification step keeps account access secure and confirms your setup.",
-  },
-  {
-    icon: "route",
-    title: "Start using the platform",
-    description: "Customers book parcels and riders manage deliveries with the tools they need.",
-  },
-];
 
 export function RegisterPage() {
   const dispatch = useDispatch();
@@ -74,18 +54,16 @@ export function RegisterPage() {
     <section className={`auth-page auth-page-split ${styles.scope}`}>
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid reverse-layout">
-          <AuthValuePanel
-            label="Get Started"
-            title="Set up the right account from the start"
-            description="Choose your role, verify your email, and move into the experience that fits you best."
-            items={registerHighlights}
-            tone="customer"
-            imageSrc={supportVisual}
-            imageAlt="Courier handing over a parcel while a customer signs for delivery"
-          />
-
           <div className="auth-panel">
-            <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
+            <div className="auth-home-link-row">
+              <Link to="/" aria-label="Deliveroo home">
+                <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
+              </Link>
+              <Link to="/" className="back-link">
+                <span className="back-link-icon" aria-hidden="true">&lt;</span>
+                <span>Return to home</span>
+              </Link>
+            </div>
             <div className="auth-header">
               <p className="eyebrow">Create Access</p>
               <h1>Create your account</h1>
