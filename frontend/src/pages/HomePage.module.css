@@ -166,7 +166,7 @@
 
 :global(.landing-visual-column) {
   position: relative;
-  min-height: 560px;
+  min-height: auto;
 }
 
 :global(.hero-orb) {
@@ -194,90 +194,58 @@
 
 :global(.hero-stage-card) {
   position: relative;
-  min-height: 100%;
+  display: grid;
+  gap: 1rem;
   border-radius: 34px;
   padding: 1.2rem;
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.74), rgba(213, 239, 255, 0.58));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(213, 239, 255, 0.6));
   border: 1px solid rgba(255, 255, 255, 0.82);
   box-shadow: 0 28px 72px rgba(18, 58, 92, 0.12);
   overflow: hidden;
 }
 
-:global(.hero-stage-surface) {
-  position: relative;
-  min-height: 100%;
-}
-
-:global(.hero-panel) {
-  position: absolute;
-  border-radius: 28px;
+:global(.hero-stage-media),
+:global(.hero-stage-copy),
+:global(.hero-stage-support),
+:global(.hero-stat-card) {
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 20px 48px rgba(18, 58, 92, 0.12);
+  box-shadow: 0 20px 48px rgba(18, 58, 92, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-:global(.hero-panel-primary) {
-  inset: 0 10% auto 0;
-  padding: 0;
-  z-index: 3;
+:global(.hero-stage-media) {
   overflow: hidden;
+  border-radius: 28px;
 }
 
-:global(.hero-panel-secondary) {
-  inset: 41% 0 auto 16%;
-  padding: 1.15rem;
-  z-index: 2;
+:global(.hero-stage-image) {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: center 22%;
 }
 
-:global(.hero-panel-tertiary) {
-  inset: auto 10% 0 8%;
-  padding: 1.15rem;
-  z-index: 1;
-  overflow: hidden;
+:global(.hero-stage-copy) {
+  padding: 1.25rem 1.35rem 1.35rem;
+  border-radius: 28px;
 }
 
-:global(.hero-panel-tag),
-:global(.landing-feature-eyebrow) {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  width: fit-content;
-  margin-bottom: 0.7rem;
-  padding: 0.35rem 0.68rem;
-  border-radius: 999px;
-  background: rgba(53, 167, 255, 0.1);
-  color: #1d78ea;
-  font-size: 0.76rem;
-  font-weight: 800;
+:global(.hero-stage-copy h3) {
+  font-size: 1.55rem;
+  line-height: 1.12;
+  margin-bottom: 0.55rem;
 }
 
-:global(.hero-panel-image),
 :global(.hero-support-image) {
   display: block;
   width: 100%;
   object-fit: cover;
 }
 
-:global(.hero-panel-image) {
-  aspect-ratio: 16 / 10;
-  min-height: 240px;
-  height: auto;
-  border-radius: 0;
-}
-
-:global(.hero-panel-copy) {
-  padding: 1.25rem 1.35rem 1.35rem;
-}
-
-:global(.hero-panel h3) {
-  font-size: 1.55rem;
-  line-height: 1.12;
-  margin-bottom: 0.55rem;
-}
-
-:global(.hero-panel p),
+:global(.hero-stage-copy p),
 :global(.landing-section-heading p),
 :global(.landing-feature-card p),
 :global(.landing-role-card p),
@@ -296,24 +264,26 @@
   font-weight: 700;
 }
 
-:global(.hero-mini-stats) {
+:global(.hero-stage-stats) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.85rem;
 }
 
-:global(.hero-mini-stats > div) {
+:global(.hero-stat-card) {
   display: grid;
   gap: 0.2rem;
+  padding: 1rem 1.05rem;
+  border-radius: 22px;
 }
 
-:global(.hero-mini-stats strong) {
+:global(.hero-stat-card strong) {
   display: block;
   font-size: 1.45rem;
   margin-bottom: 0.2rem;
 }
 
-:global(.hero-mini-stats span) {
+:global(.hero-stat-card span) {
   color: #5c7288;
   font-size: 0.92rem;
 }
@@ -325,19 +295,20 @@
 :global(.hero-benefit-list) {
   display: grid;
   gap: 0.65rem;
+  margin: 0;
   padding-left: 1.1rem;
   color: #243e59;
 }
 
-:global(.hero-support-grid) {
-  display: grid;
-  gap: 0.95rem;
+:global(.hero-stage-support) {
+  padding: 1.2rem 1.25rem;
+  border-radius: 28px;
 }
 
-:global(.hero-support-image) {
-  aspect-ratio: 16 / 9;
-  height: auto;
-  border-radius: 18px;
+:global(.hero-support-copy) {
+  display: grid;
+  gap: 0.2rem;
+  align-self: center;
 }
 
 :global(.landing-section) {
@@ -363,6 +334,12 @@
   gap: 1.2rem;
 }
 
+:global(.landing-workflow-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 :global(.overview-card),
 :global(.overview-point-card),
 :global(.landing-feature-card),
@@ -378,8 +355,27 @@
   padding: 1.5rem;
   border-radius: 30px;
   display: grid;
-  align-content: center;
+  gap: 1rem;
+  align-content: start;
   min-height: 100%;
+}
+
+:global(.overview-card-media) {
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(232, 246, 255, 0.95), rgba(255, 255, 255, 0.92));
+}
+
+:global(.overview-card-image) {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+:global(.overview-card-content) {
+  display: grid;
+  gap: 0.35rem;
 }
 
 :global(.overview-card-large h3),
@@ -433,15 +429,61 @@
   border-radius: 26px;
 }
 
+:global(.landing-workflow-card) {
+  overflow: hidden;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(223, 237, 248, 0.92);
+  box-shadow: 0 20px 48px rgba(18, 58, 92, 0.08);
+}
+
+:global(.landing-workflow-image),
+:global(.landing-trust-image) {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+
+:global(.landing-workflow-image) {
+  aspect-ratio: 16 / 10;
+}
+
+:global(.landing-workflow-copy) {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.2rem;
+}
+
+:global(.landing-workflow-copy h3) {
+  font-size: 1.2rem;
+}
+
 :global(.landing-trust-grid) {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
 :global(.landing-trust-card) {
   padding: 1.35rem;
   border-radius: 26px;
+}
+
+:global(.landing-trust-card-image) {
+  overflow: hidden;
+  padding: 0;
+}
+
+:global(.landing-trust-image) {
+  aspect-ratio: 16 / 9;
+  object-position: center;
+  background: #ffffff;
+}
+
+:global(.landing-trust-copy) {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.15rem 1.15rem;
 }
 
 :global(.landing-final-cta-card) {
@@ -451,6 +493,15 @@
   gap: 1.25rem;
   padding: 1.6rem;
   border-radius: 30px;
+}
+
+:global(.landing-final-cta-note) {
+  margin-top: 0.85rem;
+}
+
+:global(.landing-inline-link) {
+  color: #1d78ea;
+  font-weight: 700;
 }
 
 :global(.landing-footer) {
@@ -476,6 +527,7 @@
   :global(.landing-hero-grid),
   :global(.landing-overview-grid),
   :global(.landing-feature-grid),
+  :global(.landing-workflow-grid),
   :global(.landing-role-grid),
   :global(.landing-trust-grid),
   :global(.landing-footer) {
@@ -483,7 +535,7 @@
   }
 
   :global(.landing-visual-column) {
-    min-height: 500px;
+    min-height: auto;
   }
 
   :global(.landing-final-cta-card) {
@@ -522,17 +574,6 @@
     grid-template-columns: 1fr;
   }
 
-  :global(.hero-panel-primary) {
-    inset: 0 2% auto 0;
-  }
-
-  :global(.hero-panel-secondary) {
-    inset: 38% 0 auto 10%;
-  }
-
-  :global(.hero-panel-tertiary) {
-    inset: auto 4% 0 6%;
-  }
 }
 
 @media (max-width: 560px) {
@@ -557,30 +598,15 @@
   }
 
   :global(.landing-visual-column) {
-    min-height: 460px;
+    min-height: auto;
   }
 
   :global(.hero-stage-card) {
     padding: 0.85rem;
   }
 
-  :global(.hero-panel-primary) {
-    inset: 0 auto auto 0;
-    width: 94%;
-  }
-
-  :global(.hero-panel-image) {
-    min-height: 200px;
-  }
-
-  :global(.hero-panel-secondary) {
-    inset: 42% 0 auto auto;
-    width: 86%;
-  }
-
-  :global(.hero-panel-tertiary) {
-    inset: auto auto 0 0;
-    width: 92%;
+  :global(.hero-stage-stats) {
+    grid-template-columns: 1fr;
   }
 
   :global(.landing-section) {
