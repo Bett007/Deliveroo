@@ -52,10 +52,9 @@ const trustStats = [
 ];
 
 const footerLinks = [
-  { label: "Sign In", path: "/login" },
-  { label: "Create Account", path: "/register" },
   { label: "Support", href: "mailto:support@deliveroo-app.com" },
 ];
+
 
 export function HomePage() {
   return (
@@ -255,11 +254,6 @@ export function HomePage() {
             <h2>Start sending, tracking, and managing deliveries today.</h2>
             <p>Create an account to get started or sign in if you already use Deliveroo.</p>
           </div>
-
-          <div className="landing-cta-row">
-            <Link to="/register" className="landing-primary-cta">Create Account</Link>
-            <Link to="/login" className="landing-secondary-cta">Sign In</Link>
-          </div>
         </div>
       </section>
 
@@ -269,16 +263,6 @@ export function HomePage() {
           <p>Parcel delivery support for customers and riders.</p>
         </div>
 
-        <nav className="landing-footer-links" aria-label="Footer navigation">
-          {footerLinks.map((item) =>
-            item.href ? (
-              <a key={item.label} href={item.href}>{item.label}</a>
-            ) : (
-              <Link key={item.label} to={item.path}>{item.label}</Link>
-            ),
-          )}
-        </nav>
-
         <div className="landing-footer-meta">
           <a href="mailto:support@deliveroo-app.com">support@deliveroo-app.com</a>
           <span>Deliveroo Courier Service</span>
@@ -287,3 +271,4 @@ export function HomePage() {
     </main>
   );
 }
+

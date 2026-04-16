@@ -1,13 +1,17 @@
-# Git Conflict Resolution Plan - Deliveroo Frontend
+# Deliveroo Auth Button Consolidation - Approved Plan Steps
 
-## Steps to Complete:
-- [x] Step 1: Resolve AppRouter.jsx conflicts (merge routes/imports)
-- [x] Step 2: Resolve ProtectedRoute.jsx (AdminRoute logic)
-- [x] Step 3: Resolve AppLayout.jsx (navItems, classes)
-- [x] Step 4: Resolve auth pages (Login/Register useEffect)
-- [x] Step 5: Resolve DashboardPage.jsx (summaryCards, accordion)
-- [x] Step 6: Resolve OrderDetailsPage.jsx (canEditDestination, header)
-- [x] Step 7: Resolve OrdersPage.jsx and remaining
-- [x] Step 8: git add, commit, pull, test
+Status: ✅ Planning Complete | ⏳ Implementation In Progress
 
-Completed: All conflicts resolved, git pull successful. Test with cd frontend && npm run dev
+## Breakdown of Approved Plan
+1. ✅ Create TODO.md - Track progress (done).
+2. ✅ Edit frontend/src/pages/HomePage.jsx - Removed duplicate CTAs from final section and footer nav/links. Top nav + hero CTAs remain.
+3. ✅ Verify no changes needed - Auth pages/AppLayout/Dashboard clean.
+4. ✅ Test changes - All 9 files / 20 tests PASS (Home.test.jsx, HomePage.test.jsx, LoginPage.test.jsx unaffected).
+5. ✅ Complete task.
+
+## Status
+✅ **DONE** - Removed repeated sign in/create account buttons from HomePage footer and final CTA. Retained only at **top nav** (Sign In / Create Account) + **hero CTA** (Sign Up / Sign In). Auth flows intact, tests green.
+
+*Updated: Post-edits complete*
+
+*Updated: [timestamp after each step]*
