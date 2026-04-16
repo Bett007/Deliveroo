@@ -5,12 +5,20 @@ export function validateCreateOrderForm(values) {
     errors.parcelName = "Parcel name is required.";
   }
 
-  if (!String(values.pickupLocationId || "").trim()) {
-    errors.pickupLocation = "Pickup location is required.";
+  if (!String(values.pickupCounty || "").trim()) {
+    errors.pickupCounty = "Pickup county is required.";
   }
 
-  if (!String(values.destinationLocationId || "").trim()) {
-    errors.destination = "Destination is required.";
+  if (!String(values.pickupStreet || "").trim()) {
+    errors.pickupStreet = "Pickup street or location is required.";
+  }
+
+  if (!String(values.destinationCounty || "").trim()) {
+    errors.destinationCounty = "Destination county is required.";
+  }
+
+  if (!String(values.destinationStreet || "").trim()) {
+    errors.destinationStreet = "Destination street or location is required.";
   }
 
   if (!String(values.weightCategoryId || "").trim()) {

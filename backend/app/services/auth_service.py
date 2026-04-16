@@ -137,10 +137,9 @@ def resend_verification_code(payload: Optional[dict] = None) -> User:
 def update_user_profile(user: User, payload: Optional[dict] = None) -> User:
     data = validate_profile_payload(payload)
 
-    user.first_name = data["first_name"]
-    user.last_name = data["last_name"]
-    user.phone = data["phone"]
-    user.avatar_url = data["avatar_url"]
+    for field, value in data.items():
+        setattr(user, field, value)
+
     db.session.commit()
 
     return user

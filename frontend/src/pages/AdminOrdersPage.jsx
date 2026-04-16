@@ -200,8 +200,10 @@ export function AdminOrdersPage() {
           {selectedOrder ? (
             <div className="dispatch-map-surface">
               <RouteMapCard
-                origin={selectedOrder.pickupLocation}
+                origin={selectedOrder.currentLocation || selectedOrder.pickupLocation}
                 destination={selectedOrder.destination}
+                originCoords={selectedOrder.pickupCoords}
+                destinationCoords={selectedOrder.destinationCoords}
                 distanceKm={selectedOrder.distanceKm}
                 durationMinutes={selectedOrder.durationMinutes}
               />

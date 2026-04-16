@@ -14,8 +14,22 @@ function mapOrder(order) {
     parcelName: parcel.description ?? `Order ${order.id}`,
     pickupLocationId: order.pickup_location_id,
     pickupLocation: pickupLocation.address ?? `Location #${order.pickup_location_id}`,
+    pickupCoords:
+      pickupLocation.latitude != null && pickupLocation.longitude != null
+        ? {
+            latitude: Number(pickupLocation.latitude),
+            longitude: Number(pickupLocation.longitude),
+          }
+        : null,
     deliveryLocationId: order.delivery_location_id,
     destination: deliveryLocation.address ?? `Location #${order.delivery_location_id}`,
+    destinationCoords:
+      deliveryLocation.latitude != null && deliveryLocation.longitude != null
+        ? {
+            latitude: Number(deliveryLocation.latitude),
+            longitude: Number(deliveryLocation.longitude),
+          }
+        : null,
     currentLocationId: order.current_location_id,
     currentLocation: currentLocation.address ?? (order.current_location_id ? `Location #${order.current_location_id}` : "Awaiting rider update"),
     assignedRiderId: order.assigned_rider_id,

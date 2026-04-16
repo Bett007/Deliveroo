@@ -107,6 +107,43 @@
 :global(.create-order-aside) {
   max-height: 100%;
 }
+:global(.route-action-row) {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+:global(.route-summary-panel) {
+  gap: 1rem;
+}
+:global(.route-summary) {
+  display: grid;
+  gap: 1rem;
+}
+:global(.route-summary.empty) {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #f7f9fb;
+}
+:global(.route-stats-row) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+:global(.route-stats-row div) {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--ops-border);
+}
+:global(.route-stats-row p) {
+  margin-bottom: 0.4rem;
+  color: var(--ops-muted);
+}
+:global(.route-stats-row h3) {
+  margin: 0;
+  color: var(--ops-ink);
+}
 :global(.quote-card h2) {
   font-size: 2.1rem;
   color: var(--ops-ink);
