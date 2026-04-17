@@ -2,26 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import deliverooLogoFull from "../assets/deliveroo-logo-full.svg";
-import authCourierImage from "../assets/images/auth-courier.jpg";
 import { Button } from "../components/ui/Button";
-import { AuthValuePanel } from "../components/ui/AuthValuePanel";
 import { FormField } from "../components/ui/FormField";
 import { clearAuthError, loginUser } from "../features/auth/authSlice";
 import { validateLoginForm } from "../features/auth/authValidators";
 import styles from "./AuthPages.module.css";
-
-const authHighlights = [
-  {
-    icon: "package",
-    title: "For customers",
-    description: "Create parcel orders, track deliveries, and get help quickly when something changes.",
-  },
-  {
-    icon: "rider",
-    title: "For riders",
-    description: "Check assigned deliveries, follow route details, and keep updates moving smoothly.",
-  },
-];
 
 export function LoginPage() {
   const dispatch = useDispatch();
@@ -79,7 +64,15 @@ export function LoginPage() {
       <div className="auth-card auth-card-wide glass-card">
         <div className="auth-content-grid">
           <div className="auth-panel">
-            <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
+            <div className="auth-home-link-row">
+              <Link to="/" aria-label="Deliveroo home">
+                <img src={deliverooLogoFull} alt="Deliveroo Courier Service" className="auth-form-logo" />
+              </Link>
+              <Link to="/" className="back-link">
+                <span className="back-link-icon" aria-hidden="true">&lt;</span>
+                <span>Return to home</span>
+              </Link>
+            </div>
             <div className="auth-header">
               <p className="eyebrow">Sign In First</p>
               <h1>Welcome back</h1>
@@ -104,16 +97,6 @@ export function LoginPage() {
 
             <p className="auth-footer">Need an account? <Link to="/register">Create one</Link></p>
           </div>
-
-          <AuthValuePanel
-            label="Why Deliveroo"
-            title="One sign-in, the right experience"
-            description="Use one secure account to place orders, track deliveries, or manage assigned delivery work."
-            items={authHighlights}
-            tone="customer"
-            imageSrc={authCourierImage}
-            imageAlt="Customer confirming a parcel delivery on a phone"
-          />
         </div>
       </div>
     </section>
