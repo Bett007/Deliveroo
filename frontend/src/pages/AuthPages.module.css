@@ -19,13 +19,13 @@
 
 :global(.auth-card-wide .auth-content-grid) {
   display: grid;
-  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: stretch;
 }
 
 :global(.auth-card-wide .auth-content-grid.reverse-layout) {
-  grid-template-columns: minmax(360px, 1.1fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 :global(.auth-card-wide .auth-panel) {
@@ -34,11 +34,14 @@
   gap: 1rem;
   min-width: 0;
   padding: 0.5rem;
+  max-width: 620px;
+  margin: 0 auto;
 }
 
 :global(.auth-card-wide .placeholder-art),
 :global(.auth-card-wide .auth-value-panel) {
   min-width: 0;
+  display: none;
 }
 
 :global(.auth-card-wide .placeholder-art-frame),
@@ -50,11 +53,6 @@
   :global(.auth-card-wide .auth-content-grid),
   :global(.auth-card-wide .auth-content-grid.reverse-layout) {
     grid-template-columns: 1fr;
-  }
-
-  :global(.auth-card-wide .placeholder-art),
-  :global(.auth-card-wide .auth-value-panel) {
-    min-height: 360px;
   }
 }
 
@@ -75,6 +73,7 @@
 
   :global(.auth-card-wide .auth-panel) {
     padding: 0;
+    max-width: 100%;
   }
 
   :global(.auth-form-logo) {

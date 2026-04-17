@@ -107,7 +107,109 @@
 :global(.create-order-aside) {
   max-height: 100%;
 }
+:global(.route-action-row) {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+:global(.route-summary-panel) {
+  gap: 1rem;
+}
+:global(.route-summary) {
+  display: grid;
+  gap: 1rem;
+}
+:global(.route-summary.empty) {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #f7f9fb;
+}
+:global(.route-stats-row) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+:global(.route-stats-row.single-column) {
+  grid-template-columns: 1fr;
+  margin-bottom: 0;
+}
+:global(.route-stats-row div) {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--ops-border);
+}
+:global(.route-stats-row p) {
+  margin-bottom: 0.4rem;
+  color: var(--ops-muted);
+}
+:global(.route-stats-row h3) {
+  margin: 0;
+  color: var(--ops-ink);
+}
 :global(.quote-card h2) {
   font-size: 2.1rem;
   color: var(--ops-ink);
+}
+
+:global(.location-input-wrap) {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+}
+:global(.row) {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+:global(.half) {
+  width: 50%;
+}
+:global(.half input),
+:global(.half select) {
+  width: 100%;
+}
+:global(.input-actions-row) {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+:global(.tiny-btn) {
+  min-height: 30px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+}
+:global(.location-suggestions) {
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  border: 1px solid var(--ops-border);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  max-height: 210px;
+  overflow: auto;
+}
+:global(.location-suggestions li button) {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  color: var(--ops-ink);
+}
+:global(.location-suggestions li button:hover) {
+  background: #f2f6fb;
+}
+
+@media (max-width: 768px) {
+  :global(.row) {
+    flex-direction: column;
+  }
+
+  :global(.half) {
+    width: 100%;
+  }
 }

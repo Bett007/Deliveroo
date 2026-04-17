@@ -150,8 +150,11 @@ export function RiderDashboard() {
             <RouteMapCard
               origin={featuredOrder.pickupLocation}
               destination={featuredOrder.destination}
+              originCoords={featuredOrder.pickupCoords}
+              destinationCoords={featuredOrder.destinationCoords}
               distanceKm={featuredOrder.distanceKm}
               durationMinutes={featuredOrder.durationMinutes}
+              status={featuredOrder.status}
             />
           ) : (
             <section className="ops-insight-card">

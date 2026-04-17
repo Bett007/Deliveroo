@@ -19,14 +19,14 @@ const initialRegisterForm = {
 
 function getNextRouteForRole(role) {
   if (role === "admin") {
-    return "/dashboard";
+    return "/admin/dashboard";
   }
 
   if (role === "rider") {
-    return "/rider";
+    return "/rider/dashboard";
   }
 
-  return "/orders";
+  return "/dashboard";
 }
 
 function SocialButton({ label }) {
@@ -179,15 +179,6 @@ export function CombinedAuthPanel({ activeMode = "signin" }) {
 
         <div className="auth-ecosystem-panels glass-card">
           <section className={`auth-panel auth-panel-dark ${activeMode === "signin" ? "active" : "inactive"}`}>
-            <div className="auth-visual-card support-visual-card">
-              <div className="support-photo-scene">
-                <div className="support-avatar"></div>
-                <div className="support-monitor"></div>
-                <div className="support-desk"></div>
-                <div className="support-badge">Njeri M.</div>
-              </div>
-            </div>
-
             <div className="auth-copy-block">
               <h2>{authPanels.signin.title}</h2>
               <p>{authPanels.signin.subtitle}</p>
@@ -222,17 +213,6 @@ export function CombinedAuthPanel({ activeMode = "signin" }) {
           </section>
 
           <section className={`auth-panel auth-panel-light ${activeMode === "signup" ? "active" : "inactive"}`}>
-            <div className="auth-visual-card delivery-visual-card">
-              <div className="delivery-scene">
-                <div className="delivery-rider"></div>
-                <div className="delivery-customer"></div>
-                <div className="delivery-package">
-                  <span>DELIVEROO</span>
-                  <span>CUSTOMER</span>
-                </div>
-              </div>
-            </div>
-
             <div className="auth-copy-block light-copy">
               <h2>{authPanels.signup.title}</h2>
               <p>{authPanels.signup.subtitle}</p>
@@ -258,7 +238,6 @@ export function CombinedAuthPanel({ activeMode = "signin" }) {
               <div className="role-chip-row">
                 <RoleOption value="customer" currentValue={registerForm.role} onChange={(value) => setRegisterForm((current) => ({ ...current, role: value }))}>Customer</RoleOption>
                 <RoleOption value="rider" currentValue={registerForm.role} onChange={(value) => setRegisterForm((current) => ({ ...current, role: value }))}>Rider</RoleOption>
-                <RoleOption value="admin" currentValue={registerForm.role} onChange={(value) => setRegisterForm((current) => ({ ...current, role: value }))}>Admin</RoleOption>
               </div>
               {registerErrors.role || fieldErrors.role?.[0] ? <p className="field-error">{registerErrors.role || fieldErrors.role?.[0]}</p> : null}
 

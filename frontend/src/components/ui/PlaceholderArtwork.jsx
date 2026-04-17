@@ -1,37 +1,39 @@
-import logisticsImage from "../../assets/images/parcel-logistics.jpg";
 import supportImage from "../../assets/images/parcel-support.jpg";
-import routeImage from "../../assets/images/delivery-map.jpg";
+import onlineShoppingImage from "../../assets/images/online-shopping-delivery-illustration.jpg";
+import scooterRiderImage from "../../assets/images/scooter-rider-illustration.jpg";
+import warehouseForkliftImage from "../../assets/images/warehouse-forklift-aisle.jpg";
+import warehouseShelvesImage from "../../assets/images/warehouse-shelves.jpg";
 import { AppIcon } from "./AppIcon";
 import styles from "./PlaceholderArtwork.module.css";
 
 export function PlaceholderArtwork({ variant = "customer", label = "Preview", title, caption }) {
   const artworkMap = {
     customer: {
-      primary: routeImage,
-      secondary: supportImage,
+      primary: onlineShoppingImage,
+      secondary: scooterRiderImage,
       icon: "route",
       stat: "Live delivery updates",
       detail: "Order status, pickup confirmation, and parcel handoff progress.",
-      primaryAlt: "Parcel logistics team working inside a loading area",
-      secondaryAlt: "Courier handing a parcel to a customer during delivery",
+      primaryAlt: "Illustration of a customer placing an order while a rider heads out for delivery",
+      secondaryAlt: "Illustration of a scooter rider navigating a parcel delivery route",
     },
     admin: {
-      primary: logisticsImage,
-      secondary: routeImage,
+      primary: warehouseShelvesImage,
+      secondary: warehouseForkliftImage,
       icon: "chart",
       stat: "Operations snapshot",
       detail: "Dispatch flow, parcel handling, and delivery readiness at a glance.",
-      primaryAlt: "Parcel logistics team working inside a loading area",
-      secondaryAlt: "Parcel logistics team working inside a loading area",
+      primaryAlt: "Warehouse shelves organized for parcel handling and operations",
+      secondaryAlt: "Forklift moving through a warehouse aisle during dispatch preparation",
     },
     auth: {
       primary: supportImage,
-      secondary: logisticsImage,
+      secondary: scooterRiderImage,
       icon: "shield",
       stat: "Trusted delivery access",
       detail: "Simple onboarding with secure access for customers and riders.",
       primaryAlt: "Courier handing a parcel to a customer during delivery",
-      secondaryAlt: "Parcel logistics team working inside a loading area",
+      secondaryAlt: "Illustration of a scooter rider navigating a parcel delivery route",
     },
   };
 

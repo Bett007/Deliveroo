@@ -5,12 +5,12 @@ export function validateCreateOrderForm(values) {
     errors.parcelName = "Parcel name is required.";
   }
 
-  if (!String(values.pickupLocationId || "").trim()) {
+  if (!String(values.pickupLocation || "").trim()) {
     errors.pickupLocation = "Pickup location is required.";
   }
 
-  if (!String(values.destinationLocationId || "").trim()) {
-    errors.destination = "Destination is required.";
+  if (!String(values.destinationLocation || "").trim()) {
+    errors.destinationLocation = "Destination location is required.";
   }
 
   if (!String(values.weightCategoryId || "").trim()) {

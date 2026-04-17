@@ -33,8 +33,11 @@ export function RouteMap() {
           <RouteMapCard
             origin={selectedOrder.pickupLocation}
             destination={selectedOrder.destination}
+            originCoords={selectedOrder.pickupCoords}
+            destinationCoords={selectedOrder.destinationCoords}
             distanceKm={selectedOrder.distanceKm}
             durationMinutes={selectedOrder.durationMinutes}
+            status={selectedOrder.status}
           />
 
           <SectionCard title="Active Orders" description="Select an order to focus its route map details.">
