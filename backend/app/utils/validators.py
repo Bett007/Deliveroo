@@ -222,26 +222,79 @@ def validate_parcel_payload(payload: Optional[dict] = None) -> dict:
     }
 
 
+def validate_location_payload(field_name: str, payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    if not isinstance(data, dict):
+        errors[field_name] = ["Location payload must be an object."]
+        raise ValidationError("Validation failed.", errors=errors)
+
+    address = (data.get("address") or "").strip()
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+    city = data.get("city")
+    country = data.get("country")
+
+    if not address:
+        errors[f"{field_name}.address"] = ["Address is required."]
+
+    if latitude is None:
+        errors[f"{field_name}.latitude"] = ["Latitude is required."]
+    else:
+        try:
+            latitude = float(latitude)
+        except (TypeError, ValueError):
+            errors[f"{field_name}.latitude"] = ["Latitude must be a valid number."]
+
+    if longitude is None:
+        errors[f"{field_name}.longitude"] = ["Longitude is required."]
+    else:
+        try:
+            longitude = float(longitude)
+        except (TypeError, ValueError):
+            errors[f"{field_name}.longitude"] = ["Longitude must be a valid number."]
+
+    if city is not None and not isinstance(city, str):
+        errors[f"{field_name}.city"] = ["City must be a string."]
+
+    if country is not None and not isinstance(country, str):
+        errors[f"{field_name}.country"] = ["Country must be a string."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {
+        "address": address,
+        "latitude": latitude,
+        "longitude": longitude,
+        "city": city.strip() if isinstance(city, str) else None,
+        "country": country.strip() if isinstance(country, str) else None,
+    }
+
+
 def validate_order_payload(payload: Optional[dict] = None) -> dict:
     data = payload or {}
     errors = {}
 
     pickup_location_id = data.get("pickup_location_id")
     delivery_location_id = data.get("delivery_location_id")
+    pickup_location_payload = data.get("pickup_location")
+    delivery_location_payload = data.get("delivery_location")
     quoted_price = data.get("quoted_price")
     parcel_payload = data.get("parcel")
 
-    if not pickup_location_id:
-        errors["pickup_location_id"] = ["Pickup location is required."]
-    else:
+    if pickup_location_id is None and pickup_location_payload is None:
+        errors["pickup_location"] = ["Pickup location is required."]
+    elif pickup_location_id is not None:
         try:
             pickup_location_id = int(pickup_location_id)
         except (TypeError, ValueError):
             errors["pickup_location_id"] = ["Pickup location ID must be an integer."]
 
-    if not delivery_location_id:
-        errors["delivery_location_id"] = ["Delivery location is required."]
-    else:
+    if delivery_location_id is None and delivery_location_payload is None:
+        errors["delivery_location"] = ["Delivery location is required."]
+    elif delivery_location_id is not None:
         try:
             delivery_location_id = int(delivery_location_id)
         except (TypeError, ValueError):
@@ -263,11 +316,43 @@ def validate_order_payload(payload: Optional[dict] = None) -> dict:
     if errors:
         raise ValidationError("Validation failed.", errors=errors)
 
+    if pickup_location_payload is not None:
+        pickup_location_payload = validate_location_payload("pickup_location", pickup_location_payload)
+
+    if delivery_location_payload is not None:
+        delivery_location_payload = validate_location_payload("delivery_location", delivery_location_payload)
+
+    distance_km = data.get("distance_km")
+    estimated_duration_minutes = data.get("estimated_duration_minutes")
+
+    if distance_km is not None:
+        try:
+            distance_km = float(distance_km)
+            if distance_km < 0:
+                raise ValueError()
+        except (TypeError, ValueError):
+            errors["distance_km"] = ["Distance must be a valid number."]
+
+    if estimated_duration_minutes is not None:
+        try:
+            estimated_duration_minutes = int(estimated_duration_minutes)
+            if estimated_duration_minutes < 0:
+                raise ValueError()
+        except (TypeError, ValueError):
+            errors["estimated_duration_minutes"] = ["Duration must be a valid integer."]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
     parcel = validate_parcel_payload(parcel_payload)
     return {
         "pickup_location_id": pickup_location_id,
         "delivery_location_id": delivery_location_id,
+        "pickup_location": pickup_location_payload,
+        "delivery_location": delivery_location_payload,
         "quoted_price": quoted_price,
+        "distance_km": distance_km,
+        "estimated_duration_minutes": estimated_duration_minutes,
         "parcel": parcel,
     }
 

@@ -75,20 +75,46 @@ def _validate_location_exists(location_id):
     return location
 
 
+def _create_location_from_payload(location_data):
+    location = Location(
+        address=location_data["address"],
+        city=location_data.get("city"),
+        country=location_data.get("country"),
+        latitude=location_data["latitude"],
+        longitude=location_data["longitude"],
+    )
+    db.session.add(location)
+    db.session.flush()
+    return location
+
+
 def create_order(user, payload):
     data = validate_order_payload(payload)
 
-    _validate_location_exists(data["pickup_location_id"])
-    _validate_location_exists(data["delivery_location_id"])
+    if data["pickup_location_id"] is not None:
+        _validate_location_exists(data["pickup_location_id"])
+        pickup_location_id = data["pickup_location_id"]
+    else:
+        pickup_location = _create_location_from_payload(data["pickup_location"])
+        pickup_location_id = pickup_location.id
+
+    if data["delivery_location_id"] is not None:
+        _validate_location_exists(data["delivery_location_id"])
+        delivery_location_id = data["delivery_location_id"]
+    else:
+        delivery_location = _create_location_from_payload(data["delivery_location"])
+        delivery_location_id = delivery_location.id
 
     parcel = create_parcel(data["parcel"])
 
     order = Order(
         user_id=user.id,
         parcel_id=parcel.id,
-        pickup_location_id=data["pickup_location_id"],
-        delivery_location_id=data["delivery_location_id"],
+        pickup_location_id=pickup_location_id,
+        delivery_location_id=delivery_location_id,
         quoted_price=data["quoted_price"],
+        distance_km=data.get("distance_km"),
+        estimated_duration_minutes=data.get("estimated_duration_minutes"),
         status="pending",
     )
 

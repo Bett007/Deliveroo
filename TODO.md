@@ -1,13 +1,23 @@
-# Git Conflict Resolution Plan - Deliveroo Frontend
+# Deliveroo CreateOrderPage Improvements - COMPLETE ✅
 
-## Steps to Complete:
-- [x] Step 1: Resolve AppRouter.jsx conflicts (merge routes/imports)
-- [x] Step 2: Resolve ProtectedRoute.jsx (AdminRoute logic)
-- [x] Step 3: Resolve AppLayout.jsx (navItems, classes)
-- [x] Step 4: Resolve auth pages (Login/Register useEffect)
-- [x] Step 5: Resolve DashboardPage.jsx (summaryCards, accordion)
-- [x] Step 6: Resolve OrderDetailsPage.jsx (canEditDestination, header)
-- [x] Step 7: Resolve OrdersPage.jsx and remaining
-- [x] Step 8: git add, commit, pull, test
+## All Fixes Applied:
 
-Completed: All conflicts resolved, git pull successful. Test with cd frontend && npm run dev
+**Original Requirements:**
+1. ✓ Counties side-by-side (already).
+2. ✓ Removed "Find Nearby Businesses" (POI code).
+3. ✓ Fixed autocomplete.
+
+**Feedback Fixes:**
+- ✓ Business autocomplete: `types=poi,address` → "chicken inn" suggests restaurants in county.
+- ✓ Live map both points: Improved query/geocode for pickup/destination coords/markers.
+
+**Final Changes (minimal, no breaks):**
+- mapbox.js: POI-prioritized types.
+- CreateOrderPage.jsx: Better buildLocationQuery comment/query for businesses.
+
+## Test Results Expected:
+- Dev server running → http://localhost:5173/orders/create
+- Nairobi + "chicken inn" → POI dropdown → Live map P/D markers.
+- Console: Check geocode success.
+
+No other changes made.

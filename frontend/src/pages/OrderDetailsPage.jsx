@@ -7,8 +7,7 @@ import { FormField } from "../components/ui/FormField";
 import { RouteMapCard } from "../components/ui/RouteMapCard";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
-import { cancelOrder, clearOrderError, fetchOrderById, fetchTrackingUpdates, updateOrderDestination } from "../features/orders/ordersSlice";
-import { validateDestination } from "../features/orders/orderValidators";
+import { cancelOrder, clearOrderError, fetchOrderById, fetchTrackingUpdates, loadOrderReferenceData, updateOrderDestination } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
 
 export function OrderDetailsPage() {
@@ -21,13 +20,17 @@ export function OrderDetailsPage() {
     orderHistory,
     selectedOrder,
     trackingUpdates,
+    referenceData,
+    referenceStatus,
     detailsStatus,
     trackingStatus,
     mutationStatus,
     error,
     fieldErrors,
   } = useSelector((state) => state.orders);
-  const [destination, setDestination] = useState("");
+  const [destinationArea, setDestinationArea] = useState("");
+  const [destinationPlace, setDestinationPlace] = useState("");
+  const [destinationLocationId, setDestinationLocationId] = useState("");
   const [cancelReason, setCancelReason] = useState("");
   const [destinationError, setDestinationError] = useState("");
 
@@ -40,10 +43,34 @@ export function OrderDetailsPage() {
     };
   }, [dispatch, orderId]);
 
+  useEffect(() => {
+    if (referenceStatus === "idle") {
+      dispatch(loadOrderReferenceData());
+    }
+  }, [dispatch, referenceStatus]);
+
   const order = useMemo(() => {
     const mergedOrders = [...currentOrders, ...orderHistory];
     return mergedOrders.find((item) => String(item.id) === String(orderId)) || (String(selectedOrder?.id) === String(orderId) ? selectedOrder : null);
   }, [currentOrders, orderHistory, orderId, selectedOrder]);
+
+  const destinationAreas = useMemo(() => {
+    const cities = new Set(
+      referenceData.locations
+        .map((location) => (location.city || "").trim())
+        .filter(Boolean),
+    );
+    return Array.from(cities).sort((a, b) => a.localeCompare(b));
+  }, [referenceData.locations]);
+
+  const destinationPlaces = useMemo(() => {
+    return referenceData.locations.filter((location) => {
+      if (!destinationArea) {
+        return true;
+      }
+      return String(location.city || "").trim().toLowerCase() === destinationArea.trim().toLowerCase();
+    });
+  }, [referenceData.locations, destinationArea]);
 
   const orderTracking = trackingUpdates[String(orderId)] || [];
 
@@ -68,22 +95,27 @@ export function OrderDetailsPage() {
 
   async function handleUpdateDestination(event) {
     event.preventDefault();
-    const validationMessage = validateDestination(destination);
+    const matchedLocation = destinationPlaces.find(
+      (location) => location.label.toLowerCase() === destinationPlace.trim().toLowerCase(),
+    );
+    const resolvedLocationId = destinationLocationId || (matchedLocation ? String(matchedLocation.id) : "");
 
-    if (validationMessage) {
-      setDestinationError(validationMessage);
+    if (!resolvedLocationId) {
+      setDestinationError("Select a destination place from the suggestions.");
       return;
     }
 
     const result = await dispatch(
       updateOrderDestination({
         orderId: order.id,
-        deliveryLocationId: Number(destination),
+        deliveryLocationId: Number(resolvedLocationId),
       }),
     );
 
     if (updateOrderDestination.fulfilled.match(result)) {
-      setDestination("");
+      setDestinationArea("");
+      setDestinationPlace("");
+      setDestinationLocationId("");
       setDestinationError("");
     }
   }
@@ -147,19 +179,51 @@ export function OrderDetailsPage() {
         <SectionCard title="Manage Delivery" description="Update the destination or cancel this order when it is still eligible.">
           {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
           <form className="auth-form" onSubmit={handleUpdateDestination}>
-            <FormField id="new-destination" label="New Delivery Location ID" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
-              <input
-                id="new-destination"
-                name="destination"
-                placeholder="Enter a new numeric location ID"
-                value={destination}
+            <FormField id="destination-location" label="Destination Location" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
+              <select
+                id="destination-area"
+                name="destinationArea"
+                className="form-select"
+                value={destinationArea}
                 onChange={(event) => {
-                  setDestination(event.target.value);
+                  setDestinationArea(event.target.value);
+                  setDestinationPlace("");
+                  setDestinationLocationId("");
                   setDestinationError("");
                 }}
-                disabled={!canEditDestination || mutationStatus === "loading"}
-                inputMode="numeric"
+                disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
+              >
+                <option value="">Select destination location area</option>
+                {destinationAreas.map((area) => (
+                  <option key={area} value={area}>{area}</option>
+                ))}
+              </select>
+            </FormField>
+
+            <FormField id="destination-place" label="Place" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
+              <input
+                id="destination-place"
+                name="destinationPlace"
+                placeholder="Search for a place..."
+                value={destinationPlace}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setDestinationPlace(value);
+                  setDestinationError("");
+
+                  const matchedLocation = destinationPlaces.find(
+                    (location) => location.label.toLowerCase() === value.trim().toLowerCase(),
+                  );
+                  setDestinationLocationId(matchedLocation ? String(matchedLocation.id) : "");
+                }}
+                list="destination-place-options"
+                disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
               />
+              <datalist id="destination-place-options">
+                {destinationPlaces.map((locationOption) => (
+                  <option key={locationOption.id} value={locationOption.label} />
+                ))}
+              </datalist>
             </FormField>
 
             <Button type="submit" className="secondary-btn full-width" disabled={!canEditDestination || mutationStatus === "loading"}>
@@ -197,6 +261,7 @@ export function OrderDetailsPage() {
           destinationCoords={order.destinationCoords}
           distanceKm={order.distanceKm}
           durationMinutes={order.durationMinutes}
+          status={order.status}
         />
 
         <SectionCard title="Tracking Updates" description="Latest route and status updates for this order.">
