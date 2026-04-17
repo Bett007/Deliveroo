@@ -1,10 +1,10 @@
-const ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+const ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const GEOCODING_BASE_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 const DIRECTIONS_BASE_URL = "https://api.mapbox.com/directions/v5/mapbox/driving";
 
 function assertToken() {
   if (!ACCESS_TOKEN) {
-    throw new Error("Mapbox access token is required. Set VITE_MAPBOX_ACCESS_TOKEN in your environment.");
+    throw new Error("Mapbox access token is required. Set VITE_MAPBOX_TOKEN (or VITE_MAPBOX_ACCESS_TOKEN) in your environment.");
   }
 }
 
@@ -50,10 +50,70 @@ export async function autocompleteAddress(text, county) {
   const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=6&country=ke&types=poi,address`;
   const payload = await fetchJson(url);
 
-  return (payload.features || []).map((feature) => ({
-    id: feature.id,
-    label: feature.place_name,
-  }));
+  return (payload.features || []).map((feature) => {
+    const [longitude, latitude] = feature.center || [];
+    return {
+      id: feature.id,
+      label: feature.place_name,
+      latitude,
+      longitude,
+      address: feature.place_name,
+    };
+  });
+}
+
+export async function reverseGeocodeCoordinates(latitude, longitude) {
+  assertToken();
+  const encoded = encodeURIComponent(`${longitude},${latitude}`);
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&limit=1&country=ke`;
+  const payload = await fetchJson(url);
+
+  const feature = payload.features?.[0];
+  if (!feature) {
+    throw new Error("Unable to resolve coordinates.");
+  }
+
+  const [resolvedLng, resolvedLat] = feature.center || [longitude, latitude];
+  return {
+    address: feature.place_name,
+    latitude: resolvedLat,
+    longitude: resolvedLng,
+    city: feature.context?.find((item) => item.id.startsWith("place"))?.text || null,
+    country: feature.context?.find((item) => item.id.startsWith("country"))?.text || null,
+  };
+}
+
+export async function fetchNairobiPlaceSuggestions(limitPerCategory = 4) {
+  assertToken();
+  const categories = ["restaurant", "cafe", "business", "hotel", "hospital", "mall"];
+
+  const requests = categories.map(async (category) => {
+    const query = encodeURIComponent(`${category} in Nairobi`);
+    const url = `${GEOCODING_BASE_URL}/${query}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=${limitPerCategory}&country=ke&types=poi,address`;
+    const payload = await fetchJson(url);
+
+    return (payload.features || []).map((feature) => {
+      const [longitude, latitude] = feature.center || [];
+      return {
+        id: `${category}-${feature.id}`,
+        label: feature.place_name,
+        latitude,
+        longitude,
+        address: feature.place_name,
+      };
+    });
+  });
+
+  const suggestions = (await Promise.all(requests)).flat();
+  const seen = new Set();
+
+  return suggestions.filter((item) => {
+    if (!item.label || seen.has(item.label)) {
+      return false;
+    }
+    seen.add(item.label);
+    return true;
+  });
 }
 
 export async function fetchRoutePreview(originCoords, destinationCoords) {

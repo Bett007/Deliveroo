@@ -160,6 +160,7 @@ export function DashboardPage() {
               destinationCoords={featuredOrder.destinationCoords}
               distanceKm={featuredOrder.distanceKm}
               durationMinutes={featuredOrder.durationMinutes}
+              status={featuredOrder.status}
             />
           ) : (
             <section className="ops-insight-card">
@@ -167,6 +168,7 @@ export function DashboardPage() {
               <p className="helper-text">Create an order to see route mapping here.</p>
             </section>
           )}
+
         </aside>
       </div>
     </section>

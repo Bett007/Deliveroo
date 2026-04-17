@@ -206,6 +206,7 @@ export function AdminOrdersPage() {
                 destinationCoords={selectedOrder.destinationCoords}
                 distanceKm={selectedOrder.distanceKm}
                 durationMinutes={selectedOrder.durationMinutes}
+                status={selectedOrder.status}
               />
             </div>
           ) : null}
