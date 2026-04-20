@@ -784,7 +784,8 @@ export function CreateOrderPage() {
                 originCoords={pickup}
                 destinationCoords={destination}
                 routeGeoJson={routeGeoJson}
-                showNearbyPlaces={!pickup && !destination}
+                defaultCenter={[36.8219, -1.2921]}
+                defaultZoom={10}
                 clickTarget={activeLocationField}
                 onPickupSelect={(coords) => handleMapLocationSelect("pickup", coords)}
                 onDestinationSelect={(coords) => handleMapLocationSelect("destination", coords)}

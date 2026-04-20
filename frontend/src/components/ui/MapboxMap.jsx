@@ -67,6 +67,9 @@ export function MapboxMap({
   originCoords,
   destinationCoords,
   routeGeoJson,
+  onPickupSelect,
+  onDestinationSelect,
+  clickTarget = "pickup",
   onPOISelect,
   poiFilter,
   countyGeoJson,
@@ -276,6 +279,21 @@ export function MapboxMap({
         });
 
         mapRef.current.on("click", (event) => {
+          if (onPickupSelect || onDestinationSelect) {
+            const coords = {
+              longitude: Number(event.lngLat.lng.toFixed(6)),
+              latitude: Number(event.lngLat.lat.toFixed(6)),
+            };
+
+            if (clickTarget === "destination" && onDestinationSelect) {
+              onDestinationSelect(coords);
+            } else if (onPickupSelect) {
+              onPickupSelect(coords);
+            }
+
+            return;
+          }
+
           const features = mapRef.current.queryRenderedFeatures({ layers: ["poi-layer"], point: event.point });
           if (features.length > 0) {
             const feature = features[0];
@@ -326,7 +344,10 @@ export function MapboxMap({
     defaultZoom,
     destination,
     destinationCoords,
+    clickTarget,
     onPOISelect,
+    onPickupSelect,
+    onDestinationSelect,
     origin,
     originCoords,
     poiFilter,

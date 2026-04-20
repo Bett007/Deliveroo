@@ -173,7 +173,7 @@
 :global(.ops-shell-toggle) {
   position: absolute;
   top: 1.05rem;
-  left: 1.05rem;
+  left: -21px;
   z-index: 10;
   width: 42px;
   height: 42px;
@@ -187,7 +187,7 @@
   display: grid;
   place-items: center;
   box-shadow: 0 10px 24px rgba(20, 35, 55, 0.06);
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, left 0.18s ease;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 :global(.ops-shell-toggle:hover),
 :global(.ops-shell-toggle:focus-visible) {
@@ -290,5 +290,9 @@
 
   :global(.ops-main) {
     padding: 1rem;
+  }
+
+  :global(.ops-shell-toggle) {
+    left: 0.75rem;
   }
 }
