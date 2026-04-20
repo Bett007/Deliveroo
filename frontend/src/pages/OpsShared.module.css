@@ -52,6 +52,21 @@
   align-items: start;
   gap: 1rem;
 }
+:global(.orders-hero-banner) {
+  grid-column: 1 / -1;
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--ops-border);
+  background: #e8f2fb;
+}
+:global(.orders-hero-banner img) {
+  width: 100%;
+  height: clamp(140px, 20vw, 220px);
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
 :global(.orders-hero-copy) {
   display: grid;
   gap: 0.65rem;
@@ -698,12 +713,20 @@
     grid-template-columns: 1fr;
   }
 
+  :global(.orders-hero-banner img) {
+    height: clamp(132px, 32vw, 190px);
+  }
+
   :global(.orders-hero-metrics) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
+  :global(.orders-hero-banner img) {
+    height: clamp(116px, 38vw, 160px);
+  }
+
   :global(.orders-hero-metrics) {
     grid-template-columns: 1fr;
   }

@@ -31,6 +31,28 @@
   flex-wrap: wrap;
   gap: 0.45rem;
 }
+:global(.panel-toggle-bar) {
+  padding: 0.75rem;
+}
+:global(.panel-toggle-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+:global(.panel-toggle-btn) {
+  min-height: 38px;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--ops-border);
+  background: #ffffff;
+  color: var(--ops-ink);
+  font-weight: 700;
+}
+:global(.panel-toggle-btn.active) {
+  background: var(--ops-blue);
+  color: #ffffff;
+  border-color: transparent;
+}
 :global(.order-builder-progress span),
 :global(.metric-pills span) {
   min-height: 34px;
@@ -119,6 +141,34 @@
   display: grid;
   gap: 1rem;
 }
+:global(.order-summary-panel),
+:global(.order-summary-content) {
+  display: grid;
+  gap: 0.9rem;
+}
+:global(.order-summary-metadata) {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--ops-border);
+  background: #f7f9fb;
+}
+:global(.order-summary-metadata p) {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+:global(.order-summary-metadata span) {
+  color: var(--ops-muted);
+  font-weight: 700;
+}
+:global(.order-summary-metadata strong) {
+  color: var(--ops-ink);
+  text-align: right;
+}
 :global(.route-summary.empty) {
   padding: 1rem;
   border-radius: 14px;
@@ -205,6 +255,11 @@
 }
 
 @media (max-width: 768px) {
+  :global(.panel-toggle-actions) {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   :global(.row) {
     flex-direction: column;
   }

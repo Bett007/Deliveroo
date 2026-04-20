@@ -6,6 +6,7 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
 import { formatReadableDate } from "../utils/formatters/date";
+import onlineShoppingDeliveryIllustration from "../assets/images/online-shopping-delivery-illustration.jpg";
 
 export function OrdersPage() {
   const dispatch = useDispatch();
@@ -76,6 +77,10 @@ export function OrdersPage() {
   return (
     <section className="workspace-page orders-page">
       <header className="workspace-hero glass-card orders-hero">
+        <figure className="orders-hero-banner" aria-hidden="true">
+          <img src={onlineShoppingDeliveryIllustration} alt="" loading="eager" />
+        </figure>
+
         <div className="orders-hero-copy">
           <p className="eyebrow">Customer Orders</p>
           <h1>Manage your orders</h1>
