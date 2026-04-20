@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RouteMapCard } from "../components/ui/RouteMapCard";
@@ -12,10 +13,28 @@ export function RiderDashboard() {
   const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Rider";
   const avatarUrl = user?.avatar_url;
 
-  const riderActiveOrders = currentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status));
-  const inTransit = riderActiveOrders.filter((order) => order.status === "in_transit").length;
-  const completedToday = orderHistory.slice(0, 8).filter((order) => order.status === "delivered").length;
-  const featuredOrder = riderActiveOrders[0] || orderHistory[0];
+  const riderCurrentOrders = useMemo(
+    () => currentOrders.filter((order) => Number(order.assignedRiderId) === Number(user?.id)),
+    [currentOrders, user?.id],
+  );
+  const riderHistoryOrders = useMemo(
+    () => orderHistory.filter((order) => Number(order.assignedRiderId) === Number(user?.id)),
+    [orderHistory, user?.id],
+  );
+
+  const riderActiveOrders = useMemo(
+    () => riderCurrentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status)),
+    [riderCurrentOrders],
+  );
+  const inTransit = useMemo(
+    () => riderActiveOrders.filter((order) => order.status === "in_transit").length,
+    [riderActiveOrders],
+  );
+  const completedToday = useMemo(
+    () => riderHistoryOrders.filter((order) => order.status === "delivered").length,
+    [riderHistoryOrders],
+  );
+  const featuredOrder = riderActiveOrders[0] || riderHistoryOrders[0];
   const activeDeliveriesSummary = riderActiveOrders.length > 0
     ? "Orders waiting pickup, transit, or dropoff updates"
     : "No active deliveries yet";
@@ -46,7 +65,7 @@ export function RiderDashboard() {
     },
     {
       title: "Delivery History",
-      description: `${orderHistory.length} finished deliveries`,
+      description: `${riderHistoryOrders.length} finished deliveries`,
       path: "/deliveries/history",
       badge: "Past",
     },
