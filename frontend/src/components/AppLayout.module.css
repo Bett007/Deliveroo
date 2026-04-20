@@ -168,8 +168,7 @@
   min-width: 0;
   min-height: 0;
   height: 100dvh;
-  overflow-y: hidden;
-  overflow-x: visible;
+  overflow: visible;
   padding: 1.35rem;
   display: flex;
   flex-direction: column;
