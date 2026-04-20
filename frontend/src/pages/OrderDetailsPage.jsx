@@ -106,6 +106,7 @@ export function OrderDetailsPage() {
   const canEditDestination = !["delivered", "cancelled"].includes(order.status);
   const canCancel = order.status === "pending";
   const isDeliveredCustomerOrder = user?.role === "customer" && order.status === "delivered";
+  const isFulfilledOrder = order.status === "delivered";
 
   async function handleUpdateDestination(event) {
     event.preventDefault();
@@ -299,8 +300,12 @@ export function OrderDetailsPage() {
             <>
               <div className="section-header">
                 <div>
-                  <h2>Tracking Updates</h2>
-                  <p>Latest route and status updates for this order.</p>
+                  <h2>{isFulfilledOrder ? "Delivery Timeline" : "Tracking Updates"}</h2>
+                  <p>
+                    {isFulfilledOrder
+                      ? "Final route and handoff activity for this fulfilled order."
+                      : "Latest route and status updates for this order."}
+                  </p>
                 </div>
               </div>
               {trackingStatus === "loading" ? (
@@ -319,7 +324,14 @@ export function OrderDetailsPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No tracking updates yet" description="Tracking updates will appear here once the rider shares progress on this delivery." />
+                <EmptyState
+                  title={isFulfilledOrder ? "No delivery timeline entries yet" : "No tracking updates yet"}
+                  description={
+                    isFulfilledOrder
+                      ? "This order has already been fulfilled. Any recorded route and status events will appear here."
+                      : "Tracking updates will appear here once the rider shares progress on this delivery."
+                  }
+                />
               )}
             </>
           ) : null}
