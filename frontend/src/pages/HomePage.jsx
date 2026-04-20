@@ -97,10 +97,7 @@ export function HomePage() {
               Deliveroo helps customers send parcels and riders manage deliveries with a clear, dependable flow from start to finish.
             </p>
 
-            <div className="landing-cta-row">
-              <Link to="/register" className="landing-primary-cta">Sign Up</Link>
-              <Link to="/login" className="landing-secondary-cta">Sign In</Link>
-            </div>
+
 
             <div className="landing-proof-row" aria-label="Deliveroo trust indicators">
               {trustStats.map((item) => (
