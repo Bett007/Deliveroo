@@ -8,6 +8,8 @@ import { fetchOrders } from "../features/orders/ordersSlice";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { VerifyPage } from "../pages/VerifyPage";
+import { ForgotPasswordPage } from "../pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "../pages/ResetPasswordPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { HomePage } from "../pages/HomePage";
 
@@ -37,7 +39,7 @@ import { ActivityLog } from "../pages/ActivityLog";
 import { AdminOrdersPage } from "../pages/AdminOrdersPage";
 import { RiderDashboardPage } from "../pages/RiderDashboardPage";
 
-const PUBLIC_ROUTES = new Set(["/", "/login", "/register", "/verify"]);
+const PUBLIC_ROUTES = new Set(["/", "/login", "/register", "/verify", "/forgot-password", "/reset-password"]);
 
 function SessionBootstrap() {
   const dispatch = useDispatch();
@@ -80,6 +82,8 @@ export function AppRouter() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="verify" element={<VerifyPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
 
           {/* Customer */}
           <Route element={<CustomerRoute />}>

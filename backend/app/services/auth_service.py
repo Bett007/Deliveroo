@@ -6,15 +6,18 @@ from app.errors.exceptions import AuthenticationError, ValidationError
 from app.extensions import db
 from app.models import User
 from app.utils.validators import (
+    validate_forgot_password_payload,
     validate_login_payload,
     validate_profile_payload,
     validate_registration_payload,
+    validate_reset_password_payload,
     validate_verification_payload,
     validate_verification_resend_payload,
 )
 
 VERIFICATION_CODE_LENGTH = 6
 VERIFICATION_CODE_TTL_MINUTES = 10
+PASSWORD_RESET_CODE_TTL_MINUTES = 10
 
 
 def _generate_verification_code() -> str:
@@ -31,6 +34,16 @@ def _refresh_verification_code(user: User) -> User:
 
 
 def serialize_verification_details(user: User) -> dict:
+    return {
+        "email": user.email,
+        "code": user.verification_code,
+        "expires_at": user.verification_code_expires_at.isoformat()
+        if user.verification_code_expires_at
+        else None,
+    }
+
+
+def serialize_password_reset_details(user: User) -> dict:
     return {
         "email": user.email,
         "code": user.verification_code,
@@ -131,6 +144,44 @@ def resend_verification_code(payload: Optional[dict] = None) -> User:
     _refresh_verification_code(user)
     db.session.commit()
 
+    return user
+
+
+def request_password_reset(payload: Optional[dict] = None) -> Optional[User]:
+    data = validate_forgot_password_payload(payload)
+    user = User.query.filter_by(email=data["email"]).first()
+
+    # Return success even for unknown emails to avoid account enumeration.
+    if user is None:
+        return None
+
+    user.verification_code = _generate_verification_code()
+    user.verification_code_expires_at = datetime.now(timezone.utc) + timedelta(
+        minutes=PASSWORD_RESET_CODE_TTL_MINUTES
+    )
+    db.session.commit()
+    return user
+
+
+def reset_password_with_code(payload: Optional[dict] = None) -> User:
+    data = validate_reset_password_payload(payload)
+    user = User.query.filter_by(email=data["email"]).first()
+
+    if user is None:
+        raise AuthenticationError("Reset code is invalid.")
+
+    if user.verification_code != data["code"]:
+        raise AuthenticationError("Reset code is invalid.")
+
+    if _is_verification_code_expired(user.verification_code_expires_at):
+        raise AuthenticationError(
+            "Reset code has expired. Request a new code and try again."
+        )
+
+    user.set_password(data["new_password"])
+    user.verification_code = None
+    user.verification_code_expires_at = None
+    db.session.commit()
     return user
 
 

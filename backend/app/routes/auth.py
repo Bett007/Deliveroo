@@ -2,8 +2,11 @@ from flask import Blueprint, g, request
 
 from app.services.auth_service import (
     authenticate_user,
+    request_password_reset,
     register_user,
+    reset_password_with_code,
     resend_verification_code,
+    serialize_password_reset_details,
     serialize_verification_details,
     update_user_profile,
     verify_user_registration,
@@ -52,6 +55,27 @@ def resend_verification():
     return success_response(
         message="A new verification code has been generated.",
         data={"verification": serialize_verification_details(user)},
+    )
+
+
+@auth_bp.post("/forgot-password")
+def forgot_password():
+    user = request_password_reset(request.get_json(silent=True))
+    data = {}
+    if user is not None:
+        data["reset"] = serialize_password_reset_details(user)
+    return success_response(
+        message="If the account exists, a reset code has been generated.",
+        data=data,
+    )
+
+
+@auth_bp.post("/reset-password")
+def reset_password():
+    reset_password_with_code(request.get_json(silent=True))
+    return success_response(
+        message="Password has been reset successfully. You can sign in now.",
+        data={},
     )
 
 

@@ -26,6 +26,20 @@ def resend_verification_code(client, email="user@example.com"):
     )
 
 
+def forgot_password(client, email="user@example.com"):
+    return client.post(
+        "/api/auth/forgot-password",
+        json={"email": email},
+    )
+
+
+def reset_password(client, email="user@example.com", code="000000", new_password="NewPassword123"):
+    return client.post(
+        "/api/auth/reset-password",
+        json={"email": email, "code": code, "new_password": new_password},
+    )
+
+
 def test_register_user_success(client):
     response = register_user(client)
     body = response.get_json()
@@ -203,3 +217,41 @@ def test_admin_route_allows_admin_user(client):
     assert response.status_code == 200
     assert body["success"] is True
     assert body["message"] == "Admin access confirmed."
+
+
+def test_forgot_password_returns_reset_details_for_existing_user(client):
+    registration = register_user(client).get_json()
+    verify_user(client, code=registration["data"]["verification"]["code"])
+
+    response = forgot_password(client)
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["success"] is True
+    assert body["data"]["reset"]["email"] == "user@example.com"
+    assert len(body["data"]["reset"]["code"]) == 6
+
+
+def test_forgot_password_does_not_fail_for_unknown_email(client):
+    response = forgot_password(client, email="unknown@example.com")
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["success"] is True
+    assert "reset" not in body["data"]
+
+
+def test_reset_password_success_allows_login_with_new_password(client):
+    registration = register_user(client).get_json()
+    verify_user(client, code=registration["data"]["verification"]["code"])
+    forgot = forgot_password(client).get_json()
+    code = forgot["data"]["reset"]["code"]
+
+    reset_response = reset_password(client, code=code, new_password="NewPassword456")
+    assert reset_response.status_code == 200
+
+    login_old = login_user(client, password="Password123")
+    assert login_old.status_code == 401
+
+    login_new = login_user(client, password="NewPassword456")
+    assert login_new.status_code == 200

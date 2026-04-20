@@ -39,3 +39,39 @@ export function validateRegisterForm(values) {
 
   return errors;
 }
+
+export function validateForgotPasswordForm(values) {
+  const errors = {};
+  if (!values.email?.trim()) {
+    errors.email = "Email is required.";
+  }
+  return errors;
+}
+
+export function validateResetPasswordForm(values) {
+  const errors = {};
+
+  if (!values.email?.trim()) {
+    errors.email = "Email is required.";
+  }
+
+  if (!values.code?.trim()) {
+    errors.code = "Reset code is required.";
+  } else if (!/^\d{6}$/.test(values.code.trim())) {
+    errors.code = "Reset code must be 6 digits.";
+  }
+
+  if (!values.new_password?.trim()) {
+    errors.new_password = "New password is required.";
+  } else if (values.new_password.trim().length < 8) {
+    errors.new_password = "Password must be at least 8 characters long.";
+  }
+
+  if (!values.confirm_password?.trim()) {
+    errors.confirm_password = "Please confirm your password.";
+  } else if (values.confirm_password !== values.new_password) {
+    errors.confirm_password = "Passwords do not match.";
+  }
+
+  return errors;
+}
