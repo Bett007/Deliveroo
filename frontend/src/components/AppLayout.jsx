@@ -63,9 +63,24 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass, onMouseEnter, onMouseLeave }) {
+function RoleSidebar({
+  title,
+  subtitle,
+  navItems,
+  userEmail,
+  onLogout,
+  shellClass,
+  onMouseEnter,
+  onMouseLeave,
+  onNavigate,
+  mobile = false,
+}) {
   return (
-    <aside className={`ops-sidebar ${shellClass}-sidebar`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <aside
+      className={`ops-sidebar ${shellClass}-sidebar ${mobile ? "mobile-sidebar" : ""}`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <div className="ops-brand-block">
         <img src={deliverooLogoIcon} alt="Deliveroo" className="ops-brand-logo" />
         <div>
@@ -84,6 +99,7 @@ function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClas
             key={item.path}
             to={item.path}
             className={({ isActive }) => `ops-nav-link ${isActive ? "active" : ""}`}
+            onClick={onNavigate}
           >
             <NavIcon name={item.icon} />
             <span>{item.label}</span>
@@ -145,6 +161,13 @@ export function AppLayout() {
   });
   const [sidebarHover, setSidebarHover] = useState(false);
   const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.innerWidth <= 1120;
+  });
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
@@ -154,13 +177,20 @@ export function AppLayout() {
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth <= 1120) {
       setSidebarOpen(false);
+      setMobileMenuOpen(false);
     }
   }, [location.pathname]);
 
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth > 1120) {
+      const isMobile = window.innerWidth <= 1120;
+      setIsMobileViewport(isMobile);
+
+      if (!isMobile) {
         setSidebarOpen(true);
+        setMobileMenuOpen(false);
+      } else {
+        setSidebarOpen(false);
       }
     }
 
@@ -174,6 +204,18 @@ export function AppLayout() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      document.body.classList.remove("app-authenticated");
+      return;
+    }
+
+    document.body.classList.add("app-authenticated");
+    return () => {
+      document.body.classList.remove("app-authenticated");
+    };
+  }, [isAuthenticated]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -230,51 +272,95 @@ export function AppLayout() {
       <div
         className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
-        <RoleSidebar
-          onMouseEnter={() => {
-            if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
-          }}
-          onMouseLeave={() => {
-            setSidebarHover(false);
-            setSidebarLockedClosed(false);
-          }}
-          title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-          subtitle={
-            isAdmin
-              ? "Operations, monitoring, and dispatch control"
-              : isRider
-                ? "Manage active deliveries, history, and route updates"
-                : "Parcel booking, tracking, and support"
-          }
-          navItems={navItems}
-          userEmail={user.email}
-          onLogout={handleLogout}
-          shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
-        />
-
-        <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-          <button
-            type="button"
-            className="ops-shell-toggle"
-            aria-label={effectiveSidebarOpen ? "Close menu" : "Open menu"}
-            onClick={() => {
-              if (effectiveSidebarOpen) {
-                setSidebarOpen(false);
-                setSidebarHover(false);
-                setSidebarLockedClosed(true);
-                return;
-              }
-
-              setSidebarOpen(true);
+        {!isMobileViewport ? (
+          <RoleSidebar
+            onMouseEnter={() => {
+              if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
+            }}
+            onMouseLeave={() => {
+              setSidebarHover(false);
               setSidebarLockedClosed(false);
             }}
-          >
-            {effectiveSidebarOpen ? "×" : "☰"}
-          </button>
+            title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+            subtitle={
+              isAdmin
+                ? "Operations, monitoring, and dispatch control"
+                : isRider
+                  ? "Manage active deliveries, history, and route updates"
+                  : "Parcel booking, tracking, and support"
+            }
+            navItems={navItems}
+            userEmail={user.email}
+            onLogout={handleLogout}
+            shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
+          />
+        ) : null}
+
+        <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
+          {!isMobileViewport ? (
+            <button
+              type="button"
+              className="ops-shell-toggle"
+              aria-label={effectiveSidebarOpen ? "Close menu" : "Open menu"}
+              onClick={() => {
+                if (effectiveSidebarOpen) {
+                  setSidebarOpen(false);
+                  setSidebarHover(false);
+                  setSidebarLockedClosed(true);
+                  return;
+                }
+
+                setSidebarOpen(true);
+                setSidebarLockedClosed(false);
+              }}
+            >
+              {effectiveSidebarOpen ? "×" : "☰"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="ops-mobile-menu-btn"
+              aria-label="Open navigation menu"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              ☰
+            </button>
+          )}
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>
         </main>
+
+        {isMobileViewport && mobileMenuOpen ? (
+          <div className="ops-mobile-menu-layer" role="presentation">
+            <button type="button" className="ops-mobile-menu-backdrop" aria-label="Close navigation menu" onClick={() => setMobileMenuOpen(false)} />
+            <div className="ops-mobile-menu-sheet" role="dialog" aria-modal="true" aria-label="Navigation menu">
+              <div className="ops-mobile-menu-head">
+                <strong>Menu</strong>
+                <button type="button" className="ops-mobile-menu-close" aria-label="Close menu" onClick={() => setMobileMenuOpen(false)}>×</button>
+              </div>
+              <RoleSidebar
+                title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+                subtitle={
+                  isAdmin
+                    ? "Operations, monitoring, and dispatch control"
+                    : isRider
+                      ? "Manage active deliveries, history, and route updates"
+                      : "Parcel booking, tracking, and support"
+                }
+                navItems={navItems}
+                userEmail={user.email}
+                onLogout={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                onNavigate={() => setMobileMenuOpen(false)}
+                shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
+                mobile
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

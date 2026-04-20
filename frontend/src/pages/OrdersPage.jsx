@@ -15,6 +15,8 @@ export function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [mobilePane, setMobilePane] = useState("overview");
+  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== "undefined" ? window.innerWidth <= 900 : false));
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -23,6 +25,22 @@ export function OrdersPage() {
       dispatch(clearOrderError());
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobileViewport(window.innerWidth <= 900);
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
 
   const totalOrders = useMemo(() => currentOrders.length + orderHistory.length, [currentOrders.length, orderHistory.length]);
   const allOrders = useMemo(() => [...currentOrders, ...orderHistory], [currentOrders, orderHistory]);
@@ -76,6 +94,18 @@ export function OrdersPage() {
 
   return (
     <section className="workspace-page orders-page">
+      {isMobileViewport ? (
+        <section className="workspace-panel panel-toggle-bar">
+          <div className="panel-toggle-actions" role="tablist" aria-label="Orders view navigation">
+            <button type="button" className={`panel-toggle-btn ${mobilePane === "overview" ? "active" : ""}`} onClick={() => setMobilePane("overview")}>Overview</button>
+            <button type="button" className={`panel-toggle-btn ${mobilePane === "search" ? "active" : ""}`} onClick={() => setMobilePane("search")}>Search</button>
+            <button type="button" className={`panel-toggle-btn ${mobilePane === "active" ? "active" : ""}`} onClick={() => setMobilePane("active")}>Current</button>
+            <button type="button" className={`panel-toggle-btn ${mobilePane === "history" ? "active" : ""}`} onClick={() => setMobilePane("history")}>History</button>
+          </div>
+        </section>
+      ) : null}
+
+      {!isMobileViewport || mobilePane === "overview" ? (
       <header className="workspace-hero glass-card orders-hero">
         <figure className="orders-hero-banner" aria-hidden="true">
           <img src={onlineShoppingDeliveryIllustration} alt="" loading="eager" />
@@ -113,7 +143,9 @@ export function OrdersPage() {
           </article>
         </div>
       </header>
+      ) : null}
 
+      {!isMobileViewport || mobilePane === "search" ? (
       <SectionCard
         className="orders-panel"
         title="Search, Filter, and Sort"
@@ -150,8 +182,10 @@ export function OrdersPage() {
           </div>
         </div>
       </SectionCard>
+      ) : null}
 
-      <div className="workspace-grid">
+      <div className={`workspace-grid ${isMobileViewport ? "mobile-orders-grid" : ""}`}>
+        {!isMobileViewport || mobilePane === "active" ? (
         <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
           {status === "loading" ? (
             <p className="helper-text">Loading current orders from the backend...</p>
@@ -185,7 +219,9 @@ export function OrdersPage() {
             />
           )}
         </SectionCard>
+        ) : null}
 
+        {!isMobileViewport || mobilePane === "history" ? (
         <SectionCard className="orders-panel" title="Order History" description="Delivered and cancelled orders from your account.">
           {status === "loading" ? (
             <p className="helper-text">Loading order history...</p>
@@ -222,6 +258,7 @@ export function OrdersPage() {
             <EmptyState title="No order history yet" description="No delivered or cancelled orders match your current search or filters." />
           )}
         </SectionCard>
+        ) : null}
       </div>
     </section>
   );
