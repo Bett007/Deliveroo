@@ -1,5 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AppLayout } from "../components/AppLayout";
+import { hydrateSession } from "../features/auth/authSlice";
+import { fetchOrders } from "../features/orders/ordersSlice";
 
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
@@ -34,9 +38,42 @@ import { ActivityLog } from "../pages/ActivityLog";
 import { AdminOrdersPage } from "../pages/AdminOrdersPage";
 import { RiderDashboardPage } from "../pages/RiderDashboardPage";
 
+const PUBLIC_ROUTES = new Set(["/", "/login", "/register", "/verify"]);
+
+function SessionBootstrap() {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const token = useSelector((state) => state.auth.token);
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (!token || PUBLIC_ROUTES.has(location.pathname)) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    (async () => {
+      const result = await dispatch(hydrateSession());
+
+      if (isActive && hydrateSession.fulfilled.match(result)) {
+        dispatch(fetchOrders());
+      }
+    })();
+
+    return () => {
+      isActive = false;
+    };
+  }, [dispatch, location.pathname, token]);
+
+  return null;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <SessionBootstrap />
       <Routes>
         <Route element={<AppLayout />}>
           {/* Public */}

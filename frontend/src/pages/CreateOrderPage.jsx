@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
@@ -36,6 +36,14 @@ const NAIROBI_AREAS = [
   { name: "Eastleigh", center: [36.85, -1.27] },
 ];
 
+const DEFAULT_NAIROBI_CENTER = [36.8219, -1.2921];
+
+const ORDER_PANEL_MODES = {
+  VIEW_MAP: "view-map",
+  MANAGE: "manage-order",
+  SUMMARY: "order-summary",
+};
+
 function normalizeSuggestion(feature) {
   return {
     id: feature.id,
@@ -61,9 +69,22 @@ function calculatePrice(weightKg, distanceKm) {
   return Number((weightFee + deliveryFee).toFixed(2));
 }
 
+function toUserFacingMapError(error, fallback = "Map preview is unavailable right now. Please continue with location inputs.") {
+  const message = String(error?.message || "").toLowerCase();
+
+  if (message.includes("token") || message.includes("mapbox")) {
+    return "Map preview is unavailable right now. Please continue with location inputs.";
+  }
+
+  if (message.includes("network") || message.includes("failed to fetch")) {
+    return "Map services are temporarily unavailable. Please check your connection and try again.";
+  }
+
+  return error?.message || fallback;
+}
+
 export function CreateOrderPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const { createStatus, error, fieldErrors, referenceData, referenceStatus } = useSelector((state) => state.orders);
   const didRetryReferenceLoad = useRef(false);
@@ -91,6 +112,8 @@ export function CreateOrderPage() {
   const [routeError, setRouteError] = useState("");
   const [nairobiSuggestions, setNairobiSuggestions] = useState([]);
   const [isLocatingPickup, setIsLocatingPickup] = useState(false);
+  const [activePanelMode, setActivePanelMode] = useState(ORDER_PANEL_MODES.VIEW_MAP);
+  const [createdOrder, setCreatedOrder] = useState(null);
 
   useEffect(() => {
     dispatch(clearOrderError());
@@ -229,7 +252,7 @@ export function CreateOrderPage() {
       } catch (previewError) {
         if (!cancelled) {
           setRouteStatus("error");
-          setRouteError(previewError.message || "Unable to preview route.");
+          setRouteError(toUserFacingMapError(previewError, "Unable to preview route."));
           setRouteGeoJson(null);
           setDistance(null);
           setDuration(null);
@@ -248,13 +271,13 @@ export function CreateOrderPage() {
     setPrice(calculatePrice(formData.weightKg, distance));
   }, [formData.weightKg, distance]);
 
-  function clearRouteState() {
+  const clearRouteState = useCallback(() => {
     setRouteGeoJson(null);
     setDistance(null);
     setDuration(null);
     setRouteStatus("idle");
     setRouteError("");
-  }
+  }, []);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -434,7 +457,7 @@ export function CreateOrderPage() {
     };
   }
 
-  async function handleMapLocationSelect(target, coords) {
+  const handleMapLocationSelect = useCallback(async (target, coords) => {
     const fallbackAddress = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
     const selected = {
       address: fallbackAddress,
@@ -479,7 +502,15 @@ export function CreateOrderPage() {
     } catch {
       // Keep fallback coordinate text if reverse-geocoding fails.
     }
-  }
+  }, [clearRouteState]);
+
+  const handleMapPickupSelect = useCallback((coords) => {
+    void handleMapLocationSelect("pickup", coords);
+  }, [handleMapLocationSelect]);
+
+  const handleMapDestinationSelect = useCallback((coords) => {
+    void handleMapLocationSelect("destination", coords);
+  }, [handleMapLocationSelect]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -539,7 +570,7 @@ export function CreateOrderPage() {
       setDistance(routePreview.distanceKm);
       setDuration(routePreview.durationMinutes);
     } catch (previewError) {
-      setRouteError(previewError.message || "Unable to preview route.");
+      setRouteError(toUserFacingMapError(previewError, "Unable to preview route."));
       return;
     }
 
@@ -574,12 +605,16 @@ export function CreateOrderPage() {
     const result = await dispatch(createOrder(payload));
 
     if (createOrder.fulfilled.match(result)) {
-      navigate(`/orders/${result.payload.order.id}`, {
-        replace: true,
-        state: { message: "Order created successfully." },
-      });
+      setCreatedOrder(result.payload.order);
+      setActivePanelMode(ORDER_PANEL_MODES.SUMMARY);
+      setErrors({});
+      dispatch(clearOrderError());
     }
   }
+
+  const showManageOrderPanel = activePanelMode === ORDER_PANEL_MODES.MANAGE;
+  const showSummaryPanel = !showManageOrderPanel;
+  const hasOrderSummary = Boolean(pickup && destination);
 
   return (
     <section className={`workspace-page ops-page ${styles.scope}`}>
@@ -592,165 +627,258 @@ export function CreateOrderPage() {
         <Link to="/orders" className="secondary-btn">Back to Orders</Link>
       </header>
 
+      <section className="workspace-panel panel-toggle-bar">
+        <div className="panel-toggle-actions" role="tablist" aria-label="Create order views">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activePanelMode === ORDER_PANEL_MODES.VIEW_MAP}
+            className={`panel-toggle-btn ${activePanelMode === ORDER_PANEL_MODES.VIEW_MAP ? "active" : ""}`}
+            onClick={() => setActivePanelMode(ORDER_PANEL_MODES.VIEW_MAP)}
+          >
+            View Map
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activePanelMode === ORDER_PANEL_MODES.MANAGE}
+            className={`panel-toggle-btn ${activePanelMode === ORDER_PANEL_MODES.MANAGE ? "active" : ""}`}
+            onClick={() => setActivePanelMode(ORDER_PANEL_MODES.MANAGE)}
+          >
+            Manage Order
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activePanelMode === ORDER_PANEL_MODES.SUMMARY}
+            className={`panel-toggle-btn ${activePanelMode === ORDER_PANEL_MODES.SUMMARY ? "active" : ""}`}
+            onClick={() => setActivePanelMode(ORDER_PANEL_MODES.SUMMARY)}
+          >
+            Order Summary
+          </button>
+        </div>
+      </section>
+
       <div className="create-order-grid">
-        <section className="workspace-panel create-order-panel">
-          <div className="section-header">
-            <div>
-              <h2>Parcel Details</h2>
-              <p>Complete the required fields.</p>
-            </div>
-          </div>
-
-          <form className="auth-form" onSubmit={handleSubmit}>
-            {error ? <p className="form-status error">{error}</p> : null}
-
-            <FormField id="parcel-name" label="Parcel Name" error={errors.parcelName}>
-              <input id="parcel-name" name="parcelName" value={formData.parcelName} onChange={handleChange} placeholder="e.g. Office documents" />
-            </FormField>
-
-            <FormField id="pickup-location" label="Pickup Location" error={errors.pickupLocation}>
-              <div className="location-input-wrap">
-                <div className="row">
-                  <div className="half">
-                    <select
-                      id="pickup-area"
-                      name="pickupArea"
-                      className="form-select"
-                      value={pickupAreaName}
-                      onChange={(event) => handleAreaSelect("pickup", event.target.value)}
-                      onFocus={() => setActiveLocationField("pickup")}
-                    >
-                      <option value="">Select pickup area in Nairobi</option>
-                      {NAIROBI_AREAS.map((area) => (
-                        <option key={area.name} value={area.name}>{area.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="half">
-                    <input
-                      id="pickup-location"
-                      name="pickupLocation"
-                      value={formData.pickupLocation}
-                      onChange={handleChange}
-                      onFocus={() => {
-                        setShowPickupSuggestions(true);
-                        setActiveLocationField("pickup");
-                      }}
-                      onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 120)}
-                      placeholder="Search for a place..."
-                    />
-                  </div>
-                </div>
-                <div className="input-actions-row">
-                  <button type="button" className="secondary-btn tiny-btn" onClick={handleUseMyLocation} disabled={isLocatingPickup}>
-                    {isLocatingPickup ? "Locating..." : "Use my location"}
-                  </button>
-                  <button type="button" className="secondary-btn tiny-btn" onClick={handleClearPickup}>Reset pickup</button>
-                </div>
-                {showPickupSuggestions && pickupSuggestions.length ? (
-                  <ul className="location-suggestions" role="listbox" aria-label="Pickup suggestions">
-                    {pickupSuggestions.map((suggestion) => (
-                      <li key={suggestion.id}>
-                        <button type="button" onMouseDown={() => handleSelectPickup(suggestion)}>
-                          {suggestion.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                <p className="helper-text">Tip: choose a Nairobi area above or click the map to place pickup.</p>
-              </div>
-            </FormField>
-
-            <FormField id="destination-location" label="Destination Location" error={errors.destinationLocation}>
-              <div className="location-input-wrap">
-                <div className="row">
-                  <div className="half">
-                    <select
-                      id="destination-area"
-                      name="destinationArea"
-                      className="form-select"
-                      value={destinationAreaName}
-                      onChange={(event) => handleAreaSelect("destination", event.target.value)}
-                      onFocus={() => setActiveLocationField("destination")}
-                    >
-                      <option value="">Select destination area in Nairobi</option>
-                      {NAIROBI_AREAS.map((area) => (
-                        <option key={area.name} value={area.name}>{area.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="half">
-                    <input
-                      id="destination-location"
-                      name="destinationLocation"
-                      value={formData.destinationLocation}
-                      onChange={handleChange}
-                      onFocus={() => {
-                        setShowDestinationSuggestions(true);
-                        setActiveLocationField("destination");
-                      }}
-                      onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 120)}
-                      placeholder="Search for a place..."
-                    />
-                  </div>
-                </div>
-                <div className="input-actions-row">
-                  <button type="button" className="secondary-btn tiny-btn" onClick={handleClearDestination}>Reset destination</button>
-                </div>
-                {showDestinationSuggestions && destinationSuggestions.length ? (
-                  <ul className="location-suggestions" role="listbox" aria-label="Destination suggestions">
-                    {destinationSuggestions.map((suggestion) => (
-                      <li key={suggestion.id}>
-                        <button type="button" onMouseDown={() => handleSelectDestination(suggestion)}>
-                          {suggestion.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                <p className="helper-text">Tip: choose area above or click map after focusing this field.</p>
-              </div>
-            </FormField>
-
-            <div className="row">
-              <div className="half">
-                <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
-                  <select id="weight-category" name="weightCategoryId" className="form-select" value={formData.weightCategoryId} onChange={handleChange}>
-                    <option value="">Select weight category</option>
-                    {referenceData.weightCategories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name} ({category.minWeight}kg - {category.maxWeight}kg)
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              </div>
-              <div className="half">
-                <FormField id="weight-kg" label="Parcel Weight" error={errors.weightKg}>
-                  <input
-                    id="weight-kg"
-                    name="weightKg"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.weightKg}
-                    onChange={handleChange}
-                    placeholder="e.g. 1.5"
-                  />
-                </FormField>
+        {showManageOrderPanel ? (
+          <section className="workspace-panel create-order-panel">
+            <div className="section-header">
+              <div>
+                <h2>Manage Order</h2>
+                <p>Update details, validate route, then create the order.</p>
               </div>
             </div>
 
-            <FormField id="description" label="Parcel Description" error={errors.description}>
-              <textarea id="description" name="description" className="form-textarea" value={formData.description} onChange={handleChange} placeholder="Add handling notes or delivery instructions" />
-            </FormField>
+            <form className="auth-form" onSubmit={handleSubmit}>
+              {error ? <p className="form-status error">{error}</p> : null}
 
-            <Button type="submit" className="primary-btn full-width" disabled={createStatus === "loading"}>
-              {createStatus === "loading" ? "Creating Order..." : "Create Order"}
-            </Button>
-          </form>
-        </section>
+              <FormField id="parcel-name" label="Parcel Name" error={errors.parcelName}>
+                <input id="parcel-name" name="parcelName" value={formData.parcelName} onChange={handleChange} placeholder="e.g. Office documents" />
+              </FormField>
+
+              <FormField id="pickup-location" label="Pickup Location" error={errors.pickupLocation}>
+                <div className="location-input-wrap">
+                  <div className="row">
+                    <div className="half">
+                      <select
+                        id="pickup-area"
+                        name="pickupArea"
+                        className="form-select"
+                        value={pickupAreaName}
+                        onChange={(event) => handleAreaSelect("pickup", event.target.value)}
+                        onFocus={() => setActiveLocationField("pickup")}
+                      >
+                        <option value="">Select pickup area in Nairobi</option>
+                        {NAIROBI_AREAS.map((area) => (
+                          <option key={area.name} value={area.name}>{area.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="half">
+                      <input
+                        id="pickup-location"
+                        name="pickupLocation"
+                        value={formData.pickupLocation}
+                        onChange={handleChange}
+                        onFocus={() => {
+                          setShowPickupSuggestions(true);
+                          setActiveLocationField("pickup");
+                        }}
+                        onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 120)}
+                        placeholder="Search for a place..."
+                      />
+                    </div>
+                  </div>
+                  <div className="input-actions-row">
+                    <button type="button" className="secondary-btn tiny-btn" onClick={handleUseMyLocation} disabled={isLocatingPickup}>
+                      {isLocatingPickup ? "Locating..." : "Use my location"}
+                    </button>
+                    <button type="button" className="secondary-btn tiny-btn" onClick={handleClearPickup}>Reset pickup</button>
+                  </div>
+                  {showPickupSuggestions && pickupSuggestions.length ? (
+                    <ul className="location-suggestions" role="listbox" aria-label="Pickup suggestions">
+                      {pickupSuggestions.map((suggestion) => (
+                        <li key={suggestion.id}>
+                          <button type="button" onMouseDown={() => handleSelectPickup(suggestion)}>
+                            {suggestion.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <p className="helper-text">Tip: choose a Nairobi area above or click the map to place pickup.</p>
+                </div>
+              </FormField>
+
+              <FormField id="destination-location" label="Destination Location" error={errors.destinationLocation}>
+                <div className="location-input-wrap">
+                  <div className="row">
+                    <div className="half">
+                      <select
+                        id="destination-area"
+                        name="destinationArea"
+                        className="form-select"
+                        value={destinationAreaName}
+                        onChange={(event) => handleAreaSelect("destination", event.target.value)}
+                        onFocus={() => setActiveLocationField("destination")}
+                      >
+                        <option value="">Select destination area in Nairobi</option>
+                        {NAIROBI_AREAS.map((area) => (
+                          <option key={area.name} value={area.name}>{area.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="half">
+                      <input
+                        id="destination-location"
+                        name="destinationLocation"
+                        value={formData.destinationLocation}
+                        onChange={handleChange}
+                        onFocus={() => {
+                          setShowDestinationSuggestions(true);
+                          setActiveLocationField("destination");
+                        }}
+                        onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 120)}
+                        placeholder="Search for a place..."
+                      />
+                    </div>
+                  </div>
+                  <div className="input-actions-row">
+                    <button type="button" className="secondary-btn tiny-btn" onClick={handleClearDestination}>Reset destination</button>
+                  </div>
+                  {showDestinationSuggestions && destinationSuggestions.length ? (
+                    <ul className="location-suggestions" role="listbox" aria-label="Destination suggestions">
+                      {destinationSuggestions.map((suggestion) => (
+                        <li key={suggestion.id}>
+                          <button type="button" onMouseDown={() => handleSelectDestination(suggestion)}>
+                            {suggestion.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <p className="helper-text">Tip: choose area above or click map after focusing this field.</p>
+                </div>
+              </FormField>
+
+              <div className="row">
+                <div className="half">
+                  <FormField id="weight-category" label="Weight Category" error={errors.weightCategoryId}>
+                    <select id="weight-category" name="weightCategoryId" className="form-select" value={formData.weightCategoryId} onChange={handleChange}>
+                      <option value="">Select weight category</option>
+                      {referenceData.weightCategories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name} ({category.minWeight}kg - {category.maxWeight}kg)
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                </div>
+                <div className="half">
+                  <FormField id="weight-kg" label="Parcel Weight" error={errors.weightKg}>
+                    <input
+                      id="weight-kg"
+                      name="weightKg"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.weightKg}
+                      onChange={handleChange}
+                      placeholder="e.g. 1.5"
+                    />
+                  </FormField>
+                </div>
+              </div>
+
+              <FormField id="description" label="Parcel Description" error={errors.description}>
+                <textarea id="description" name="description" className="form-textarea" value={formData.description} onChange={handleChange} placeholder="Add handling notes or delivery instructions" />
+              </FormField>
+
+              <Button type="submit" className="primary-btn full-width" disabled={createStatus === "loading"}>
+                {createStatus === "loading" ? "Creating Order..." : "Create Order"}
+              </Button>
+            </form>
+          </section>
+        ) : null}
+
+        {showSummaryPanel ? (
+          <section className="workspace-panel order-summary-panel">
+            <div className="section-header">
+              <div>
+                <h2>Order Summary</h2>
+                <p>
+                  {createdOrder
+                    ? `Order #${createdOrder.id} created successfully.`
+                    : "Review route and pricing while the map stays in focus."}
+                </p>
+              </div>
+            </div>
+
+            {createdOrder ? (
+              <div className="form-status success">
+                <p>Order created successfully.</p>
+                <Link to={`/orders/${createdOrder.id}`} className="inline-link">Open order details</Link>
+              </div>
+            ) : null}
+
+            <div className="order-summary-content">
+              <div className="route-preview">
+                <div>
+                  <span>P</span>
+                  <strong>{formData.pickupLocation?.trim() || "Pickup not set yet."}</strong>
+                </div>
+                <i />
+                <div>
+                  <span>D</span>
+                  <strong>{formData.destinationLocation?.trim() || "Destination not set yet."}</strong>
+                </div>
+              </div>
+
+              <div className="route-stats-row single-column">
+                <div>
+                  <p className="card-label">Distance</p>
+                  <h3>{distance != null ? `${distance} km` : "--"}</h3>
+                </div>
+                <div>
+                  <p className="card-label">Estimated Time</p>
+                  <h3>{duration != null ? `${duration} min` : "--"}</h3>
+                </div>
+                <div>
+                  <p className="card-label">Price</p>
+                  <h3>{price != null ? `KES ${price}` : "KES --"}</h3>
+                </div>
+              </div>
+
+              <div className="order-summary-metadata">
+                <p><span>Parcel</span><strong>{formData.parcelName?.trim() || "--"}</strong></p>
+                <p><span>Weight Category</span><strong>{formData.weightCategoryId ? `#${formData.weightCategoryId}` : "--"}</strong></p>
+                <p><span>Weight</span><strong>{formData.weightKg?.trim() ? `${formData.weightKg} kg` : "--"}</strong></p>
+              </div>
+            </div>
+
+            {!hasOrderSummary ? <p className="helper-text">Select pickup and destination to unlock full route summary.</p> : null}
+          </section>
+        ) : null}
 
         <aside className="create-order-aside">
           <section className="workspace-panel route-summary-panel">
@@ -770,10 +898,11 @@ export function CreateOrderPage() {
                 originCoords={pickup}
                 destinationCoords={destination}
                 routeGeoJson={routeGeoJson}
-                showNearbyPlaces={!pickup && !destination}
+                defaultCenter={DEFAULT_NAIROBI_CENTER}
+                defaultZoom={10}
                 clickTarget={activeLocationField}
-                onPickupSelect={(coords) => handleMapLocationSelect("pickup", coords)}
-                onDestinationSelect={(coords) => handleMapLocationSelect("destination", coords)}
+                onPickupSelect={handleMapPickupSelect}
+                onDestinationSelect={handleMapDestinationSelect}
               />
               {!pickup || !destination ? (
                 <div className="route-summary empty">

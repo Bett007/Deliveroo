@@ -1,6 +1,6 @@
-export function SectionCard({ title, description, children, action }) {
+export function SectionCard({ title, description, children, action, className = "" }) {
   return (
-    <section className="glass-card workspace-panel">
+    <section className={`glass-card workspace-panel ${className}`.trim()}>
       <div className="section-header">
         <div>
           <h2>{title}</h2>

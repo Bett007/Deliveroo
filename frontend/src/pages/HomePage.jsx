@@ -8,24 +8,30 @@ import warehouseShelvesImage from "../assets/images/warehouse-shelves.jpg";
 import { AppIcon } from "../components/ui/AppIcon";
 import styles from "./HomePage.module.css";
 
-const featureCards = [
+const processSteps = [
   {
+    number: "01",
     icon: "package",
-    eyebrow: "Booking",
-    title: "Easy parcel booking",
-    description: "Create a delivery request in minutes with clear pickup, drop-off, and parcel details.",
+    title: "Book",
+    description: "Create a parcel request with clear pickup, drop-off, and item details in minutes.",
+    imageSrc: onlineShoppingDeliveryIllustration,
+    imageAlt: "Illustration of a customer creating a parcel order",
   },
   {
+    number: "02",
     icon: "route",
-    eyebrow: "Tracking",
-    title: "Live order tracking",
-    description: "Follow delivery progress with updates that make it easy to see where each parcel stands.",
+    title: "Track",
+    description: "Follow delivery progress with live status updates that remove uncertainty.",
+    imageSrc: warehouseForkliftAisleImage,
+    imageAlt: "Warehouse workflow representing order progress tracking",
   },
   {
-    icon: "rider",
-    eyebrow: "Riders",
-    title: "Rider delivery workflow",
-    description: "Help riders move through assigned deliveries with clear route and status steps.",
+    number: "03",
+    icon: "check",
+    title: "Deliver",
+    description: "Complete handoff with clear confirmation for both the customer and rider.",
+    imageSrc: warehouseShelvesImage,
+    imageAlt: "Organized delivery operations representing reliable handoff",
   },
 ];
 
@@ -33,34 +39,13 @@ const roleCards = [
   {
     icon: "customer",
     title: "Customers",
-    description: "Place parcel orders, review current deliveries, and get help quickly when something needs attention.",
+    description: "Book deliveries fast, track parcels in real time, and get support quickly when plans change.",
   },
   {
     icon: "rider",
     title: "Riders",
-    description: "Manage assigned deliveries, follow the route ahead, and keep each status update moving forward.",
+    description: "Manage assigned orders, follow route context, and update status without extra friction.",
   },
-];
-
-const workflowCards = [
-  {
-    title: "Orders are prepared with care",
-    description: "Pickup details, parcel handling, and dispatch steps stay clear before a rider heads out.",
-    imageSrc: warehouseForkliftAisleImage,
-    imageAlt: "Forklift moving through a warehouse aisle during order preparation",
-  },
-  {
-    title: "Busy delivery days stay organized",
-    description: "Parcel volume, fulfillment flow, and delivery status stay easier to manage as orders grow.",
-    imageSrc: warehouseShelvesImage,
-    imageAlt: "Warehouse shelves filled with organized parcel stock",
-  },
-];
-
-const productPoints = [
-  "Book deliveries without confusion",
-  "Track progress without constant follow-up",
-  "Support every role with the right tools",
 ];
 
 const trustStats = [
@@ -69,10 +54,31 @@ const trustStats = [
   { value: "98%", label: "successful deliveries" },
 ];
 
-const footerLinks = [
-  { label: "Sign In", path: "/login" },
-  { label: "Create Account", path: "/register" },
-  { label: "Support", href: "mailto:support@deliveroo-app.com" },
+const footerGroups = [
+  {
+    title: "Product",
+    links: [
+      { label: "Book Delivery", path: "/register" },
+      { label: "Track Orders", path: "/login" },
+      { label: "For Riders", path: "/register" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About Deliveroo", href: "#" },
+      { label: "Reliability", href: "#" },
+      { label: "Security", href: "#" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Help Center", href: "mailto:support@deliveroo-app.com" },
+      { label: "Contact", href: "mailto:support@deliveroo-app.com" },
+      { label: "Create Account", path: "/register" },
+    ],
+  },
 ];
 
 export function HomePage() {
@@ -124,9 +130,7 @@ export function HomePage() {
             <div className="hero-orb hero-orb-b"></div>
 
             <section className="hero-stage-card">
-              <div className="hero-stage-media">
-                <img src={scooterRiderIllustration} alt="Illustration of a scooter rider navigating a delivery route" className="hero-stage-image" />
-              </div>
+              <img src={scooterRiderIllustration} alt="Illustration of a scooter rider navigating a delivery route" className="hero-stage-image" />
 
               <div className="hero-stage-copy">
                 <span className="hero-panel-tag">
@@ -165,79 +169,25 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="landing-section landing-overview-section">
+      <section className="landing-section landing-process-section">
         <div className="landing-section-heading">
-          <span className="landing-section-kicker">Product Overview</span>
-          <h2>Deliveroo keeps parcel delivery easy to understand.</h2>
-          <p>
-            From the moment an order is created to the final drop-off, the app helps every user see what matters and act quickly.
-          </p>
+          <span className="landing-section-kicker">How It Works</span>
+          <h2>A simple 3-step delivery flow.</h2>
+          <p>Everything on Deliveroo follows a single clear path so users always know what happens next.</p>
         </div>
 
-        <div className="landing-overview-grid">
-          <article className="overview-card overview-card-large">
-            <div className="overview-card-media">
-              <img
-                src={onlineShoppingDeliveryIllustration}
-                alt="Illustration of a customer placing an online delivery order while a rider heads out"
-                className="overview-card-image"
-              />
-            </div>
-            <div className="overview-card-content">
-              <h3>Everything important in one place</h3>
-              <p>
-                Customers can place and track orders while riders stay focused on active deliveries without losing the bigger picture.
-              </p>
-            </div>
-          </article>
-
-          <div className="overview-points">
-            {productPoints.map((point) => (
-              <article key={point} className="overview-point-card">
-                <span className="overview-point-dot" aria-hidden="true"></span>
-                <p>{point}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="landing-section">
-        <div className="landing-section-heading">
-          <span className="landing-section-kicker">Behind Every Delivery</span>
-          <h2>Preparation and parcel handling stay visible from the start.</h2>
-          <p>From packing to dispatch, the delivery flow stays easier to understand before a parcel goes on the road.</p>
-        </div>
-
-        <div className="landing-workflow-grid">
-          {workflowCards.map((card) => (
-            <article key={card.title} className="landing-workflow-card">
-              <img src={card.imageSrc} alt={card.imageAlt} className="landing-workflow-image" />
-              <div className="landing-workflow-copy">
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
+        <div className="landing-process-grid" aria-label="Three step delivery flow">
+          {processSteps.map((step) => (
+            <article key={step.number} className="landing-process-card">
+              <img src={step.imageSrc} alt={step.imageAlt} className="landing-process-image" />
+              <div className="landing-process-copy">
+                <span className="landing-process-number">Step {step.number}</span>
+                <span className="landing-card-icon" aria-hidden="true">
+                  <AppIcon name={step.icon} size={20} />
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
               </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="landing-section">
-        <div className="landing-section-heading">
-          <span className="landing-section-kicker">Features</span>
-          <h2>Built around the moments that matter most.</h2>
-          <p>Every feature is designed to help people move parcels with less friction and more confidence.</p>
-        </div>
-
-        <div className="landing-feature-grid">
-          {featureCards.map((card) => (
-            <article key={card.title} className="landing-feature-card">
-              <span className="landing-card-icon" aria-hidden="true">
-                <AppIcon name={card.icon} size={20} />
-              </span>
-              <span className="landing-feature-eyebrow">{card.eyebrow}</span>
-              <h3>{card.title}</h3>
-              <p>{card.description}</p>
             </article>
           ))}
         </div>
@@ -247,7 +197,7 @@ export function HomePage() {
         <div className="landing-section-heading">
           <span className="landing-section-kicker">Built For Delivery Teams</span>
           <h2>The right experience for customers and riders.</h2>
-          <p>Each role gets a clearer path through the delivery process without unnecessary clutter.</p>
+          <p>Each role gets a clear path through delivery without extra clutter.</p>
         </div>
 
         <div className="landing-role-grid">
@@ -265,9 +215,9 @@ export function HomePage() {
 
       <section className="landing-section landing-trust-section">
         <div className="landing-section-heading">
-          <span className="landing-section-kicker">Why Teams Trust Deliveroo</span>
-          <h2>A delivery experience that feels dependable.</h2>
-          <p>These metrics show the kind of confidence and consistency the product is built to support.</p>
+          <span className="landing-section-kicker">Proof</span>
+          <h2>Dependable delivery outcomes at scale.</h2>
+          <p>Reliability is visible in the numbers and in the handoff experience across every order.</p>
         </div>
 
         <div className="landing-trust-grid">
@@ -275,7 +225,7 @@ export function HomePage() {
             <img src={redDeliveryTruckImage} alt="3D red delivery truck representing fast and dependable shipping" className="landing-trust-image" />
             <div className="landing-trust-copy">
               <strong>Trusted handoffs</strong>
-              <span>Customers and riders both see a clearer delivery finish.</span>
+              <span>Customers and riders both see a clear delivery finish.</span>
             </div>
           </article>
           {trustStats.map((item) => (
@@ -303,22 +253,32 @@ export function HomePage() {
       <footer className="landing-footer">
         <div className="landing-footer-brand">
           <img src={deliverooLogoFull} alt="Deliveroo" className="landing-footer-logo" />
-          <p>Parcel delivery support for customers and riders.</p>
+          <p>Clear parcel operations for customers, riders, and delivery teams.</p>
         </div>
 
-        <nav className="landing-footer-links" aria-label="Footer navigation">
-          {footerLinks.map((item) =>
-            item.href ? (
-              <a key={item.label} href={item.href}>{item.label}</a>
-            ) : (
-              <Link key={item.label} to={item.path}>{item.label}</Link>
-            ),
-          )}
-        </nav>
+        {footerGroups.map((group) => (
+          <nav key={group.title} className="landing-footer-group" aria-label={`${group.title} links`}>
+            <strong>{group.title}</strong>
+            <div className="landing-footer-links">
+              {group.links.map((item) => (
+                item.href
+                  ? <a key={item.label} href={item.href}>{item.label}</a>
+                  : <Link key={item.label} to={item.path}>{item.label}</Link>
+              ))}
+            </div>
+          </nav>
+        ))}
 
         <div className="landing-footer-meta">
           <a href="mailto:support@deliveroo-app.com">support@deliveroo-app.com</a>
-          <span>Deliveroo Courier Service</span>
+          <span>Mon - Sat, 8:00 AM - 8:00 PM</span>
+          <span>Kenya-wide delivery support</span>
+        </div>
+
+        <div className="landing-footer-legal">
+          <span>© {new Date().getFullYear()} Deliveroo Courier Service</span>
+          <a href="#">Terms</a>
+          <a href="#">Privacy</a>
         </div>
       </footer>
     </main>

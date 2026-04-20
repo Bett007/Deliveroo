@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RouteMapCard } from "../components/ui/RouteMapCard";
@@ -12,9 +12,9 @@ export function DashboardPage() {
   const { user } = useSelector((state) => state.auth);
   const { currentOrders, orderHistory, status } = useSelector((state) => state.orders);
   const featuredOrder = currentOrders[0] || orderHistory[0];
-  const inTransit = currentOrders.filter((order) => order.status === "in_transit").length;
   const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Customer";
   const avatarUrl = user?.avatar_url;
+  const [activePane, setActivePane] = useState("overview");
   const customerModules = [
     {
       title: "Current Orders",
@@ -44,16 +44,28 @@ export function DashboardPage() {
 
   const summaryCards = useMemo(() => {
     const totalOrders = currentOrders.length + orderHistory.length;
-
     const spend = [...currentOrders, ...orderHistory].reduce(
       (sum, order) => sum + Number(order.quotedPrice || 0),
       0,
     );
+    const roundedSpend = Math.round(spend);
 
     return [
-      { title: "Total Orders", value: totalOrders, sub: "+12% this week" },
-      { title: "Active Deliveries", value: currentOrders.length, sub: "+8% this week" },
-      { title: "Spend", value: `KES ${Math.round(spend)}`, sub: "+15% this week" },
+      {
+        title: "Total Orders",
+        value: totalOrders,
+        sub: totalOrders > 0 ? "Orders created so far" : "No orders yet",
+      },
+      {
+        title: "Active Deliveries",
+        value: currentOrders.length,
+        sub: currentOrders.length > 0 ? "Deliveries currently in progress" : "No active deliveries yet",
+      },
+      {
+        title: "Spend",
+        value: `KES ${roundedSpend}`,
+        sub: roundedSpend > 0 ? "Spend recorded so far" : "No spend recorded yet",
+      },
     ];
   }, [currentOrders, orderHistory]);
 
@@ -64,7 +76,7 @@ export function DashboardPage() {
           <h1 className="dashboard-greeting">Welcome back, {dashboardName}</h1>
         </div>
         <div className="topbar-actions dashboard-user-meta">
-          <NotificationBell label="Notifications" minimumCount={Math.max(1, inTransit)} />
+          <NotificationBell label="Notifications" />
           <div className="dashboard-account-card">
             <span className="dashboard-avatar" aria-hidden="true">
               {avatarUrl ? <img src={avatarUrl} alt={`${dashboardName} avatar`} /> : dashboardName?.[0]?.toUpperCase() || "C"}
@@ -77,37 +89,50 @@ export function DashboardPage() {
         </div>
       </header>
 
-      <section className="summary-grid ops-summary-grid">
-        {summaryCards.map((card) => (
-          <div key={card.title} className="summary-card">
-            <span className="summary-icon" aria-hidden="true">
-              <AppIcon
-                name={card.title === "Total Orders" ? "package" : card.title === "Active Deliveries" ? "route" : "wallet"}
-                size={22}
-              />
-            </span>
-            <div className="summary-copy">
-              <p className="card-label">{card.title}</p>
-              <h3>{card.value}</h3>
-              <span>{card.sub}</span>
-            </div>
-          </div>
-        ))}
+      <section className="workspace-panel panel-toggle-bar">
+        <div className="panel-toggle-actions" role="tablist" aria-label="Dashboard views">
+          <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "orders" ? "active" : ""}`} onClick={() => setActivePane("orders")}>Recent Orders</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "map" ? "active" : ""}`} onClick={() => setActivePane("map")}>Map</button>
+        </div>
       </section>
 
-      <section className="dashboard-module-grid" aria-label="Customer modules">
-        {customerModules.map((module) => (
-          <Link key={`${module.title}-${module.path}`} to={module.path} className="dashboard-module-card">
-            <div className="dashboard-module-head">
-              <span className="dashboard-module-badge">{module.badge}</span>
-              <span className="dashboard-module-arrow" aria-hidden="true">↗</span>
-            </div>
-            <h3>{module.title}</h3>
-            <p>{module.description}</p>
-          </Link>
-        ))}
-      </section>
+      {activePane === "overview" ? (
+        <>
+          <section className="summary-grid ops-summary-grid">
+            {summaryCards.map((card) => (
+              <div key={card.title} className="summary-card">
+                <span className="summary-icon" aria-hidden="true">
+                  <AppIcon
+                    name={card.title === "Total Orders" ? "package" : card.title === "Active Deliveries" ? "route" : "wallet"}
+                    size={22}
+                  />
+                </span>
+                <div className="summary-copy">
+                  <p className="card-label">{card.title}</p>
+                  <h3>{card.value}</h3>
+                  <span>{card.sub}</span>
+                </div>
+              </div>
+            ))}
+          </section>
 
+          <section className="dashboard-module-grid" aria-label="Customer modules">
+            {customerModules.map((module) => (
+              <Link key={`${module.title}-${module.path}`} to={module.path} className="dashboard-module-card">
+                <div className="dashboard-module-head">
+                  <span className="dashboard-module-badge">{module.badge}</span>
+                  <span className="dashboard-module-arrow" aria-hidden="true">↗</span>
+                </div>
+                <h3>{module.title}</h3>
+                <p>{module.description}</p>
+              </Link>
+            ))}
+          </section>
+        </>
+      ) : null}
+
+      {activePane === "orders" ? (
       <div className="ops-dashboard-grid">
         <SectionCard title="Recent Orders" description="Latest active deliveries for this customer account.">
           {status === "loading" ? (
@@ -150,8 +175,11 @@ export function DashboardPage() {
             <Link className="secondary-btn" to="/orders">Open Orders</Link>
           </div>
         </SectionCard>
+      </div>
+      ) : null}
 
-        <aside className="ops-side-stack">
+      {activePane === "map" ? (
+      <aside className="ops-side-stack">
           {featuredOrder ? (
             <RouteMapCard
               origin={featuredOrder.pickupLocation}
@@ -168,9 +196,8 @@ export function DashboardPage() {
               <p className="helper-text">Create an order to see route mapping here.</p>
             </section>
           )}
-
-        </aside>
-      </div>
+      </aside>
+      ) : null}
     </section>
   );
 }

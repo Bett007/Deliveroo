@@ -50,6 +50,7 @@ export function HelpPage() {
   const { user } = useSelector((state) => state.auth);
   const copy = useMemo(() => roleCopy[user?.role] || roleCopy.customer, [user?.role]);
   const [selectedTopic, setSelectedTopic] = useState(helpTopics[0]);
+  const [activePane, setActivePane] = useState("issue");
   const supportHref = useMemo(() => {
     const subject = encodeURIComponent(`Deliveroo Support: ${selectedTopic.title}`);
     const body = encodeURIComponent(
@@ -84,7 +85,15 @@ export function HelpPage() {
         </div>
       </header>
 
-      <div className="help-layout-grid">
+      <section className="workspace-panel panel-toggle-bar">
+        <div className="panel-toggle-actions" role="tablist" aria-label="Help views">
+          <button type="button" className={`panel-toggle-btn ${activePane === "issue" ? "active" : ""}`} onClick={() => setActivePane("issue")}>Choose Issue</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "contact" ? "active" : ""}`} onClick={() => setActivePane("contact")}>Contact</button>
+        </div>
+      </section>
+
+      <div className="help-layout-grid single-pane-layout">
+        {activePane === "issue" ? (
         <section className="glass-card workspace-panel help-issue-panel">
           <div className="section-header">
             <div>
@@ -110,7 +119,9 @@ export function HelpPage() {
             ))}
           </div>
         </section>
+        ) : null}
 
+        {activePane === "contact" ? (
         <section className="glass-card workspace-panel help-contact-panel">
           <div className="section-header">
             <div>
@@ -160,6 +171,7 @@ export function HelpPage() {
             </div>
           </div>
         </section>
+        ) : null}
       </div>
     </section>
   );

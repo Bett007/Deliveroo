@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
@@ -8,6 +8,8 @@ import { Button } from "./ui/Button";
 import { ErrorBoundary } from "./ErrorBoundary";
 import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
+
+const PROFILE_PLACEHOLDER_SRC = "/placeholder_profile_avatar.png";
 
 function NavIcon({ name }) {
   const icons = {
@@ -63,9 +65,52 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
-function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClass, onMouseEnter, onMouseLeave }) {
+function ProfileNavAvatar({ avatarUrl, fallbackInitial }) {
+  const [usePlaceholder, setUsePlaceholder] = useState(!avatarUrl);
+  const [showInitial, setShowInitial] = useState(false);
+  const src = usePlaceholder ? PROFILE_PLACEHOLDER_SRC : avatarUrl;
+
   return (
-    <aside className={`ops-sidebar ${shellClass}-sidebar`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <span className="nav-avatar-icon" aria-hidden="true">
+      {!showInitial ? (
+        <img
+          src={src}
+          alt=""
+          onError={() => {
+            if (!usePlaceholder) {
+              setUsePlaceholder(true);
+              return;
+            }
+            setShowInitial(true);
+          }}
+        />
+      ) : (
+        <span className="nav-avatar-fallback">{fallbackInitial}</span>
+      )}
+    </span>
+  );
+}
+
+function RoleSidebar({
+  title,
+  subtitle,
+  navItems,
+  userEmail,
+  userAvatarUrl,
+  userFallbackInitial,
+  onLogout,
+  shellClass,
+  onMouseEnter,
+  onMouseLeave,
+  onNavigate,
+  mobile = false,
+}) {
+  return (
+    <aside
+      className={`ops-sidebar ${shellClass}-sidebar ${mobile ? "mobile-sidebar" : ""}`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <div className="ops-brand-block">
         <img src={deliverooLogoIcon} alt="Deliveroo" className="ops-brand-logo" />
         <div>
@@ -84,8 +129,13 @@ function RoleSidebar({ title, subtitle, navItems, userEmail, onLogout, shellClas
             key={item.path}
             to={item.path}
             className={({ isActive }) => `ops-nav-link ${isActive ? "active" : ""}`}
+            onClick={onNavigate}
           >
-            <NavIcon name={item.icon} />
+            {item.icon === "profile" ? (
+              <ProfileNavAvatar avatarUrl={userAvatarUrl} fallbackInitial={userFallbackInitial} />
+            ) : (
+              <NavIcon name={item.icon} />
+            )}
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -145,22 +195,40 @@ export function AppLayout() {
   });
   const [sidebarHover, setSidebarHover] = useState(false);
   const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [fitScale, setFitScale] = useState(1);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.innerWidth <= 1120;
+  });
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
+  const fitShellRef = useRef(null);
+  const fitContentRef = useRef(null);
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
   const isRider = user?.role === "rider";
+  const userFallbackInitial = (user?.first_name?.trim()?.[0] || user?.email?.trim()?.[0] || "U").toUpperCase();
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth <= 1120) {
       setSidebarOpen(false);
+      setMobileMenuOpen(false);
     }
   }, [location.pathname]);
 
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth > 1120) {
+      const isMobile = window.innerWidth <= 1120;
+      setIsMobileViewport(isMobile);
+
+      if (!isMobile) {
         setSidebarOpen(true);
+        setMobileMenuOpen(false);
+      } else {
+        setSidebarOpen(false);
       }
     }
 
@@ -174,6 +242,74 @@ export function AppLayout() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      document.body.classList.remove("app-authenticated");
+      return;
+    }
+
+    document.body.classList.add("app-authenticated");
+    return () => {
+      document.body.classList.remove("app-authenticated");
+    };
+  }, [isAuthenticated]);
+
+  useLayoutEffect(() => {
+    if (!isAuthenticated || isMobileViewport) {
+      setFitScale(1);
+      return;
+    }
+
+    let frame = null;
+    let settleTimer = null;
+
+    function measureAndScale() {
+      const shellEl = fitShellRef.current;
+      const contentEl = fitContentRef.current;
+      if (!shellEl || !contentEl) {
+        return;
+      }
+
+      // Measure natural height first, then apply scaling only when overflow would occur.
+      contentEl.style.setProperty("--ops-fit-scale", "1");
+      const availableHeight = shellEl.clientHeight;
+      const requiredHeight = contentEl.scrollHeight;
+
+      const nextScale = requiredHeight > availableHeight && requiredHeight > 0
+        ? Math.max(0.68, availableHeight / requiredHeight)
+        : 1;
+
+      setFitScale(nextScale);
+    }
+
+    function scheduleMeasure() {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      frame = requestAnimationFrame(measureAndScale);
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleMeasure();
+    });
+
+    if (fitShellRef.current) resizeObserver.observe(fitShellRef.current);
+    if (fitContentRef.current) resizeObserver.observe(fitContentRef.current);
+
+    window.addEventListener("resize", scheduleMeasure);
+    scheduleMeasure();
+
+    // Re-measure shortly after route/content settles (images/map widgets/fonts).
+    settleTimer = window.setTimeout(scheduleMeasure, 260);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      if (settleTimer) clearTimeout(settleTimer);
+      window.removeEventListener("resize", scheduleMeasure);
+      resizeObserver.disconnect();
+    };
+  }, [isAuthenticated, isMobileViewport, location.pathname]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -203,7 +339,7 @@ export function AppLayout() {
         { label: "Analytics", path: "/admin/analytics", icon: "orders" },
         { label: "Monitoring", path: "/admin/monitoring", icon: "help" },
         { label: "Activity", path: "/admin/activity", icon: "create" },
-        { label: "Profile", path: "/profile", icon: "register" },
+        { label: "Profile", path: "/profile", icon: "profile" },
         { label: "Help", path: "/help", icon: "help" },
       ]
     : isRider
@@ -213,15 +349,14 @@ export function AppLayout() {
           { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
           { label: "Delivery History", path: "/deliveries/history", icon: "create" },
           { label: "Route Map", path: "/map", icon: "help" },
-          { label: "Profile", path: "/profile", icon: "register" },
+          { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ]
       : [
           { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
           { label: "Orders", path: "/orders", icon: "orders" },
           { label: "History", path: "/orders/history", icon: "create" },
-          { label: "Create Order", path: "/orders/create", icon: "create" },
-          { label: "Profile", path: "/profile", icon: "register" },
+          { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ];
 
@@ -230,51 +365,103 @@ export function AppLayout() {
       <div
         className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
-        <RoleSidebar
-          onMouseEnter={() => {
-            if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
-          }}
-          onMouseLeave={() => {
-            setSidebarHover(false);
-            setSidebarLockedClosed(false);
-          }}
-          title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
-          subtitle={
-            isAdmin
-              ? "Operations, monitoring, and dispatch control"
-              : isRider
-                ? "Manage active deliveries, history, and route updates"
-                : "Parcel booking, tracking, and support"
-          }
-          navItems={navItems}
-          userEmail={user.email}
-          onLogout={handleLogout}
-          shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
-        />
-
-        <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
-          <button
-            type="button"
-            className="ops-shell-toggle"
-            aria-label={effectiveSidebarOpen ? "Close menu" : "Open menu"}
-            onClick={() => {
-              if (effectiveSidebarOpen) {
-                setSidebarOpen(false);
-                setSidebarHover(false);
-                setSidebarLockedClosed(true);
-                return;
-              }
-
-              setSidebarOpen(true);
+        {!isMobileViewport ? (
+          <RoleSidebar
+            onMouseEnter={() => {
+              if (!sidebarOpen && !sidebarLockedClosed) setSidebarHover(true);
+            }}
+            onMouseLeave={() => {
+              setSidebarHover(false);
               setSidebarLockedClosed(false);
             }}
-          >
-            {effectiveSidebarOpen ? "×" : "☰"}
-          </button>
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
+            title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+            subtitle={
+              isAdmin
+                ? "Operations, monitoring, and dispatch control"
+                : isRider
+                  ? "Manage active deliveries, history, and route updates"
+                  : "Parcel booking, tracking, and support"
+            }
+            navItems={navItems}
+            userEmail={user.email}
+            userAvatarUrl={user?.avatar_url}
+            userFallbackInitial={userFallbackInitial}
+            onLogout={handleLogout}
+            shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
+          />
+        ) : null}
+
+        <main className={`role-main ops-main ${isAdmin ? "admin-main" : isRider ? "rider-main" : "customer-main"}`}>
+          {!isMobileViewport ? (
+            <button
+              type="button"
+              className="ops-shell-toggle"
+              aria-label={effectiveSidebarOpen ? "Close menu" : "Open menu"}
+              onClick={() => {
+                if (effectiveSidebarOpen) {
+                  setSidebarOpen(false);
+                  setSidebarHover(false);
+                  setSidebarLockedClosed(true);
+                  return;
+                }
+
+                setSidebarOpen(true);
+                setSidebarLockedClosed(false);
+              }}
+            >
+              {effectiveSidebarOpen ? "×" : "☰"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="ops-mobile-menu-btn"
+              aria-label="Open navigation menu"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              ☰
+            </button>
+          )}
+          <div ref={fitShellRef} className="ops-fit-shell">
+            <div ref={fitContentRef} className="ops-fit-content" style={{ "--ops-fit-scale": fitScale }}>
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
+            </div>
+          </div>
         </main>
+
+        {isMobileViewport && mobileMenuOpen ? (
+          <div className="ops-mobile-menu-layer" role="presentation">
+            <button type="button" className="ops-mobile-menu-backdrop" aria-label="Close navigation menu" onClick={() => setMobileMenuOpen(false)} />
+            <div className="ops-mobile-menu-sheet" role="dialog" aria-modal="true" aria-label="Navigation menu">
+              <div className="ops-mobile-menu-head">
+                <strong>Menu</strong>
+                <button type="button" className="ops-mobile-menu-close" aria-label="Close menu" onClick={() => setMobileMenuOpen(false)}>×</button>
+              </div>
+              <RoleSidebar
+                title={isAdmin ? "Admin Portal" : isRider ? "Rider Workspace" : "Customer Workspace"}
+                subtitle={
+                  isAdmin
+                    ? "Operations, monitoring, and dispatch control"
+                    : isRider
+                      ? "Manage active deliveries, history, and route updates"
+                      : "Parcel booking, tracking, and support"
+                }
+                navItems={navItems}
+                userEmail={user.email}
+                userAvatarUrl={user?.avatar_url}
+                userFallbackInitial={userFallbackInitial}
+                onLogout={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                onNavigate={() => setMobileMenuOpen(false)}
+                shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
+                mobile
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

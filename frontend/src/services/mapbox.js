@@ -1,13 +1,61 @@
-const ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+/* global __MAPBOX_FALLBACK_TOKEN__ */
+
+function normalizeToken(value) {
+  const token = String(value || "").trim().replace(/^['"]|['"]$/g, "");
+  return token || null;
+}
+
+function isPublicToken(value) {
+  return typeof value === "string" && value.startsWith("pk.");
+}
+
+export function getMapboxAccessToken() {
+  const envTokenCandidate = normalizeToken(
+    import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+    || import.meta.env.VITE_MAPBOX_TOKEN
+    || import.meta.env.MAPBOX_ACCESS_TOKEN
+    || import.meta.env.MAPBOX_PUBLIC_TOKEN,
+  );
+  const envToken = isPublicToken(envTokenCandidate) ? envTokenCandidate : null;
+
+  if (envToken) {
+    return envToken;
+  }
+
+  const buildFallbackCandidate = normalizeToken(
+    typeof __MAPBOX_FALLBACK_TOKEN__ !== "undefined" ? __MAPBOX_FALLBACK_TOKEN__ : "",
+  );
+  const buildFallbackToken = isPublicToken(buildFallbackCandidate) ? buildFallbackCandidate : null;
+  if (buildFallbackToken) {
+    return buildFallbackToken;
+  }
+
+  if (typeof window !== "undefined") {
+    const localTokenCandidate = normalizeToken(
+      window.localStorage.getItem("VITE_MAPBOX_ACCESS_TOKEN")
+      || window.localStorage.getItem("VITE_MAPBOX_TOKEN")
+      || window.localStorage.getItem("MAPBOX_ACCESS_TOKEN")
+      || window.localStorage.getItem("MAPBOX_PUBLIC_TOKEN"),
+    );
+    const localToken = isPublicToken(localTokenCandidate) ? localTokenCandidate : null;
+    if (localToken) {
+      return localToken;
+    }
+  }
+
+  return "";
+}
+
+const ACCESS_TOKEN = getMapboxAccessToken();
 const GEOCODING_BASE_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 const DIRECTIONS_BASE_URL = "https://api.mapbox.com/directions/v5/mapbox/driving";
 
 function assertToken() {
   if (!ACCESS_TOKEN) {
-    throw new Error("Mapbox access token is required. Set VITE_MAPBOX_TOKEN (or VITE_MAPBOX_ACCESS_TOKEN) in your environment.");
+    throw new Error("Map services are temporarily unavailable. Please continue with location inputs and try again shortly.");
   }
   if (!ACCESS_TOKEN.startsWith("pk.")) {
-    throw new Error("Use a public Mapbox token (starts with 'pk.') for VITE_MAPBOX_ACCESS_TOKEN.");
+    throw new Error("Map services are temporarily unavailable. Please continue with location inputs and try again shortly.");
   }
 }
 
@@ -15,7 +63,15 @@ async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.message || `Mapbox request failed with status ${response.status}`);
+    if ([401, 403].includes(response.status)) {
+      throw new Error("Map services are unavailable right now. Please continue with location inputs.");
+    }
+
+    if (response.status >= 500) {
+      throw new Error("Map services are temporarily unavailable. Please try again shortly.");
+    }
+
+    throw new Error(body.message || "Unable to load map results right now.");
   }
   return response.json();
 }

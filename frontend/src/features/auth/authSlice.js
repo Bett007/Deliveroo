@@ -11,6 +11,29 @@ import { clearStoredSession, persistSession, readStoredSession } from "./authSto
 
 const storedSession = readStoredSession();
 
+function getFriendlyAuthError(errorPayload, fallbackMessage) {
+  const status = errorPayload?.status;
+  const message = (errorPayload?.message || "").toLowerCase();
+
+  if (status === 0) {
+    return "We couldn't reach the server. Please check your connection and try again.";
+  }
+
+  if (status === 503) {
+    return "Sign in is temporarily unavailable. Please try again in a moment.";
+  }
+
+  if (status >= 500) {
+    return "Something went wrong on our side. Please try again shortly.";
+  }
+
+  if (message.includes("database connection failed")) {
+    return "Sign in is temporarily unavailable. Please try again in a moment.";
+  }
+
+  return errorPayload?.message ?? fallbackMessage;
+}
+
 export const loginUser = createAsyncThunk("auth/loginUser", async (payload, { rejectWithValue }) => {
   try {
     return await loginRequest(payload);
@@ -145,7 +168,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload?.message ?? "Login failed.";
+        state.error = getFriendlyAuthError(action.payload, "Login failed.");
         state.fieldErrors = action.payload?.errors ?? {};
       })
       .addCase(registerUser.pending, (state) => {
