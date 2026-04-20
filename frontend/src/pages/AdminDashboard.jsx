@@ -14,12 +14,16 @@ export function AdminDashboard() {
 
   const totalOrders = allOrders.length;
   const activeOrders = allOrders.filter((order) => !["delivered", "cancelled"].includes(order.status)).length;
-  const delivered = allOrders.filter((order) => order.status === "delivered").length;
   const estimatedRevenue = allOrders.reduce((sum, order) => sum + Number(order.quotedPrice || 0), 0);
   const avgDuration = allOrders.length
     ? Math.round(allOrders.reduce((sum, order) => sum + Number(order.durationMinutes || 0), 0) / allOrders.length)
     : 0;
   const featuredOrder = currentOrders[0] || orderHistory[0];
+  const totalOrdersSummary = totalOrders > 0 ? "Platform orders recorded so far" : "No platform orders yet";
+  const activeOrdersSummary = activeOrders > 0
+    ? "Pending, confirmed, and in-transit deliveries"
+    : "No active deliveries yet";
+  const revenueSummary = estimatedRevenue > 0 ? "Revenue recorded so far" : "No revenue recorded yet";
   const adminModules = [
     {
       title: "Manage Orders",
@@ -55,7 +59,7 @@ export function AdminDashboard() {
           <p className="workspace-copy">Monitor operations, deliveries, and platform activity.</p>
         </div>
         <div className="topbar-actions dashboard-user-meta">
-          <NotificationBell label="Platform alerts" minimumCount={Math.max(1, activeOrders)} />
+          <NotificationBell label="Platform alerts" />
           <div className="dashboard-account-card">
             <span className="dashboard-avatar" aria-hidden="true">A</span>
             <span className="dashboard-account-copy">
@@ -72,7 +76,7 @@ export function AdminDashboard() {
           <div className="summary-copy">
             <p className="card-label">Total Orders</p>
             <h3>{totalOrders}</h3>
-            <span>Platform-wide order volume snapshot</span>
+            <span>{totalOrdersSummary}</span>
           </div>
         </div>
         <div className="glass-card summary-card">
@@ -80,7 +84,7 @@ export function AdminDashboard() {
           <div className="summary-copy">
             <p className="card-label">Active Deliveries</p>
             <h3>{activeOrders}</h3>
-            <span>Pending, confirmed, and in-transit deliveries</span>
+            <span>{activeOrdersSummary}</span>
           </div>
         </div>
         <div className="glass-card summary-card">
@@ -88,7 +92,7 @@ export function AdminDashboard() {
           <div className="summary-copy">
             <p className="card-label">Revenue Estimate</p>
             <h3>KES {estimatedRevenue.toFixed(2)}</h3>
-            <span>{delivered} delivered in available records</span>
+            <span>{revenueSummary}</span>
           </div>
         </div>
       </section>
@@ -107,7 +111,10 @@ export function AdminDashboard() {
       </section>
 
       <div className="ops-dashboard-grid">
-        <SectionCard title="Recent Orders" description={`Average completion time: ${avgDuration} minutes`}>
+        <SectionCard
+          title="Recent Orders"
+          description={allOrders.length ? `Average completion time: ${avgDuration} minutes` : "No order timing data yet."}
+        >
           {allOrders.length ? (
             <div className="table-wrapper">
               <table className="orders-table">

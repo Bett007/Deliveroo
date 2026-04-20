@@ -190,7 +190,12 @@ export function OrderDetailsPage() {
       </div>
 
       <div className="workspace-grid">
-        <RouteMapCard origin={order.pickupLocation} destination={order.destination} distanceKm={order.distanceKm} durationMinutes={order.durationMinutes} />
+        <RouteMapCard
+          origin={order.pickupLocation}
+          destination={order.destination}
+          distanceKm={order.distanceKm}
+          durationMinutes={order.durationMinutes}
+        />
 
         <SectionCard title="Tracking Updates" description="Latest route and status updates for this order.">
           {trackingStatus === "loading" ? (
