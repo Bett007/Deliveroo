@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
@@ -12,7 +12,26 @@ export function VerifyPage() {
   const { error, fieldErrors, resendStatus, verificationCode, verificationEmail, verificationExpiresAt, verifyStatus } = useSelector((state) => state.auth);
   const [code, setCode] = useState("");
   const [clientError, setClientError] = useState("");
+  const [countdownSeconds, setCountdownSeconds] = useState(60);
   const email = location.state?.email || verificationEmail || "";
+
+  useEffect(() => {
+    setCountdownSeconds(60);
+  }, [verificationCode, verificationExpiresAt]);
+
+  useEffect(() => {
+    if (countdownSeconds <= 0) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setCountdownSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [countdownSeconds]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -44,6 +63,10 @@ export function VerifyPage() {
     await dispatch(resendVerificationCode({ email }));
   }
 
+  const timerMinutes = String(Math.floor(countdownSeconds / 60)).padStart(2, "0");
+  const timerSeconds = String(countdownSeconds % 60).padStart(2, "0");
+  const timerLabel = `${timerMinutes}:${timerSeconds}`;
+
   return (
     <section className="auth-page">
       <div className="auth-card glass-card verification-card">
@@ -56,7 +79,13 @@ export function VerifyPage() {
           <h1>Two-Step Verification</h1>
           <p>Enter the verification code for {email || "your account"} to finish setup.</p>
           {verificationCode ? <p className="helper-text">Demo verification code: <strong>{verificationCode}</strong></p> : null}
-          {verificationExpiresAt ? <p className="helper-text">This code expires at {new Date(verificationExpiresAt).toLocaleString()}.</p> : null}
+          {verificationCode ? (
+            <p className="helper-text">
+              {countdownSeconds > 0
+                ? <>Code expires in <strong>{timerLabel}</strong>.</>
+                : <>Code expired. Request a new code to continue.</>}
+            </p>
+          ) : null}
           {error ? <p className="form-status error">{error}</p> : null}
           {clientError ? <p className="form-status error">{clientError}</p> : null}
         </div>
