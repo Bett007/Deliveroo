@@ -1,13 +1,13 @@
-<svg width="400" height="200" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="80" cy="100" r="48" fill="#2563EB" />
-  <rect x="60" y="90" width="28" height="28" fill="white" rx="2" />
-  <line x1="60" y1="104" x2="88" y2="104" stroke="#2563EB" stroke-width="2" />
-  <line x1="74" y1="90" x2="74" y2="104" stroke="#2563EB" stroke-width="2" />
-  <path d="M95 95 L105 95" stroke="white" stroke-width="3" stroke-linecap="round" />
-  <path d="M98 102 L108 102" stroke="white" stroke-width="3" stroke-linecap="round" />
-  <path d="M95 109 L105 109" stroke="white" stroke-width="3" stroke-linecap="round" />
-  <circle cx="102" cy="85" r="4" fill="white" />
-  <circle cx="102" cy="85" r="2" fill="#2563EB" />
-  <text x="170" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="#1A1A1A">Deliveroo</text>
-  <text x="170" y="135" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="400" fill="#666666" letter-spacing="2">COURIER SERVICE</text>
+<svg width="520" height="128" viewBox="0 0 520 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="48" cy="64" r="40" fill="#2563EB" />
+  <rect x="33" y="56" width="22" height="22" fill="white" rx="2" />
+  <line x1="33" y1="67" x2="55" y2="67" stroke="#2563EB" stroke-width="2" />
+  <line x1="44" y1="56" x2="44" y2="67" stroke="#2563EB" stroke-width="2" />
+  <path d="M61 60 L70 60" stroke="white" stroke-width="3" stroke-linecap="round" />
+  <path d="M64 66 L73 66" stroke="white" stroke-width="3" stroke-linecap="round" />
+  <path d="M61 72 L70 72" stroke="white" stroke-width="3" stroke-linecap="round" />
+  <circle cx="67" cy="52" r="4" fill="white" />
+  <circle cx="67" cy="52" r="2" fill="#2563EB" />
+  <text x="104" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="700" fill="#1A1A1A">Deliveroo</text>
+  <text x="104" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="500" fill="#666666" letter-spacing="2">COURIER SERVICE</text>
 </svg>

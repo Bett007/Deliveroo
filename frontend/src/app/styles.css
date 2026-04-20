@@ -11,9 +11,9 @@
   --accent-soft: rgba(30, 200, 255, 0.12);
   --white: #ffffff;
   --shadow: 0 12px 35px rgba(12, 77, 110, 0.12);
-  --radius-xl: 28px;
-  --radius-lg: 20px;
-  --radius-md: 14px;
+  --radius-xl: 20px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
   --sidebar-width: 270px;
 }
 
@@ -135,7 +135,7 @@ button {
 .brand-logo {
   width: 46px;
   height: 46px;
-  border-radius: 16px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
@@ -160,7 +160,7 @@ button {
 
 .nav-link {
   padding: 0.95rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   font-weight: 600;
   color: var(--text-secondary);
   background: transparent;
@@ -191,7 +191,7 @@ button {
   z-index: 40;
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.7);
   box-shadow: var(--shadow);
 }
@@ -277,7 +277,7 @@ button {
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  border-radius: 18px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.35);
 }
 
@@ -369,7 +369,7 @@ button {
 
 .fake-map {
   height: 260px;
-  border-radius: 22px;
+  border-radius: 14px;
   position: relative;
   overflow: hidden;
   background:
@@ -412,14 +412,14 @@ button {
   gap: 0.8rem;
   align-items: flex-start;
   padding: 0.8rem;
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.35);
 }
 
 .notification-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: 8px;
   display: grid;
   place-items: center;
   background: rgba(30, 200, 255, 0.18);
@@ -571,7 +571,7 @@ button {
 .public-brand-mark {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
@@ -752,7 +752,7 @@ button {
 .search-input {
   width: 100%;
   padding: 0.95rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.6);
   color: var(--text-primary);
@@ -768,7 +768,7 @@ button {
 .form-select {
   width: 100%;
   padding: 0.95rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.6);
   outline: none;
@@ -877,7 +877,7 @@ button {
   width: 100%;
   min-height: 120px;
   padding: 0.95rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.6);
   outline: none;
@@ -917,7 +917,7 @@ button {
 .form-group select {
   width: 100%;
   padding: 0.95rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.6);
   outline: none;
@@ -933,7 +933,7 @@ button {
 }
 .form-status {
   padding: 0.85rem 1rem;
-  border-radius: 16px;
+  border-radius: 10px;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -1011,7 +1011,7 @@ button {
 .portal-mark {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   overflow: hidden;
