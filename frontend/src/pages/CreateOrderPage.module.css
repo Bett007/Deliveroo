@@ -206,6 +206,17 @@
   display: grid;
   gap: 0.5rem;
 }
+:global(.order-edit-mode-row) {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 420px);
+  align-items: end;
+  gap: 0.8rem;
+}
+:global(.active-mode-btn) {
+  background: var(--ops-blue);
+  border-color: var(--ops-blue);
+  color: #ffffff;
+}
 :global(.row) {
   display: flex;
   gap: 10px;
@@ -253,6 +264,10 @@
 }
 
 @media (max-width: 768px) {
+  :global(.order-edit-mode-row) {
+    grid-template-columns: 1fr;
+  }
+
   :global(.route-stats-row.single-column) {
     grid-template-columns: 1fr;
   }
