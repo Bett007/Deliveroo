@@ -133,7 +133,7 @@ export function RiderDashboard() {
       </section>
 
       <div className="ops-dashboard-grid">
-        <SectionCard title="Recent Assignments" description="Most recent rider assignments across active delivery jobs.">
+        <SectionCard className="rider-assignments-panel" title="Recent Assignments" description="Most recent rider assignments across active delivery jobs.">
           {riderActiveOrders.length ? (
             <div className="table-wrapper">
               <table className="orders-table">

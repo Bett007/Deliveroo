@@ -7,18 +7,23 @@ import { fetchOrders } from "../features/orders/ordersSlice";
 
 export function ActiveDeliveries() {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const { currentOrders, status } = useSelector((state) => state.orders);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  const activeOrders = useMemo(
-    () =>
-      currentOrders
-        .filter((order) => !["delivered", "cancelled"].includes(order.status)),
-    [currentOrders],
-  );
+  const activeOrders = useMemo(() => {
+    const nonTerminalOrders = currentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status));
+
+    if (user?.role === "rider") {
+      // Rider accept queue: show only unassigned deliveries ready to be picked.
+      return nonTerminalOrders.filter((order) => !order.assignedRiderId);
+    }
+
+    return nonTerminalOrders;
+  }, [currentOrders, user?.role]);
 
   return (
     <section className="workspace-page">
@@ -33,7 +38,7 @@ export function ActiveDeliveries() {
         <Link to="/rider/dashboard" className="secondary-btn">Back to Rider Dashboard</Link>
       </header>
 
-      <SectionCard title="Delivery Queue" description="Only non-completed deliveries are shown here.">
+      <SectionCard title="Delivery Queue" description="Only unassigned, non-completed deliveries are shown here for rider pickup.">
         {status === "loading" ? (
           <p className="helper-text">Loading active deliveries from the backend...</p>
         ) : activeOrders.length ? (
@@ -60,7 +65,7 @@ export function ActiveDeliveries() {
             ))}
           </div>
         ) : (
-          <p className="helper-text">No active deliveries are currently assigned.</p>
+          <p className="helper-text">No unassigned deliveries are available right now.</p>
         )}
       </SectionCard>
     </section>

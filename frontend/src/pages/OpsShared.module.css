@@ -528,6 +528,47 @@
   background: #f7f9fb;
   border: 1px solid var(--ops-border);
 }
+:global(.ops-main .order-card) {
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+:global(.ops-main .order-card-top) {
+  align-items: flex-start;
+}
+:global(.ops-main .order-card .order-route),
+:global(.ops-main .order-card .helper-text) {
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+:global(.ops-main .order-card .topbar-actions) {
+  margin-top: 0.45rem;
+  padding-top: 0.25rem;
+}
+
+:global(.rider-assignments-panel .table-wrapper) {
+  overflow-x: hidden;
+}
+:global(.rider-assignments-panel .orders-table) {
+  min-width: 0;
+  table-layout: fixed;
+}
+:global(.rider-assignments-panel .orders-table th),
+:global(.rider-assignments-panel .orders-table td) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
+:global(.rider-assignments-panel .orders-table th:nth-child(1)),
+:global(.rider-assignments-panel .orders-table td:nth-child(1)),
+:global(.rider-assignments-panel .orders-table th:nth-child(4)),
+:global(.rider-assignments-panel .orders-table td:nth-child(4)),
+:global(.rider-assignments-panel .orders-table th:nth-child(5)),
+:global(.rider-assignments-panel .orders-table td:nth-child(5)) {
+  white-space: nowrap;
+}
 :global(.dashboard-page .table-wrapper) {
   border-radius: 14px;
   box-shadow: 0 22px 52px rgba(20, 35, 55, 0.06);
