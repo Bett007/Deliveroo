@@ -312,7 +312,7 @@ export function OrderDetailsPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No tracking updates yet" description="The backend has not returned any tracking updates for this order yet." />
+                <EmptyState title="No tracking updates yet" description="Tracking updates will appear here once the rider shares progress on this delivery." />
               )}
             </>
           ) : null}
