@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AppLayout } from "../components/AppLayout";
 import { hydrateSession } from "../features/auth/authSlice";
 import { fetchOrders } from "../features/orders/ordersSlice";
@@ -26,7 +26,6 @@ import { AdminRoute, ProtectedRoute } from "./ProtectedRoute";
 
 // Rider Pages
 import { RiderDashboard } from "../pages/RiderDashboard";
-import { ActiveDeliveries } from "../pages/ActiveDeliveries";
 import { DeliveryHistory } from "../pages/DeliveryHistory";
 import { RouteMap } from "../pages/RouteMap";
 
@@ -94,7 +93,7 @@ export function AppRouter() {
           <Route element={<RiderRoute />}>
             <Route path="rider/dashboard" element={<RiderDashboard />} />
             <Route path="rider/board" element={<RiderDashboardPage />} />
-            <Route path="deliveries/active" element={<ActiveDeliveries />} />
+            <Route path="deliveries/active" element={<Navigate to="/rider/board" replace />} />
             <Route path="deliveries/history" element={<DeliveryHistory />} />
             <Route path="map" element={<RouteMap />} />
           </Route>

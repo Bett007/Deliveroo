@@ -363,7 +363,6 @@ export function AppLayout() {
       ? [
           { label: "Dashboard", path: "/rider/dashboard", icon: "dashboard" },
           { label: "Work Board", path: "/rider/board", icon: "orders" },
-          { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
           { label: "Delivery History", path: "/deliveries/history", icon: "create" },
           { label: "Route Map", path: "/map", icon: "help" },
           { label: "Profile", path: "/profile", icon: "profile" },

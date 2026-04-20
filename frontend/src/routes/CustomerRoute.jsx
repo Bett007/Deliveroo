@@ -11,7 +11,7 @@ export function CustomerRoute() {
 
   if (user?.role !== "customer") {
     if (user?.role === "rider") {
-      return <Navigate to="/deliveries/active" replace />;
+      return <Navigate to="/rider/board" replace />;
     }
     if (user?.role === "admin") {
       return <Navigate to="/admin/dashboard" replace />;

@@ -52,12 +52,6 @@ export function RiderDashboard() {
       badge: "Board",
     },
     {
-      title: "Active Deliveries",
-      description: `${riderActiveOrders.length} live jobs`,
-      path: "/deliveries/active",
-      badge: "Live",
-    },
-    {
       title: "Route Map",
       description: "Open full map tracking",
       path: "/map",
@@ -164,7 +158,7 @@ export function RiderDashboard() {
           )}
 
           <div className="topbar-actions">
-            <Link to="/deliveries/active" className="primary-btn">Active Deliveries</Link>
+            <Link to="/rider/board" className="primary-btn">Work Board</Link>
             <Link to="/deliveries/history" className="secondary-btn">Delivery History</Link>
             <Link to="/map" className="secondary-btn">Route Map</Link>
           </div>
