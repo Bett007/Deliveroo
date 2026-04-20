@@ -3,12 +3,18 @@
 }
 
 :global(.create-order-workspace) {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 1rem;
+  height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 :global(.create-order-workspace .create-order-grid) {
   min-height: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 :global(.create-order-workspace .create-order-panel),
