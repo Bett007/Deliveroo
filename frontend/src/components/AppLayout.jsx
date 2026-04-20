@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
+import placeholderProfileAvatar from "../assets/icons/placeholder_profile_avatar.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
 import { Button } from "./ui/Button";
@@ -9,7 +10,25 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
 
-const PROFILE_PLACEHOLDER_SRC = "/placeholder_profile_avatar.png";
+const PROFILE_PLACEHOLDER_SRC = placeholderProfileAvatar;
+
+function getViewportWidth() {
+  if (typeof window === "undefined") {
+    return 1440;
+  }
+
+  const widths = [
+    window.innerWidth,
+    window.visualViewport?.width,
+    document.documentElement?.clientWidth,
+  ].filter((value) => Number.isFinite(value) && value > 0);
+
+  return widths.length ? Math.min(...widths) : window.innerWidth;
+}
+
+function isMobileShellViewport() {
+  return getViewportWidth() <= 1120;
+}
 
 function NavIcon({ name }) {
   const icons = {
@@ -187,21 +206,14 @@ export function AppLayout() {
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") {
-      return true;
-    }
-
-    return window.innerWidth > 1120;
+    return !isMobileShellViewport();
   });
   const [sidebarHover, setSidebarHover] = useState(false);
   const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [fitScale, setFitScale] = useState(1);
   const [isMobileViewport, setIsMobileViewport] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    return window.innerWidth <= 1120;
+    return isMobileShellViewport();
   });
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const fitShellRef = useRef(null);
@@ -213,7 +225,7 @@ export function AppLayout() {
   const userFallbackInitial = (user?.first_name?.trim()?.[0] || user?.email?.trim()?.[0] || "U").toUpperCase();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth <= 1120) {
+    if (isMobileShellViewport()) {
       setSidebarOpen(false);
       setMobileMenuOpen(false);
     }
@@ -221,7 +233,7 @@ export function AppLayout() {
 
   useEffect(() => {
     function handleResize() {
-      const isMobile = window.innerWidth <= 1120;
+      const isMobile = isMobileShellViewport();
       setIsMobileViewport(isMobile);
 
       if (!isMobile) {
@@ -232,13 +244,17 @@ export function AppLayout() {
       }
     }
 
+    handleResize();
+
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
+      window.visualViewport?.addEventListener("resize", handleResize);
     }
 
     return () => {
       if (typeof window !== "undefined") {
         window.removeEventListener("resize", handleResize);
+        window.visualViewport?.removeEventListener("resize", handleResize);
       }
     };
   }, []);
@@ -263,6 +279,7 @@ export function AppLayout() {
 
     let frame = null;
     let settleTimer = null;
+    let settleTimerTwo = null;
 
     function measureAndScale() {
       const shellEl = fitShellRef.current;
@@ -271,14 +288,21 @@ export function AppLayout() {
         return;
       }
 
+      if (shellEl.clientWidth <= 1120) {
+        setFitScale(1);
+        return;
+      }
+
       // Measure natural height first, then apply scaling only when overflow would occur.
       contentEl.style.setProperty("--ops-fit-scale", "1");
       const availableHeight = shellEl.clientHeight;
+      const availableWidth = shellEl.clientWidth;
       const requiredHeight = contentEl.scrollHeight;
+      const requiredWidth = contentEl.scrollWidth;
 
-      const nextScale = requiredHeight > availableHeight && requiredHeight > 0
-        ? Math.max(0.68, availableHeight / requiredHeight)
-        : 1;
+      const heightScale = requiredHeight > 0 ? availableHeight / requiredHeight : 1;
+      const widthScale = requiredWidth > 0 ? availableWidth / requiredWidth : 1;
+      const nextScale = Math.min(1, Math.max(0.42, Math.min(heightScale, widthScale)));
 
       setFitScale(nextScale);
     }
@@ -297,19 +321,32 @@ export function AppLayout() {
     if (fitShellRef.current) resizeObserver.observe(fitShellRef.current);
     if (fitContentRef.current) resizeObserver.observe(fitContentRef.current);
 
+    const mutationObserver = new MutationObserver(() => {
+      scheduleMeasure();
+    });
+    if (fitContentRef.current) {
+      mutationObserver.observe(fitContentRef.current, { childList: true, subtree: true, characterData: true, attributes: true });
+    }
+
     window.addEventListener("resize", scheduleMeasure);
     scheduleMeasure();
 
     // Re-measure shortly after route/content settles (images/map widgets/fonts).
     settleTimer = window.setTimeout(scheduleMeasure, 260);
+    settleTimerTwo = window.setTimeout(scheduleMeasure, 850);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(scheduleMeasure).catch(() => {});
+    }
 
     return () => {
       if (frame) cancelAnimationFrame(frame);
       if (settleTimer) clearTimeout(settleTimer);
+      if (settleTimerTwo) clearTimeout(settleTimerTwo);
       window.removeEventListener("resize", scheduleMeasure);
+      mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [isAuthenticated, isMobileViewport, location.pathname]);
+  }, [isAuthenticated, isMobileViewport, location.pathname, effectiveSidebarOpen]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -346,7 +383,6 @@ export function AppLayout() {
       ? [
           { label: "Dashboard", path: "/rider/dashboard", icon: "dashboard" },
           { label: "Work Board", path: "/rider/board", icon: "orders" },
-          { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
           { label: "Delivery History", path: "/deliveries/history", icon: "create" },
           { label: "Route Map", path: "/map", icon: "help" },
           { label: "Profile", path: "/profile", icon: "profile" },
@@ -359,11 +395,12 @@ export function AppLayout() {
           { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ];
+  const shellStateClass = isMobileViewport ? "sidebar-open" : effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed";
 
   return (
     <div className={`${shellStyles.scope} ${opsSharedStyles.scope}`}>
       <div
-        className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
+        className={`role-shell ops-shell ${shellStateClass} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
         {!isMobileViewport ? (
           <RoleSidebar

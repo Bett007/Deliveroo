@@ -48,6 +48,14 @@
   right: 16%;
   top: calc(50% - 21px);
 }
+:global(.map-stop-terminal) {
+  background: rgba(148, 163, 184, 0.9);
+  color: #f8fafc;
+}
+:global(.mini-badge.terminal) {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
 :global(.map-meta-grid) {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

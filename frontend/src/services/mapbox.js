@@ -46,17 +46,18 @@ export function getMapboxAccessToken() {
   return "";
 }
 
-const ACCESS_TOKEN = getMapboxAccessToken();
 const GEOCODING_BASE_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 const DIRECTIONS_BASE_URL = "https://api.mapbox.com/directions/v5/mapbox/driving";
 
 function assertToken() {
-  if (!ACCESS_TOKEN) {
+  const token = getMapboxAccessToken();
+  if (!token) {
     throw new Error("Map services are temporarily unavailable. Please continue with location inputs and try again shortly.");
   }
-  if (!ACCESS_TOKEN.startsWith("pk.")) {
+  if (!token.startsWith("pk.")) {
     throw new Error("Map services are temporarily unavailable. Please continue with location inputs and try again shortly.");
   }
+  return token;
 }
 
 async function fetchJson(url) {
@@ -77,9 +78,9 @@ async function fetchJson(url) {
 }
 
 export async function geocodeAddress(address) {
-  assertToken();
+  const accessToken = assertToken();
   const encoded = encodeURIComponent(address.trim());
-  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&limit=1&autocomplete=true&country=ke`;
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${accessToken}&limit=1&autocomplete=true&country=ke`;
   const payload = await fetchJson(url);
 
   const feature = payload.features?.[0];
@@ -98,7 +99,7 @@ export async function geocodeAddress(address) {
 }
 
 export async function autocompleteAddress(text, county) {
-  assertToken();
+  const accessToken = assertToken();
   const normalized = String(text || "").trim();
   const region = county ? String(county || "").trim() : "";
   const query = region && !normalized.toLowerCase().includes(region.toLowerCase())
@@ -106,7 +107,7 @@ export async function autocompleteAddress(text, county) {
     : normalized;
 
   const encoded = encodeURIComponent(query);
-  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=6&country=ke&types=poi,address`;
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${accessToken}&autocomplete=true&limit=6&country=ke&types=poi,address`;
   const payload = await fetchJson(url);
 
   return (payload.features || []).map((feature) => {
@@ -122,9 +123,9 @@ export async function autocompleteAddress(text, county) {
 }
 
 export async function reverseGeocodeCoordinates(latitude, longitude) {
-  assertToken();
+  const accessToken = assertToken();
   const encoded = encodeURIComponent(`${longitude},${latitude}`);
-  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&limit=1&country=ke`;
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${accessToken}&limit=1&country=ke`;
   const payload = await fetchJson(url);
 
   const feature = payload.features?.[0];
@@ -143,12 +144,12 @@ export async function reverseGeocodeCoordinates(latitude, longitude) {
 }
 
 export async function fetchNairobiPlaceSuggestions(limitPerCategory = 4) {
-  assertToken();
+  const accessToken = assertToken();
   const categories = ["restaurant", "cafe", "business", "hotel", "hospital", "mall"];
 
   const requests = categories.map(async (category) => {
     const query = encodeURIComponent(`${category} in Nairobi`);
-    const url = `${GEOCODING_BASE_URL}/${query}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=${limitPerCategory}&country=ke&types=poi,address`;
+    const url = `${GEOCODING_BASE_URL}/${query}.json?access_token=${accessToken}&autocomplete=true&limit=${limitPerCategory}&country=ke&types=poi,address`;
     const payload = await fetchJson(url);
 
     return (payload.features || []).map((feature) => {
@@ -176,14 +177,14 @@ export async function fetchNairobiPlaceSuggestions(limitPerCategory = 4) {
 }
 
 export async function fetchRoutePreview(originCoords, destinationCoords) {
-  assertToken();
+  const accessToken = assertToken();
 
   if (!originCoords || !destinationCoords) {
     throw new Error("Origin and destination coordinates are required for route preview.");
   }
 
   const coordinates = `${originCoords.longitude},${originCoords.latitude};${destinationCoords.longitude},${destinationCoords.latitude}`;
-  const url = `${DIRECTIONS_BASE_URL}/${coordinates}?access_token=${ACCESS_TOKEN}&overview=full&geometries=geojson&alternatives=false&steps=false`;
+  const url = `${DIRECTIONS_BASE_URL}/${coordinates}?access_token=${accessToken}&overview=full&geometries=geojson&alternatives=false&steps=false`;
   const payload = await fetchJson(url);
 
   if (!payload.routes?.length) {
@@ -200,7 +201,7 @@ export async function fetchRoutePreview(originCoords, destinationCoords) {
 }
 
 export async function searchPOIs(query, county, poiType = null) {
-  assertToken();
+  const accessToken = assertToken();
   const normalized = String(query || "").trim();
   if (!normalized) {
     return [];
@@ -213,7 +214,7 @@ export async function searchPOIs(query, county, poiType = null) {
 
   const encoded = encodeURIComponent(searchQuery);
   const types = poiType ? `poi.${poiType}` : "poi,place";
-  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${ACCESS_TOKEN}&autocomplete=true&limit=10&country=ke&types=${types}`;
+  const url = `${GEOCODING_BASE_URL}/${encoded}.json?access_token=${accessToken}&autocomplete=true&limit=10&country=ke&types=${types}`;
   const payload = await fetchJson(url);
 
   return (payload.features || []).map((feature) => {

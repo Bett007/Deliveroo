@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RouteMapCard } from "../components/ui/RouteMapCard";
@@ -12,10 +13,28 @@ export function RiderDashboard() {
   const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Rider";
   const avatarUrl = user?.avatar_url;
 
-  const riderActiveOrders = currentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status));
-  const inTransit = riderActiveOrders.filter((order) => order.status === "in_transit").length;
-  const completedToday = orderHistory.slice(0, 8).filter((order) => order.status === "delivered").length;
-  const featuredOrder = riderActiveOrders[0] || orderHistory[0];
+  const riderCurrentOrders = useMemo(
+    () => currentOrders.filter((order) => Number(order.assignedRiderId) === Number(user?.id)),
+    [currentOrders, user?.id],
+  );
+  const riderHistoryOrders = useMemo(
+    () => orderHistory.filter((order) => Number(order.assignedRiderId) === Number(user?.id)),
+    [orderHistory, user?.id],
+  );
+
+  const riderActiveOrders = useMemo(
+    () => riderCurrentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status)),
+    [riderCurrentOrders],
+  );
+  const inTransit = useMemo(
+    () => riderActiveOrders.filter((order) => order.status === "in_transit").length,
+    [riderActiveOrders],
+  );
+  const completedToday = useMemo(
+    () => riderHistoryOrders.filter((order) => order.status === "delivered").length,
+    [riderHistoryOrders],
+  );
+  const featuredOrder = riderActiveOrders[0] || riderHistoryOrders[0];
   const activeDeliveriesSummary = riderActiveOrders.length > 0
     ? "Orders waiting pickup, transit, or dropoff updates"
     : "No active deliveries yet";
@@ -33,12 +52,6 @@ export function RiderDashboard() {
       badge: "Board",
     },
     {
-      title: "Active Deliveries",
-      description: `${riderActiveOrders.length} live jobs`,
-      path: "/deliveries/active",
-      badge: "Live",
-    },
-    {
       title: "Route Map",
       description: "Open full map tracking",
       path: "/map",
@@ -46,7 +59,7 @@ export function RiderDashboard() {
     },
     {
       title: "Delivery History",
-      description: `${orderHistory.length} finished deliveries`,
+      description: `${riderHistoryOrders.length} finished deliveries`,
       path: "/deliveries/history",
       badge: "Past",
     },
@@ -114,7 +127,7 @@ export function RiderDashboard() {
       </section>
 
       <div className="ops-dashboard-grid">
-        <SectionCard title="Recent Assignments" description="Most recent rider assignments across active delivery jobs.">
+        <SectionCard className="rider-assignments-panel" title="Recent Assignments" description="Most recent rider assignments across active delivery jobs.">
           {riderActiveOrders.length ? (
             <div className="table-wrapper">
               <table className="orders-table">
@@ -145,7 +158,7 @@ export function RiderDashboard() {
           )}
 
           <div className="topbar-actions">
-            <Link to="/deliveries/active" className="primary-btn">Active Deliveries</Link>
+            <Link to="/rider/board" className="primary-btn">Work Board</Link>
             <Link to="/deliveries/history" className="secondary-btn">Delivery History</Link>
             <Link to="/map" className="secondary-btn">Route Map</Link>
           </div>

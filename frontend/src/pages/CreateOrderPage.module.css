@@ -2,6 +2,31 @@
   display: contents;
 }
 
+:global(.create-order-workspace) {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:global(.create-order-workspace .create-order-grid) {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+:global(.create-order-workspace .create-order-panel),
+:global(.create-order-workspace .create-order-aside),
+:global(.create-order-workspace .order-summary-panel),
+:global(.create-order-workspace .route-summary-panel) {
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
 
 :global(.mini-route),
 :global(.route-preview) {
@@ -109,8 +134,7 @@
   gap: 1rem;
   align-items: start;
   min-height: 0;
-  overflow: auto;
-  scrollbar-width: thin;
+  overflow: visible;
 }
 :global(.create-order-panel),
 :global(.create-order-aside),
@@ -120,8 +144,7 @@
   gap: 1rem;
   align-content: start;
   min-height: 0;
-  overflow: auto;
-  scrollbar-width: thin;
+  overflow: visible;
 }
 :global(.create-order-panel .auth-form) {
   gap: 0.75rem;
@@ -181,7 +204,7 @@
   margin-bottom: 1rem;
 }
 :global(.route-stats-row.single-column) {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 0;
 }
 :global(.route-stats-row div) {
@@ -255,6 +278,10 @@
 }
 
 @media (max-width: 768px) {
+  :global(.route-stats-row.single-column) {
+    grid-template-columns: 1fr;
+  }
+
   :global(.panel-toggle-actions) {
     display: grid;
     grid-template-columns: 1fr;
@@ -266,5 +293,26 @@
 
   :global(.half) {
     width: 100%;
+  }
+}
+
+@media (max-width: 1120px) {
+  :global(.create-order-workspace) {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  :global(.create-order-workspace .create-order-grid) {
+    height: auto;
+    overflow: visible;
+  }
+
+  :global(.create-order-workspace .create-order-panel),
+  :global(.create-order-workspace .create-order-aside),
+  :global(.create-order-workspace .order-summary-panel),
+  :global(.create-order-workspace .route-summary-panel) {
+    max-height: none;
+    overflow: visible;
   }
 }

@@ -133,7 +133,7 @@ export function DashboardPage() {
       ) : null}
 
       {activePane === "orders" ? (
-      <div className="ops-dashboard-grid">
+      <div className="ops-dashboard-grid dashboard-orders-pane-grid">
         <SectionCard title="Recent Orders" description="Latest active deliveries for this customer account.">
           {status === "loading" ? (
             <p className="helper-text">Loading orders...</p>
@@ -171,8 +171,8 @@ export function DashboardPage() {
           )}
 
           <div className="topbar-actions">
-            <Link className="primary-btn" to="/orders/create">Create Order</Link>
-            <Link className="secondary-btn" to="/orders">Open Orders</Link>
+            <Link className="primary-btn" to="/orders/create" state={{ initialPanel: "create-order" }}>Create Order</Link>
+            <Link className="secondary-btn" to="/orders/history">Open Orders</Link>
           </div>
         </SectionCard>
       </div>

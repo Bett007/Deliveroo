@@ -81,3 +81,28 @@ which python
 - Frontend values should go in `frontend/.env`.
 - Backend values should go in `backend/.env`.
 - Do not commit real environment files or secrets.
+
+## Demo Seed Accounts
+
+After backend setup, run:
+
+```bash
+cd backend
+flask seed-demo-data
+```
+
+Seeded credentials:
+
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer.one@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.two@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.three@deliveroo.demo` | `Customer123!` |
+| Rider | `rider.one@deliveroo.demo` | `Rider123!` |
+| Rider | `rider.two@deliveroo.demo` | `Rider123!` |
+| Admin | `admin@deliveroo.demo` | `Admin123!` |
+
+Admin access flow:
+
+- Admin sign-up is not available from the frontend registration page.
+- Sign in with the seeded admin credentials, then navigate directly to admin routes such as `/admin/dashboard`.

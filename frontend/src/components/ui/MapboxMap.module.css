@@ -36,6 +36,11 @@
   color: white;
 }
 
+.mapboxMarkerMuted {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  color: #f8fafc;
+}
+
 .mapboxMarkerBusiness {
   background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
   color: white;

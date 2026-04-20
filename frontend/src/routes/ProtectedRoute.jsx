@@ -25,7 +25,7 @@ export function AdminRoute() {
       return <Navigate to="/dashboard" replace />;
     }
     if (user?.role === "rider") {
-      return <Navigate to="/deliveries/active" replace />;
+      return <Navigate to="/rider/board" replace />;
     }
     return <Navigate to="/login" replace />;
   }

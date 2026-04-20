@@ -52,7 +52,7 @@ export function OrdersPage() {
             {error ? <p className="form-status error">{error}</p> : null}
 
             <div className="orders-hero-actions">
-              <button type="button" className="primary-btn" onClick={() => setActivePane("active")}>Create Parcel Order</button>
+              <Link to="/orders/create" className="primary-btn">Create Parcel Order</Link>
               <span className="mini-badge">{totalOrders} total</span>
             </div>
           </div>
@@ -75,50 +75,19 @@ export function OrdersPage() {
       </header>
 
       <div className="orders-pane-switch" role="tablist" aria-label="Orders view navigation">
-        <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "explore" ? "active" : ""}`} onClick={() => setActivePane("explore")}>Explore Orders</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current Order</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History Summary</button>
       </div>
 
       <div className="workspace-grid mobile-orders-grid single-pane-layout">
-        {activePane === "overview" ? (
-          <SectionCard className="orders-panel" title="Orders Overview" description="Top-level delivery metrics and quick actions.">
-            <div className="route-stats-row">
-              <div>
-                <p className="card-label">Active</p>
-                <h3>{currentOrders.length}</h3>
-              </div>
-              <div>
-                <p className="card-label">Delivered</p>
-                <h3>{deliveredCount}</h3>
-              </div>
-              <div>
-                <p className="card-label">Cancelled</p>
-                <h3>{cancelledCount}</h3>
-              </div>
-              <div>
-                <p className="card-label">Total</p>
-                <h3>{totalOrders}</h3>
-              </div>
-            </div>
-            <div className="topbar-actions">
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("explore")}>Explore Orders</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("active")}>Current Summary</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("history")}>History Summary</button>
-              <Link to="/orders/create" className="primary-btn">Create Parcel Order</Link>
-            </div>
-          </SectionCard>
-        ) : null}
-
         {activePane === "explore" ? (
           <SectionCard className="orders-panel" title="Explore Orders" description="Open the detailed views you need.">
             <div className="topbar-actions">
-              {featuredCurrentOrder ? <Link to={`/orders/${featuredCurrentOrder.id}`} className="secondary-btn">Open Latest Active Order</Link> : null}
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("active")}>Open Current Summary</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("history")}>Open History Summary</button>
-              <Link to="/orders/history" className="secondary-btn">Open Full History Page</Link>
-              <Link to="/orders/create" className="primary-btn">Open Full Create Order</Link>
+              {featuredCurrentOrder ? <Link to={`/orders/${featuredCurrentOrder.id}`} className="secondary-btn explore-orders-btn">Open Latest Active Order</Link> : null}
+              <button type="button" className="secondary-btn explore-orders-btn" onClick={() => setActivePane("active")}>Open Current Summary</button>
+              <button type="button" className="secondary-btn explore-orders-btn" onClick={() => setActivePane("history")}>Open History Summary</button>
+              <Link to="/orders/history" className="secondary-btn explore-orders-btn">Open Full History Page</Link>
             </div>
           </SectionCard>
         ) : null}
@@ -150,7 +119,7 @@ export function OrdersPage() {
 
         {activePane === "history" ? (
           <SectionCard className="orders-panel" title="History Summary" description="Top-level completed and cancelled activity.">
-            <div className="route-stats-row">
+            <div className="route-stats-row history-summary-stats">
               <div>
                 <p className="card-label">Delivered</p>
                 <h3>{deliveredCount}</h3>
