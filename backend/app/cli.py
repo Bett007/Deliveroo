@@ -5,7 +5,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.engine import make_url
 
 from app.extensions import db
-from app.seed_data import seed_reference_data
+from app.seed_data import seed_demo_data, seed_reference_data
 
 
 def register_cli_commands(app):
@@ -59,4 +59,17 @@ def register_cli_commands(app):
             f"weight categories created: {stats['weight_categories_created']}, "
             f"total locations: {stats['total_locations']}, "
             f"total weight categories: {stats['total_weight_categories']}."
+        )
+
+    @app.cli.command("seed-demo-data")
+    def seed_demo_data_command():
+        """Seed demo users, riders, admin account, and sample orders."""
+        stats = seed_demo_data()
+        click.echo(
+            "Demo seed completed. "
+            f"Users created: {stats['users_created']}, "
+            f"users updated: {stats['users_updated']}, "
+            f"orders created: {stats['orders_created']}, "
+            f"total users: {stats['total_users']}, "
+            f"total orders: {stats['total_orders']}."
         )

@@ -532,6 +532,30 @@
   border: 1px solid rgba(47, 115, 217, 0.08);
   overflow: hidden;
 }
+:global(.dashboard-page .table-wrapper) {
+  overflow-x: visible;
+}
+:global(.dashboard-page .orders-table) {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+:global(.dashboard-page .orders-table th),
+:global(.dashboard-page .orders-table td) {
+  padding: 0.72rem 0.52rem;
+  font-size: 0.94rem;
+}
+:global(.dashboard-page .orders-table th),
+:global(.dashboard-page .orders-table td) {
+  white-space: nowrap;
+}
+:global(.dashboard-page .orders-table th:nth-child(3)),
+:global(.dashboard-page .orders-table td:nth-child(3)),
+:global(.dashboard-page .orders-table th:nth-child(6)),
+:global(.dashboard-page .orders-table td:nth-child(6)) {
+  white-space: normal;
+  word-break: break-word;
+}
 :global(.history-summary-stats) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

@@ -46,6 +46,23 @@ Current example:
 
 Important: set this token in `frontend/.env` (not `backend/.env`) and restart `npm run dev` after changing it.
 
+## Demo Access Notes
+
+- Frontend sign-up supports `customer` and `rider` only.
+- Admin account creation is intentionally not available via sign-up.
+- To access admin pages, sign in with the seeded admin account, then open an admin URL directly (for example `/admin/dashboard`).
+
+Seeded demo credentials (from backend `flask seed-demo-data`):
+
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer.one@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.two@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.three@deliveroo.demo` | `Customer123!` |
+| Rider | `rider.one@deliveroo.demo` | `Rider123!` |
+| Rider | `rider.two@deliveroo.demo` | `Rider123!` |
+| Admin | `admin@deliveroo.demo` | `Admin123!` |
+
 ## Folder Structure
 
 ```text

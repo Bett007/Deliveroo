@@ -68,6 +68,12 @@ flask ensure-local-db
 flask seed-reference-data
 ```
 
+5. Seed demo accounts and orders:
+
+```bash
+flask seed-demo-data
+```
+
 This command checks whether the local DB file exists, creates it if missing, and initializes tables.
 
 ## PostgreSQL Setup
@@ -121,6 +127,37 @@ The seed command is idempotent and inserts starter:
 
 - locations
 - weight categories (`light`, `medium`, `heavy`)
+
+### Seed Demo Users And Orders
+
+Run:
+
+```bash
+flask seed-demo-data
+```
+
+This command is idempotent and seeds:
+
+- 3 customer users
+- 2 rider users
+- 1 admin user
+- sample orders tied to the seeded customer accounts (with mixed statuses)
+
+Demo credentials:
+
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer.one@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.two@deliveroo.demo` | `Customer123!` |
+| Customer | `customer.three@deliveroo.demo` | `Customer123!` |
+| Rider | `rider.one@deliveroo.demo` | `Rider123!` |
+| Rider | `rider.two@deliveroo.demo` | `Rider123!` |
+| Admin | `admin@deliveroo.demo` | `Admin123!` |
+
+Admin access note:
+
+- Admin account creation is not exposed on frontend sign-up.
+- Use the seeded admin account to sign in, then open admin URLs directly (for example `/admin/dashboard`).
 
 ### Recommended Section 1 Flow For Supabase
 

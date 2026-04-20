@@ -22,7 +22,7 @@ export function RouteMapCard({
   const effectiveDestinationCoords = isTerminalStatus ? null : destinationCoords;
   const hasLocations = origin && destination;
   const canRenderMap = Boolean(effectiveOriginCoords && effectiveDestinationCoords);
-  const shouldRenderMap = Boolean((hasLocations && canRenderMap) || isTerminalStatus);
+  const shouldRenderMap = Boolean(hasLocations && canRenderMap);
   const displayDistanceKm = routePreview?.distanceKm ?? distanceKm;
   const displayDurationMinutes = routePreview?.durationMinutes ?? durationMinutes;
 

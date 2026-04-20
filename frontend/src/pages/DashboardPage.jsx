@@ -172,7 +172,7 @@ export function DashboardPage() {
 
           <div className="topbar-actions">
             <Link className="primary-btn" to="/orders/create">Create Order</Link>
-            <Link className="secondary-btn" to="/orders">Open Orders</Link>
+            <Link className="secondary-btn" to="/orders/history">Open Orders</Link>
           </div>
         </SectionCard>
       </div>
