@@ -16,6 +16,7 @@
   --ops-blue: #2f73d9;
   --ops-teal: #28b8a8;
   --ops-orange: #f0a43a;
+  --ops-sidebar-edge: 248px;
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
   height: 100dvh;
@@ -27,6 +28,7 @@
 }
 :global(.ops-shell.sidebar-collapsed) {
   grid-template-columns: 84px minmax(0, 1fr);
+  --ops-sidebar-edge: 84px;
 }
 :global(.ops-shell.admin-shell),
 :global(.ops-shell.customer-shell) {
@@ -231,11 +233,11 @@
   overflow: hidden;
 }
 :global(.ops-shell-toggle) {
-  position: absolute;
+  position: fixed;
   top: 1.05rem;
-  left: 0;
-  transform: translateX(-50%);
-  z-index: 120;
+  left: calc(var(--ops-sidebar-edge) - 21px);
+  transform: none;
+  z-index: 400;
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -252,7 +254,7 @@
 }
 :global(.ops-shell-toggle:hover),
 :global(.ops-shell-toggle:focus-visible) {
-  transform: translateX(-50%) scale(1.02);
+  transform: scale(1.02);
   border-color: rgba(47, 115, 217, 0.28);
   background: #ffffff;
 }
@@ -383,5 +385,9 @@
     line-height: 1;
     display: grid;
     place-items: center;
+  }
+
+  :global(.ops-shell-toggle) {
+    display: none;
   }
 }
