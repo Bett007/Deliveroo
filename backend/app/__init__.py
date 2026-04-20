@@ -10,6 +10,7 @@ from .extensions import cors, db, migrate
 from .routes.auth import auth_bp
 from .routes.docs import docs_bp
 from .routes.health import health_bp
+from .routes.locations import locations_bp
 from .routes.order import order_bp
 from .routes.tracking import tracking_bp
 
@@ -30,6 +31,7 @@ def create_app(config_name: Optional[str] = None) -> Flask:
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(locations_bp, url_prefix="/api/locations")
     app.register_blueprint(order_bp, url_prefix="/api/orders")
     app.register_blueprint(tracking_bp, url_prefix="/api/tracking")
     app.register_blueprint(docs_bp, url_prefix="/api/docs")
