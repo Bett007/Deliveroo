@@ -75,42 +75,12 @@ export function OrdersPage() {
       </header>
 
       <div className="orders-pane-switch" role="tablist" aria-label="Orders view navigation">
-        <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "explore" ? "active" : ""}`} onClick={() => setActivePane("explore")}>Explore Orders</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current Order</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
       </div>
 
       <div className="workspace-grid mobile-orders-grid single-pane-layout">
-        {activePane === "overview" ? (
-          <SectionCard className="orders-panel" title="Orders Overview" description="Top-level delivery metrics and quick actions.">
-            <div className="route-stats-row">
-              <div>
-                <p className="card-label">Active</p>
-                <h3>{currentOrders.length}</h3>
-              </div>
-              <div>
-                <p className="card-label">Delivered</p>
-                <h3>{deliveredCount}</h3>
-              </div>
-              <div>
-                <p className="card-label">Cancelled</p>
-                <h3>{cancelledCount}</h3>
-              </div>
-              <div>
-                <p className="card-label">Total</p>
-                <h3>{totalOrders}</h3>
-              </div>
-            </div>
-            <div className="topbar-actions">
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("explore")}>Explore Orders</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("active")}>Current Summary</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("history")}>History Summary</button>
-              <Link to="/orders/create" className="primary-btn">Create Parcel Order</Link>
-            </div>
-          </SectionCard>
-        ) : null}
-
         {activePane === "explore" ? (
           <SectionCard className="orders-panel" title="Explore Orders" description="Open the detailed views you need.">
             <div className="topbar-actions">
