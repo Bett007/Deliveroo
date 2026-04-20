@@ -918,6 +918,52 @@
 }
 
 @media (max-width: 1120px) {
+  :global(.mobile-shell .profile-grid),
+  :global(.mobile-shell .create-order-grid),
+  :global(.mobile-shell .order-details-grid),
+  :global(.mobile-shell .order-details-split),
+  :global(.mobile-shell .ops-main .workspace-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  :global(.mobile-shell .profile-card),
+  :global(.mobile-shell .profile-form-panel),
+  :global(.mobile-shell .create-order-panel),
+  :global(.mobile-shell .create-order-aside),
+  :global(.mobile-shell .order-summary-panel),
+  :global(.mobile-shell .route-summary-panel) {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  :global(.mobile-shell .profile-facts) {
+    grid-template-columns: 1fr !important;
+  }
+
+  :global(.mobile-shell .delivery-history-page .workspace-hero .secondary-btn) {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  :global(.mobile-shell .delivery-history-page .table-wrapper) {
+    overflow-x: visible;
+  }
+
+  :global(.mobile-shell .delivery-history-page .orders-table) {
+    min-width: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  :global(.mobile-shell .delivery-history-page .orders-table th),
+  :global(.mobile-shell .delivery-history-page .orders-table td) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    vertical-align: top;
+  }
+
   :global(.ops-page),
   :global(.ops-main .workspace-page),
   :global(.ops-main .dashboard-page) {
@@ -961,7 +1007,7 @@
 
   :global(.panel-toggle-actions) {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
   :global(.history-summary-stats) {
     grid-template-columns: 1fr;
@@ -1026,5 +1072,68 @@
   :global(.dispatch-edit-toggle) {
     justify-self: stretch;
     justify-content: center;
+  }
+
+  :global(.mobile-shell .dashboard-page .table-wrapper) {
+    overflow: visible;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table) {
+    min-width: 0 !important;
+    width: 100%;
+    table-layout: auto;
+    border-spacing: 0;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table thead) {
+    display: none;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table tbody) {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table tr) {
+    display: grid;
+    gap: 0.42rem;
+    padding: 0.7rem;
+    border: 1px solid var(--ops-border);
+    border-radius: 8px;
+    background: #f7f9fb;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table td) {
+    display: grid;
+    grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
+    align-items: start;
+    gap: 0.45rem;
+    padding: 0;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    border: 0;
+  }
+
+  :global(.mobile-shell .dashboard-page .orders-table td::before) {
+    content: attr(data-label);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ops-muted);
+  }
+
+  :global(.mobile-shell .dashboard-page .topbar-actions) {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  :global(.mobile-shell .dashboard-page .topbar-actions .primary-btn),
+  :global(.mobile-shell .dashboard-page .topbar-actions .secondary-btn) {
+    width: 100%;
+    text-align: center;
   }
 }

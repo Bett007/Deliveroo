@@ -218,6 +218,7 @@ export function AppLayout() {
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const fitShellRef = useRef(null);
   const fitContentRef = useRef(null);
+  const isCreateOrderRoute = location.pathname.startsWith("/orders/create");
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
@@ -272,7 +273,7 @@ export function AppLayout() {
   }, [isAuthenticated]);
 
   useLayoutEffect(() => {
-    if (!isAuthenticated || isMobileViewport) {
+    if (!isAuthenticated || isMobileViewport || isCreateOrderRoute) {
       setFitScale(1);
       return;
     }
@@ -346,7 +347,7 @@ export function AppLayout() {
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [isAuthenticated, isMobileViewport, location.pathname, effectiveSidebarOpen]);
+  }, [isAuthenticated, isMobileViewport, isCreateOrderRoute, location.pathname, effectiveSidebarOpen]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -400,7 +401,7 @@ export function AppLayout() {
   return (
     <div className={`${shellStyles.scope} ${opsSharedStyles.scope}`}>
       <div
-        className={`role-shell ops-shell ${shellStateClass} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
+        className={`role-shell ops-shell ${shellStateClass} ${isMobileViewport ? "mobile-shell" : ""} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
         {!isMobileViewport ? (
           <RoleSidebar
@@ -458,7 +459,7 @@ export function AppLayout() {
               ☰
             </button>
           )}
-          <div ref={fitShellRef} className="ops-fit-shell">
+          <div ref={fitShellRef} className={`ops-fit-shell ${isCreateOrderRoute ? "ops-fit-shell-scroll" : ""}`}>
             <div ref={fitContentRef} className="ops-fit-content" style={{ "--ops-fit-scale": fitScale }}>
               <ErrorBoundary>
                 <Outlet />

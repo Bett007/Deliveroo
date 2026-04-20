@@ -4,17 +4,17 @@
 
 :global(.create-order-workspace) {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
   gap: 1rem;
-  height: 100%;
+  height: auto;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 :global(.create-order-workspace .create-order-grid) {
   min-height: 0;
-  height: 100%;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
 }
 
 :global(.create-order-workspace .create-order-panel),
@@ -22,7 +22,7 @@
 :global(.create-order-workspace .order-summary-panel),
 :global(.create-order-workspace .route-summary-panel) {
   min-height: 0;
-  max-height: 100%;
+  max-height: none;
   overflow: auto;
   scrollbar-width: thin;
 }

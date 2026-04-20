@@ -153,14 +153,14 @@ export function DashboardPage() {
                 <tbody>
                   {currentOrders.slice(0, 6).map((order) => (
                     <tr key={order.id}>
-                      <td>
+                      <td data-label="Order ID">
                         <Link to={`/orders/${order.id}`} className="inline-link">#{order.id}</Link>
                       </td>
-                      <td>{order.parcelName}</td>
-                      <td>{order.destination}</td>
-                      <td>KES {Number(order.quotedPrice || 0).toFixed(2)}</td>
-                      <td><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
-                      <td>{formatReadableDate(order.updatedAt)}</td>
+                      <td data-label="Parcel">{order.parcelName}</td>
+                      <td data-label="Destination">{order.destination}</td>
+                      <td data-label="Price">KES {Number(order.quotedPrice || 0).toFixed(2)}</td>
+                      <td data-label="Status"><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
+                      <td data-label="Updated">{formatReadableDate(order.updatedAt)}</td>
                     </tr>
                   ))}
                 </tbody>
