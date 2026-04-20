@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { EmptyState } from "../components/ui/EmptyState";
-import { PlaceholderArtwork } from "../components/ui/PlaceholderArtwork";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { clearOrderError, fetchOrders } from "../features/orders/ordersSlice";
@@ -26,6 +25,14 @@ export function OrdersPage() {
 
   const totalOrders = useMemo(() => currentOrders.length + orderHistory.length, [currentOrders.length, orderHistory.length]);
   const allOrders = useMemo(() => [...currentOrders, ...orderHistory], [currentOrders, orderHistory]);
+  const deliveredCount = useMemo(
+    () => allOrders.filter((order) => order.status === "delivered").length,
+    [allOrders],
+  );
+  const cancelledCount = useMemo(
+    () => allOrders.filter((order) => order.status === "cancelled").length,
+    [allOrders],
+  );
 
   const filteredAndSortedOrders = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -67,9 +74,9 @@ export function OrdersPage() {
   );
 
   return (
-    <section className="workspace-page">
-      <header className="workspace-hero workspace-hero-split glass-card">
-        <div className="workspace-hero-copy">
+    <section className="workspace-page orders-page">
+      <header className="workspace-hero glass-card orders-hero">
+        <div className="orders-hero-copy">
           <p className="eyebrow">Customer Orders</p>
           <h1>Manage your orders</h1>
           <p className="workspace-copy">
@@ -78,23 +85,35 @@ export function OrdersPage() {
           {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
           {error ? <p className="form-status error">{error}</p> : null}
 
-          <div className="topbar-actions">
-            <span className="mini-badge">{totalOrders} total</span>
+          <div className="orders-hero-actions">
             <Link to="/orders/create" className="primary-btn">
               Create Parcel Order
             </Link>
+            <span className="mini-badge">{totalOrders} total</span>
           </div>
         </div>
 
-        <PlaceholderArtwork
-          variant="customer"
-          label="Customer Preview"
-          title="Parcel visibility built into every order"
-          caption="Stay close to route progress, delivery support, and parcel handling updates while you manage current orders."
-        />
+        <div className="orders-hero-metrics" aria-label="Order summary metrics">
+          <article className="orders-metric-card">
+            <span>Active</span>
+            <strong>{currentOrders.length}</strong>
+          </article>
+          <article className="orders-metric-card">
+            <span>Delivered</span>
+            <strong>{deliveredCount}</strong>
+          </article>
+          <article className="orders-metric-card">
+            <span>Cancelled</span>
+            <strong>{cancelledCount}</strong>
+          </article>
+        </div>
       </header>
 
-      <SectionCard title="Search, Filter, and Sort" description="Find orders by ID, parcel, pickup, destination, or status quickly.">
+      <SectionCard
+        className="orders-panel"
+        title="Search, Filter, and Sort"
+        description="Find orders by ID, parcel, pickup, destination, or status quickly."
+      >
         <div className="auth-form">
           <input
             className="search-input"
@@ -128,7 +147,7 @@ export function OrdersPage() {
       </SectionCard>
 
       <div className="workspace-grid">
-        <SectionCard title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
+        <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
           {status === "loading" ? (
             <p className="helper-text">Loading current orders from the backend...</p>
           ) : filteredCurrentOrders.length ? (
@@ -162,7 +181,7 @@ export function OrdersPage() {
           )}
         </SectionCard>
 
-        <SectionCard title="Order History" description="Delivered and cancelled orders from your account.">
+        <SectionCard className="orders-panel" title="Order History" description="Delivered and cancelled orders from your account.">
           {status === "loading" ? (
             <p className="helper-text">Loading order history...</p>
           ) : filteredOrderHistory.length ? (
