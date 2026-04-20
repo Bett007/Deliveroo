@@ -6,6 +6,9 @@ function assertToken() {
   if (!ACCESS_TOKEN) {
     throw new Error("Mapbox access token is required. Set VITE_MAPBOX_TOKEN (or VITE_MAPBOX_ACCESS_TOKEN) in your environment.");
   }
+  if (!ACCESS_TOKEN.startsWith("pk.")) {
+    throw new Error("Use a public Mapbox token (starts with 'pk.') for VITE_MAPBOX_ACCESS_TOKEN.");
+  }
 }
 
 async function fetchJson(url) {
