@@ -1,16 +1,67 @@
+import { useEffect, useState } from "react";
+import { fetchRoutePreview } from "../../services/mapbox";
 import { formatDistance, formatDuration } from "../../utils/formatters/distance";
 import { MapboxMap } from "./MapboxMap";
 import styles from "./RouteMapCard.module.css";
 
 const TERMINAL_STATUSES = new Set(["delivered", "cancelled"]);
 
-export function RouteMapCard({ origin, destination, originCoords, destinationCoords, distanceKm, durationMinutes, status }) {
+export function RouteMapCard({
+  origin,
+  destination,
+  originCoords,
+  destinationCoords,
+  distanceKm,
+  durationMinutes,
+  status,
+  onRoutePreviewChange,
+}) {
+  const [routePreview, setRoutePreview] = useState(null);
   const isTerminalStatus = TERMINAL_STATUSES.has(String(status || "").toLowerCase());
   const effectiveOriginCoords = isTerminalStatus ? null : originCoords;
   const effectiveDestinationCoords = isTerminalStatus ? null : destinationCoords;
   const hasLocations = origin && destination;
   const canRenderMap = Boolean(effectiveOriginCoords && effectiveDestinationCoords);
   const shouldRenderMap = Boolean((hasLocations && canRenderMap) || isTerminalStatus);
+  const displayDistanceKm = routePreview?.distanceKm ?? distanceKm;
+  const displayDurationMinutes = routePreview?.durationMinutes ?? durationMinutes;
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadRoutePreview() {
+      if (!effectiveOriginCoords || !effectiveDestinationCoords) {
+        setRoutePreview(null);
+        onRoutePreviewChange?.(null);
+        return;
+      }
+
+      try {
+        const preview = await fetchRoutePreview(effectiveOriginCoords, effectiveDestinationCoords);
+
+        if (isActive) {
+          setRoutePreview(preview);
+          onRoutePreviewChange?.(preview);
+        }
+      } catch {
+        if (isActive) {
+          setRoutePreview(null);
+          onRoutePreviewChange?.(null);
+        }
+      }
+    }
+
+    loadRoutePreview();
+
+    return () => {
+      isActive = false;
+    };
+  }, [
+    effectiveOriginCoords?.latitude,
+    effectiveOriginCoords?.longitude,
+    effectiveDestinationCoords?.latitude,
+    effectiveDestinationCoords?.longitude,
+  ]);
 
   return (
     <section className={`glass-card map-card route-map-card ${styles.scope}`}>
@@ -28,6 +79,7 @@ export function RouteMapCard({ origin, destination, originCoords, destinationCoo
           destination={destination}
           originCoords={effectiveOriginCoords}
           destinationCoords={effectiveDestinationCoords}
+          routeGeoJson={routePreview?.geometry}
         />
       ) : (
         <div className="fake-map route-map-fallback">
@@ -44,11 +96,11 @@ export function RouteMapCard({ origin, destination, originCoords, destinationCoo
       <div className="map-meta-grid">
         <div className="map-meta-card">
           <p className="card-label">Distance</p>
-          <h3>{formatDistance(distanceKm)}</h3>
+          <h3>{formatDistance(displayDistanceKm)}</h3>
         </div>
         <div className="map-meta-card">
           <p className="card-label">Duration</p>
-          <h3>{formatDuration(durationMinutes)}</h3>
+          <h3>{formatDuration(displayDurationMinutes)}</h3>
         </div>
       </div>
     </section>

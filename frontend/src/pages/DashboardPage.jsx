@@ -12,7 +12,6 @@ export function DashboardPage() {
   const { user } = useSelector((state) => state.auth);
   const { currentOrders, orderHistory, status } = useSelector((state) => state.orders);
   const featuredOrder = currentOrders[0] || orderHistory[0];
-  const inTransit = currentOrders.filter((order) => order.status === "in_transit").length;
   const dashboardName = user?.first_name?.trim() || user?.email?.split("@")[0] || "Customer";
   const avatarUrl = user?.avatar_url;
   const customerModules = [
@@ -44,16 +43,28 @@ export function DashboardPage() {
 
   const summaryCards = useMemo(() => {
     const totalOrders = currentOrders.length + orderHistory.length;
-
     const spend = [...currentOrders, ...orderHistory].reduce(
       (sum, order) => sum + Number(order.quotedPrice || 0),
       0,
     );
+    const roundedSpend = Math.round(spend);
 
     return [
-      { title: "Total Orders", value: totalOrders, sub: "+12% this week" },
-      { title: "Active Deliveries", value: currentOrders.length, sub: "+8% this week" },
-      { title: "Spend", value: `KES ${Math.round(spend)}`, sub: "+15% this week" },
+      {
+        title: "Total Orders",
+        value: totalOrders,
+        sub: totalOrders > 0 ? "Orders created so far" : "No orders yet",
+      },
+      {
+        title: "Active Deliveries",
+        value: currentOrders.length,
+        sub: currentOrders.length > 0 ? "Deliveries currently in progress" : "No active deliveries yet",
+      },
+      {
+        title: "Spend",
+        value: `KES ${roundedSpend}`,
+        sub: roundedSpend > 0 ? "Spend recorded so far" : "No spend recorded yet",
+      },
     ];
   }, [currentOrders, orderHistory]);
 
@@ -64,7 +75,7 @@ export function DashboardPage() {
           <h1 className="dashboard-greeting">Welcome back, {dashboardName}</h1>
         </div>
         <div className="topbar-actions dashboard-user-meta">
-          <NotificationBell label="Notifications" minimumCount={Math.max(1, inTransit)} />
+          <NotificationBell label="Notifications" />
           <div className="dashboard-account-card">
             <span className="dashboard-avatar" aria-hidden="true">
               {avatarUrl ? <img src={avatarUrl} alt={`${dashboardName} avatar`} /> : dashboardName?.[0]?.toUpperCase() || "C"}

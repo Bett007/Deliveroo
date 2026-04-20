@@ -1,38 +1,24 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
-
-function nextStatus(status) {
-  if (status === "pending") return "confirmed";
-  if (status === "confirmed") return "in_transit";
-  if (status === "in_transit") return "delivered";
-  return status;
-}
+import { fetchOrders } from "../features/orders/ordersSlice";
 
 export function ActiveDeliveries() {
-  const { currentOrders } = useSelector((state) => state.orders);
-  const [localStatuses, setLocalStatuses] = useState({});
+  const dispatch = useDispatch();
+  const { currentOrders, status } = useSelector((state) => state.orders);
+
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
   const activeOrders = useMemo(
     () =>
       currentOrders
-        .map((order) => ({ ...order, status: localStatuses[order.id] || order.status }))
         .filter((order) => !["delivered", "cancelled"].includes(order.status)),
-    [currentOrders, localStatuses],
+    [currentOrders],
   );
-
-  function handleAction(order) {
-    setLocalStatuses((current) => ({ ...current, [order.id]: nextStatus(order.status) }));
-  }
-
-  function actionLabel(status) {
-    if (status === "pending") return "Accept Delivery";
-    if (status === "confirmed") return "Start Delivery";
-    if (status === "in_transit") return "Confirm Dropoff";
-    return "Update";
-  }
 
   return (
     <section className="workspace-page">
@@ -48,7 +34,9 @@ export function ActiveDeliveries() {
       </header>
 
       <SectionCard title="Delivery Queue" description="Only non-completed deliveries are shown here.">
-        {activeOrders.length ? (
+        {status === "loading" ? (
+          <p className="helper-text">Loading active deliveries from the backend...</p>
+        ) : activeOrders.length ? (
           <div className="order-card-list">
             {activeOrders.map((order) => (
               <article className="order-card" key={order.id}>
@@ -65,9 +53,7 @@ export function ActiveDeliveries() {
                 <p className="helper-text">Instructions: {order.description || "No instructions provided."}</p>
 
                 <div className="topbar-actions">
-                  <button type="button" className="primary-btn" onClick={() => handleAction(order)}>
-                    {actionLabel(order.status)}
-                  </button>
+                  <Link className="primary-btn" to="/rider/board">Manage in Work Board</Link>
                   <Link className="secondary-btn" to={`/orders/${order.id}`}>View Full Details</Link>
                 </div>
               </article>

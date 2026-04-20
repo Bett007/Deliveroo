@@ -15,10 +15,16 @@ export function RiderDashboard() {
   const riderActiveOrders = currentOrders.filter((order) => !["delivered", "cancelled"].includes(order.status));
   const inTransit = riderActiveOrders.filter((order) => order.status === "in_transit").length;
   const completedToday = orderHistory.slice(0, 8).filter((order) => order.status === "delivered").length;
-  const avgDuration = riderActiveOrders.length
-    ? Math.round(riderActiveOrders.reduce((sum, order) => sum + Number(order.durationMinutes || 0), 0) / riderActiveOrders.length)
-    : 0;
   const featuredOrder = riderActiveOrders[0] || orderHistory[0];
+  const activeDeliveriesSummary = riderActiveOrders.length > 0
+    ? "Orders waiting pickup, transit, or dropoff updates"
+    : "No active deliveries yet";
+  const inTransitSummary = inTransit > 0
+    ? "Deliveries currently on route"
+    : "No deliveries currently on route";
+  const completedSummary = completedToday > 0
+    ? "Completed deliveries in available history"
+    : "No completed deliveries yet";
   const riderModules = [
     {
       title: "Work Board",
@@ -54,7 +60,7 @@ export function RiderDashboard() {
           <p className="workspace-copy">Manage assigned deliveries and keep each route moving.</p>
         </div>
         <div className="topbar-actions dashboard-user-meta">
-          <NotificationBell label="Dispatch alerts" minimumCount={Math.max(1, riderActiveOrders.length)} />
+          <NotificationBell label="Dispatch alerts" />
           <div className="dashboard-account-card">
             <span className="dashboard-avatar" aria-hidden="true">
               {avatarUrl ? <img src={avatarUrl} alt={`${dashboardName} avatar`} /> : dashboardName?.[0]?.toUpperCase() || "R"}
@@ -73,7 +79,7 @@ export function RiderDashboard() {
           <div className="summary-copy">
             <p className="card-label">Active Deliveries</p>
             <h3>{riderActiveOrders.length}</h3>
-            <span>Orders waiting pickup, transit, or dropoff updates</span>
+            <span>{activeDeliveriesSummary}</span>
           </div>
         </div>
         <div className="glass-card summary-card">
@@ -81,15 +87,15 @@ export function RiderDashboard() {
           <div className="summary-copy">
             <p className="card-label">In Transit</p>
             <h3>{inTransit}</h3>
-            <span>Deliveries currently on route</span>
+            <span>{inTransitSummary}</span>
           </div>
         </div>
         <div className="glass-card summary-card">
           <span className="summary-icon" aria-hidden="true"><AppIcon name="check" size={22} /></span>
           <div className="summary-copy">
-            <p className="card-label">Completed Today</p>
+            <p className="card-label">Completed Deliveries</p>
             <h3>{completedToday}</h3>
-            <span>Avg ETA {avgDuration} min</span>
+            <span>{completedSummary}</span>
           </div>
         </div>
       </section>

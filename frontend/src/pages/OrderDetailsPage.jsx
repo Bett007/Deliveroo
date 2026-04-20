@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
@@ -33,6 +33,7 @@ export function OrderDetailsPage() {
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [cancelReason, setCancelReason] = useState("");
   const [destinationError, setDestinationError] = useState("");
+  const [routePreview, setRoutePreview] = useState(null);
 
   useEffect(() => {
     dispatch(fetchOrderById(orderId));
@@ -74,6 +75,34 @@ export function OrderDetailsPage() {
 
   const orderTracking = trackingUpdates[String(orderId)] || [];
 
+  useEffect(() => {
+    setRoutePreview(null);
+  }, [
+    orderId,
+    order?.pickupCoords?.latitude,
+    order?.pickupCoords?.longitude,
+    order?.destinationCoords?.latitude,
+    order?.destinationCoords?.longitude,
+  ]);
+
+  const handleRoutePreviewChange = useCallback((preview) => {
+    setRoutePreview((current) => {
+      if (!preview) {
+        return current === null ? current : null;
+      }
+
+      if (
+        current?.distanceKm === preview.distanceKm
+        && current?.durationMinutes === preview.durationMinutes
+        && current?.geometry === preview.geometry
+      ) {
+        return current;
+      }
+
+      return preview;
+    });
+  }, []);
+
   if (detailsStatus === "loading" && !order) {
     return (
       <section className="workspace-page">
@@ -92,6 +121,8 @@ export function OrderDetailsPage() {
 
   const canEditDestination = !["delivered", "cancelled"].includes(order.status);
   const canCancel = order.status === "pending";
+  const displayDistanceKm = routePreview?.distanceKm ?? order.distanceKm;
+  const displayDurationMinutes = routePreview?.durationMinutes ?? order.durationMinutes;
 
   async function handleUpdateDestination(event) {
     event.preventDefault();
@@ -168,8 +199,8 @@ export function OrderDetailsPage() {
             <div><strong>Delivery Location:</strong> {order.destination}</div>
             <div><strong>Current Location:</strong> {order.currentLocation}</div>
             <div><strong>Quoted Price:</strong> KES {Number(order.quotedPrice || 0).toFixed(2)}</div>
-            <div><strong>Distance:</strong> {order.distanceKm ?? "--"} km</div>
-            <div><strong>Estimated Duration:</strong> {order.durationMinutes ?? "--"} minutes</div>
+            <div><strong>Distance:</strong> {displayDistanceKm ?? "--"} km</div>
+            <div><strong>Estimated Duration:</strong> {displayDurationMinutes ?? "--"} minutes</div>
             <div><strong>Parcel Note:</strong> {order.description}</div>
             <div><strong>Created:</strong> {formatReadableDate(order.createdAt)}</div>
             <div><strong>Last Updated:</strong> {formatReadableDate(order.updatedAt)}</div>
@@ -262,6 +293,7 @@ export function OrderDetailsPage() {
           distanceKm={order.distanceKm}
           durationMinutes={order.durationMinutes}
           status={order.status}
+          onRoutePreviewChange={handleRoutePreviewChange}
         />
 
         <SectionCard title="Tracking Updates" description="Latest route and status updates for this order.">
