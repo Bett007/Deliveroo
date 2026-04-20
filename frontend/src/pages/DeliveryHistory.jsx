@@ -1,19 +1,31 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { SectionCard } from "../components/ui/SectionCard";
 import { formatReadableDate } from "../utils/formatters/date";
+import { fetchOrders } from "../features/orders/ordersSlice";
 
 const PAGE_SIZE = 20;
 
 export function DeliveryHistory() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const { orderHistory } = useSelector((state) => state.orders);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
+
   const filtered = useMemo(() => {
     return orderHistory.filter((order) => {
+      if (user?.role === "rider" && Number(order.assignedRiderId) !== Number(user.id)) {
+        return false;
+      }
+
       const orderDate = new Date(order.updatedAt || order.createdAt);
       const from = fromDate ? new Date(fromDate) : null;
       const to = toDate ? new Date(`${toDate}T23:59:59`) : null;
@@ -22,7 +34,7 @@ export function DeliveryHistory() {
       if (to && orderDate > to) return false;
       return true;
     });
-  }, [orderHistory, fromDate, toDate]);
+  }, [orderHistory, fromDate, toDate, user?.id, user?.role]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);

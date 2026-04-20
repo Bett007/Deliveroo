@@ -369,6 +369,36 @@ def test_second_rider_cannot_update_assigned_delivery(client, app):
     assert response.get_json()["message"] == "Accept this delivery before updating it."
 
 
+def test_rider_can_see_own_delivered_orders_in_list(client, app):
+    reference_ids = create_reference_data(app)
+    register_user(client, email="customer@example.com", role="customer")
+    register_user(client, email="rider@example.com", role="rider")
+    customer_token = login_user(client, email="customer@example.com")
+    rider_token = login_user(client, email="rider@example.com")
+    create_response = create_order(client, customer_token, build_order_payload(reference_ids))
+    order_id = create_response.get_json()["data"]["order"]["id"]
+
+    client.patch(
+        f"/api/orders/{order_id}/assign",
+        json={},
+        headers=auth_headers(rider_token),
+    )
+    deliver_response = client.patch(
+        f"/api/orders/{order_id}/status",
+        json={"status": "delivered"},
+        headers=auth_headers(rider_token),
+    )
+    list_response = client.get("/api/orders/?page=1&limit=20", headers=auth_headers(rider_token))
+
+    assert deliver_response.status_code == 200
+    assert deliver_response.get_json()["data"]["order"]["status"] == "delivered"
+    assert list_response.status_code == 200
+    assert any(
+        item["id"] == order_id and item["status"] == "delivered"
+        for item in list_response.get_json()["data"]["items"]
+    )
+
+
 def test_tracking_updates_create_and_list(client, app):
     reference_ids = create_reference_data(app)
     register_user(client, email="customer@example.com", role="customer")

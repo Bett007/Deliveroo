@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from app.errors.exceptions import AuthorizationError, NotFoundError, ValidationError
 from app.extensions import db
@@ -131,8 +131,16 @@ def get_orders(user, page=1, limit=10):
         query = Order.query
     elif user.role == "rider":
         query = Order.query.filter(
-            ~Order.status.in_(["delivered", "cancelled"]),
-            or_(Order.assigned_rider_id.is_(None), Order.assigned_rider_id == user.id),
+            or_(
+                and_(
+                    ~Order.status.in_(["delivered", "cancelled"]),
+                    or_(Order.assigned_rider_id.is_(None), Order.assigned_rider_id == user.id),
+                ),
+                and_(
+                    Order.status.in_(["delivered", "cancelled"]),
+                    Order.assigned_rider_id == user.id,
+                ),
+            ),
         )
     else:
         query = Order.query.filter_by(user_id=user.id)
