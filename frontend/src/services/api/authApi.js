@@ -72,3 +72,26 @@ export async function resendVerificationRequest(payload) {
     message: response.message,
   };
 }
+
+export async function forgotPasswordRequest(payload) {
+  const response = await apiRequest("/auth/forgot-password", {
+    method: "POST",
+    body: payload,
+  });
+
+  return {
+    reset: response.data.reset ?? null,
+    message: response.message,
+  };
+}
+
+export async function resetPasswordRequest(payload) {
+  const response = await apiRequest("/auth/reset-password", {
+    method: "POST",
+    body: payload,
+  });
+
+  return {
+    message: response.message,
+  };
+}

@@ -127,6 +127,41 @@ def validate_verification_resend_payload(payload: Optional[dict] = None) -> dict
     return {"email": email}
 
 
+def validate_forgot_password_payload(payload: Optional[dict] = None) -> dict:
+    return validate_verification_resend_payload(payload)
+
+
+def validate_reset_password_payload(payload: Optional[dict] = None) -> dict:
+    data = payload or {}
+    errors = {}
+
+    email = (data.get("email") or "").strip().lower()
+    code = str(data.get("code") or "").strip()
+    new_password = str(data.get("new_password") or "")
+
+    if not email:
+        errors["email"] = ["Email is required."]
+    elif not EMAIL_PATTERN.match(email):
+        errors["email"] = ["Enter a valid email address."]
+
+    if not code:
+        errors["code"] = ["Reset code is required."]
+    elif not re.fullmatch(r"\d{6}", code):
+        errors["code"] = ["Reset code must be a 6-digit number."]
+
+    if not new_password:
+        errors["new_password"] = ["New password is required."]
+    elif len(new_password) < MIN_PASSWORD_LENGTH:
+        errors["new_password"] = [
+            f"Password must be at least {MIN_PASSWORD_LENGTH} characters long."
+        ]
+
+    if errors:
+        raise ValidationError("Validation failed.", errors=errors)
+
+    return {"email": email, "code": code, "new_password": new_password}
+
+
 def validate_profile_payload(payload: Optional[dict] = None) -> dict:
     if payload is None:
         data = {}

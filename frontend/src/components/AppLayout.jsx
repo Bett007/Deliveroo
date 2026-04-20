@@ -219,7 +219,7 @@ export function AppLayout() {
   const fitShellRef = useRef(null);
   const fitContentRef = useRef(null);
   const isCreateOrderRoute = location.pathname.startsWith("/orders/create");
-  const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
+  const isAuthRoute = ["/login", "/register", "/verify", "/forgot-password", "/reset-password"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
   const isRider = user?.role === "rider";
