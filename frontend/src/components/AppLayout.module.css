@@ -171,10 +171,27 @@
   overflow-y: hidden;
   overflow-x: visible;
   padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
   border-left: 1px solid rgba(223, 230, 238, 0.95);
   box-shadow: inset 12px 0 24px rgba(20, 35, 55, 0.02);
   scrollbar-width: thin;
+}
+ :global(.ops-fit-shell) {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+:global(.ops-fit-content) {
+  --ops-fit-scale: 1;
+  width: calc(100% / var(--ops-fit-scale));
+  min-height: calc(100% / var(--ops-fit-scale));
+  transform: scale(var(--ops-fit-scale));
+  transform-origin: top left;
+  will-change: transform;
 }
 :global(.ops-mobile-menu-btn) {
   display: none;
@@ -233,11 +250,11 @@
   overflow: hidden;
 }
 :global(.ops-shell-toggle) {
-  position: fixed;
+  position: absolute;
   top: 1.05rem;
-  left: calc(var(--ops-sidebar-edge) - 21px);
+  left: -21px;
   transform: none;
-  z-index: 400;
+  z-index: 1200;
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -363,6 +380,11 @@
     padding: 4.2rem 0.85rem 0.85rem;
     border-left: 0;
     box-shadow: none;
+  }
+  :global(.ops-fit-content) {
+    width: 100%;
+    min-height: 100%;
+    transform: none;
   }
 
   :global(.ops-shell-toggle) {

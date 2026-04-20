@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import deliverooLogoIcon from "../assets/deliveroo-logo-icon.svg";
 import { logoutUser } from "../features/auth/authSlice";
 import { resetOrdersState } from "../features/orders/ordersSlice";
@@ -196,6 +196,7 @@ export function AppLayout() {
   const [sidebarHover, setSidebarHover] = useState(false);
   const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [fitScale, setFitScale] = useState(1);
   const [isMobileViewport, setIsMobileViewport] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -203,6 +204,8 @@ export function AppLayout() {
     return window.innerWidth <= 1120;
   });
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
+  const fitShellRef = useRef(null);
+  const fitContentRef = useRef(null);
   const isAuthRoute = ["/login", "/register", "/verify"].includes(location.pathname);
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
@@ -251,6 +254,62 @@ export function AppLayout() {
       document.body.classList.remove("app-authenticated");
     };
   }, [isAuthenticated]);
+
+  useLayoutEffect(() => {
+    if (!isAuthenticated || isMobileViewport) {
+      setFitScale(1);
+      return;
+    }
+
+    let frame = null;
+    let settleTimer = null;
+
+    function measureAndScale() {
+      const shellEl = fitShellRef.current;
+      const contentEl = fitContentRef.current;
+      if (!shellEl || !contentEl) {
+        return;
+      }
+
+      // Measure natural height first, then apply scaling only when overflow would occur.
+      contentEl.style.setProperty("--ops-fit-scale", "1");
+      const availableHeight = shellEl.clientHeight;
+      const requiredHeight = contentEl.scrollHeight;
+
+      const nextScale = requiredHeight > availableHeight && requiredHeight > 0
+        ? Math.max(0.68, availableHeight / requiredHeight)
+        : 1;
+
+      setFitScale(nextScale);
+    }
+
+    function scheduleMeasure() {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      frame = requestAnimationFrame(measureAndScale);
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleMeasure();
+    });
+
+    if (fitShellRef.current) resizeObserver.observe(fitShellRef.current);
+    if (fitContentRef.current) resizeObserver.observe(fitContentRef.current);
+
+    window.addEventListener("resize", scheduleMeasure);
+    scheduleMeasure();
+
+    // Re-measure shortly after route/content settles (images/map widgets/fonts).
+    settleTimer = window.setTimeout(scheduleMeasure, 260);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      if (settleTimer) clearTimeout(settleTimer);
+      window.removeEventListener("resize", scheduleMeasure);
+      resizeObserver.disconnect();
+    };
+  }, [isAuthenticated, isMobileViewport, location.pathname]);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -362,9 +421,13 @@ export function AppLayout() {
               ☰
             </button>
           )}
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
+          <div ref={fitShellRef} className="ops-fit-shell">
+            <div ref={fitContentRef} className="ops-fit-content" style={{ "--ops-fit-scale": fitScale }}>
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
+            </div>
+          </div>
         </main>
 
         {isMobileViewport && mobileMenuOpen ? (
