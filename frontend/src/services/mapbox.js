@@ -1,4 +1,36 @@
-const ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || import.meta.env.VITE_MAPBOX_TOKEN;
+function normalizeToken(value) {
+  const token = String(value || "").trim().replace(/^['"]|['"]$/g, "");
+  return token || null;
+}
+
+export function getMapboxAccessToken() {
+  const envToken = normalizeToken(
+    import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+    || import.meta.env.VITE_MAPBOX_TOKEN
+    || import.meta.env.MAPBOX_ACCESS_TOKEN
+    || import.meta.env.MAPBOX_PUBLIC_TOKEN,
+  );
+
+  if (envToken) {
+    return envToken;
+  }
+
+  if (typeof window !== "undefined") {
+    const localToken = normalizeToken(
+      window.localStorage.getItem("VITE_MAPBOX_ACCESS_TOKEN")
+      || window.localStorage.getItem("VITE_MAPBOX_TOKEN")
+      || window.localStorage.getItem("MAPBOX_ACCESS_TOKEN")
+      || window.localStorage.getItem("MAPBOX_PUBLIC_TOKEN"),
+    );
+    if (localToken) {
+      return localToken;
+    }
+  }
+
+  return "";
+}
+
+const ACCESS_TOKEN = getMapboxAccessToken();
 const GEOCODING_BASE_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 const DIRECTIONS_BASE_URL = "https://api.mapbox.com/directions/v5/mapbox/driving";
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { getMapboxAccessToken } from "../../services/mapbox";
 import styles from "./MapboxMap.module.css";
 
 const DEFAULT_KENYA_CENTER = [37.9062, -0.0236];
@@ -82,7 +83,7 @@ export function MapboxMap({
   const mapRef = useRef(null);
   const mapboxglRef = useRef(null);
   const [mapError, setMapError] = useState(false);
-  const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || import.meta.env.VITE_MAPBOX_TOKEN;
+  const accessToken = getMapboxAccessToken();
 
   const hasExplorerData = Boolean(showCountyBoundaries || countyGeoJson?.features?.length || businessMarkers?.length);
   const canRenderMap = Boolean(accessToken && (originCoords || destinationCoords || hasExplorerData || defaultCenter));
