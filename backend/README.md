@@ -44,9 +44,31 @@ Main variables used right now:
 - `SECRET_KEY` for Flask config
 - `JWT_SECRET_KEY` for signing JWT access tokens
 - `JWT_ACCESS_TOKEN_EXPIRES_MINUTES` for auth token lifetime
-- `DATABASE_URL` for the PostgreSQL connection string
+- `USE_LOCAL_DB` when `true` (default in development), uses a local SQLite DB instead of `DATABASE_URL`
+- `LOCAL_DATABASE_PATH` optional path for the local SQLite DB file
+- `DATABASE_URL` for PostgreSQL (used when `USE_LOCAL_DB=false` in development, or in production)
 - `CLIENT_ORIGIN` for frontend CORS access. You can provide a comma-separated list for multiple frontend origins.
   Wildcards are supported (for example `https://*.vercel.app`).
+
+## Local Development Database (Recommended)
+
+By default, development uses a local SQLite file so no one accidentally writes to Supabase.
+
+1. Copy `.env.example` to `.env`.
+2. Keep `USE_LOCAL_DB=true`.
+3. Initialize local DB file and schema:
+
+```bash
+flask ensure-local-db
+```
+
+4. Seed reference data:
+
+```bash
+flask seed-reference-data
+```
+
+This command checks whether the local DB file exists, creates it if missing, and initializes tables.
 
 ## PostgreSQL Setup
 
@@ -66,7 +88,7 @@ Example format:
 postgresql://postgres.<project-ref>:<password>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
 ```
 
-### Run Migrations
+### Run Migrations (PostgreSQL)
 
 With your virtualenv active and `.env` configured:
 
@@ -103,8 +125,9 @@ The seed command is idempotent and inserts starter:
 ### Recommended Section 1 Flow For Supabase
 
 1. Copy `.env.example` to `.env`.
-2. Paste your Supabase direct Postgres URL into `DATABASE_URL`.
-3. If you are working from an NTFS external drive on macOS, run Flask commands through the cleanup wrapper so AppleDouble sidecar files do not break Alembic:
+2. Set `USE_LOCAL_DB=false`.
+3. Paste your Supabase direct Postgres URL into `DATABASE_URL`.
+4. If you are working from an NTFS external drive on macOS, run Flask commands through the cleanup wrapper so AppleDouble sidecar files do not break Alembic:
 
 ```bash
 ./scripts/run_clean.sh flask verify-db
@@ -112,10 +135,10 @@ The seed command is idempotent and inserts starter:
 ./scripts/run_clean.sh flask seed-reference-data
 ```
 
-4. Otherwise run `flask verify-db`.
-5. Run `flask db upgrade`.
-6. Run `flask seed-reference-data`.
-7. In Supabase Table Editor or SQL, confirm the six tables exist and that `locations` and `weight_categories` contain starter rows.
+5. Otherwise run `flask verify-db`.
+6. Run `flask db upgrade`.
+7. Run `flask seed-reference-data`.
+8. In Supabase Table Editor or SQL, confirm the six tables exist and that `locations` and `weight_categories` contain starter rows.
 
 ## Run The Backend
 

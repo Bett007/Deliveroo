@@ -36,6 +36,16 @@
   color: white;
 }
 
+.mapboxMarkerBusiness {
+  background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+  color: white;
+}
+
+.mapboxMarkerHub {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  color: white;
+}
+
 .markerLabel {
   display: flex;
   align-items: center;

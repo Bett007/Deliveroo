@@ -116,8 +116,11 @@ export async function fetchOrderReferenceData(token) {
     locations: response.data.locations.map((location) => ({
       id: location.id,
       label: `${location.address}${location.city ? `, ${location.city}` : ""}`,
+      address: location.address,
       city: location.city,
       country: location.country,
+      latitude: location.latitude != null ? Number(location.latitude) : null,
+      longitude: location.longitude != null ? Number(location.longitude) : null,
     })),
     weightCategories: response.data.weight_categories.map((category) => ({
       id: category.id,
