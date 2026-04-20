@@ -20,6 +20,7 @@
   grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100dvh;
   overflow: visible;
+  position: relative;
   background: var(--ops-bg);
   color: var(--ops-ink);
   transition: grid-template-columns 0.25s ease;
@@ -35,6 +36,8 @@
   min-height: 0;
   height: 100%;
   padding: 1.25rem 1rem 1rem;
+  position: relative;
+  z-index: 10;
   background: linear-gradient(180deg, var(--ops-sidebar), var(--ops-sidebar-strong));
   color: #ffffff;
   display: grid;
@@ -159,6 +162,7 @@
 }
 :global(.ops-main) {
   position: relative;
+  z-index: 20;
   min-width: 0;
   min-height: 0;
   height: auto;
@@ -174,7 +178,7 @@
   position: absolute;
   top: 1.05rem;
   left: -21px;
-  z-index: 40;
+  z-index: 60;
   width: 42px;
   height: 42px;
   border-radius: 50%;

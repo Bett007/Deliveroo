@@ -1,27 +1,43 @@
+/* global __MAPBOX_FALLBACK_TOKEN__ */
+
 function normalizeToken(value) {
   const token = String(value || "").trim().replace(/^['"]|['"]$/g, "");
   return token || null;
 }
 
+function isPublicToken(value) {
+  return typeof value === "string" && value.startsWith("pk.");
+}
+
 export function getMapboxAccessToken() {
-  const envToken = normalizeToken(
+  const envTokenCandidate = normalizeToken(
     import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
     || import.meta.env.VITE_MAPBOX_TOKEN
     || import.meta.env.MAPBOX_ACCESS_TOKEN
     || import.meta.env.MAPBOX_PUBLIC_TOKEN,
   );
+  const envToken = isPublicToken(envTokenCandidate) ? envTokenCandidate : null;
 
   if (envToken) {
     return envToken;
   }
 
+  const buildFallbackCandidate = normalizeToken(
+    typeof __MAPBOX_FALLBACK_TOKEN__ !== "undefined" ? __MAPBOX_FALLBACK_TOKEN__ : "",
+  );
+  const buildFallbackToken = isPublicToken(buildFallbackCandidate) ? buildFallbackCandidate : null;
+  if (buildFallbackToken) {
+    return buildFallbackToken;
+  }
+
   if (typeof window !== "undefined") {
-    const localToken = normalizeToken(
+    const localTokenCandidate = normalizeToken(
       window.localStorage.getItem("VITE_MAPBOX_ACCESS_TOKEN")
       || window.localStorage.getItem("VITE_MAPBOX_TOKEN")
       || window.localStorage.getItem("MAPBOX_ACCESS_TOKEN")
       || window.localStorage.getItem("MAPBOX_PUBLIC_TOKEN"),
     );
+    const localToken = isPublicToken(localTokenCandidate) ? localTokenCandidate : null;
     if (localToken) {
       return localToken;
     }
