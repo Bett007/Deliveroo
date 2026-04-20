@@ -18,8 +18,8 @@ export function RouteMapCard({
 }) {
   const [routePreview, setRoutePreview] = useState(null);
   const isTerminalStatus = TERMINAL_STATUSES.has(String(status || "").toLowerCase());
-  const effectiveOriginCoords = isTerminalStatus ? null : originCoords;
-  const effectiveDestinationCoords = isTerminalStatus ? null : destinationCoords;
+  const effectiveOriginCoords = originCoords;
+  const effectiveDestinationCoords = destinationCoords;
   const hasLocations = origin && destination;
   const canRenderMap = Boolean(effectiveOriginCoords && effectiveDestinationCoords);
   const shouldRenderMap = Boolean(hasLocations && canRenderMap);
@@ -70,7 +70,7 @@ export function RouteMapCard({
           <h2>Delivery Map</h2>
           <p>{origin} to {destination}</p>
         </div>
-        <span className="mini-badge">Live</span>
+        <span className={`mini-badge ${isTerminalStatus ? "terminal" : ""}`}>{isTerminalStatus ? "Completed" : "Live"}</span>
       </div>
 
       {shouldRenderMap ? (
@@ -80,14 +80,15 @@ export function RouteMapCard({
           originCoords={effectiveOriginCoords}
           destinationCoords={effectiveDestinationCoords}
           routeGeoJson={routePreview?.geometry}
+          mutedStops={isTerminalStatus}
         />
       ) : (
         <div className="fake-map route-map-fallback">
           <div className="map-route-line"></div>
-          <div className="map-stop map-stop-start">
+          <div className={`map-stop map-stop-start ${isTerminalStatus ? "map-stop-terminal" : ""}`}>
             <span>P</span>
           </div>
-          <div className="map-stop map-stop-end">
+          <div className={`map-stop map-stop-end ${isTerminalStatus ? "map-stop-terminal" : ""}`}>
             <span>D</span>
           </div>
         </div>

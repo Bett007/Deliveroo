@@ -105,6 +105,7 @@ export function OrderDetailsPage() {
 
   const canEditDestination = !["delivered", "cancelled"].includes(order.status);
   const canCancel = order.status === "pending";
+  const isDeliveredCustomerOrder = user?.role === "customer" && order.status === "delivered";
 
   async function handleUpdateDestination(event) {
     event.preventDefault();
@@ -212,78 +213,84 @@ export function OrderDetailsPage() {
                   <p>Update destination or cancel while eligible.</p>
                 </div>
               </div>
-              {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
-              <form className="auth-form" onSubmit={handleUpdateDestination}>
-                <FormField id="destination-location" label="Destination Location" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
-                  <select
-                    id="destination-area"
-                    name="destinationArea"
-                    className="form-select"
-                    value={destinationArea}
-                    onChange={(event) => {
-                      setDestinationArea(event.target.value);
-                      setDestinationPlace("");
-                      setDestinationLocationId("");
-                      setDestinationError("");
-                    }}
-                    disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
-                  >
-                    <option value="">Select destination location area</option>
-                    {destinationAreas.map((area) => (
-                      <option key={area} value={area}>{area}</option>
-                    ))}
-                  </select>
-                </FormField>
-
-                <FormField id="destination-place" label="Place" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
-                  <input
-                    id="destination-place"
-                    name="destinationPlace"
-                    placeholder="Search for a place..."
-                    value={destinationPlace}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      setDestinationPlace(value);
-                      setDestinationError("");
-
-                      const matchedLocation = destinationPlaces.find(
-                        (location) => location.label.toLowerCase() === value.trim().toLowerCase(),
-                      );
-                      setDestinationLocationId(matchedLocation ? String(matchedLocation.id) : "");
-                    }}
-                    list="destination-place-options"
-                    disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
-                  />
-                  <datalist id="destination-place-options">
-                    {destinationPlaces.map((locationOption) => (
-                      <option key={locationOption.id} value={locationOption.label} />
-                    ))}
-                  </datalist>
-                </FormField>
-
-                <Button type="submit" className="secondary-btn full-width" disabled={!canEditDestination || mutationStatus === "loading"}>
-                  {mutationStatus === "loading" ? "Updating Destination..." : "Update Destination"}
-                </Button>
-              </form>
-
-              <FormField id="cancel-reason" label="Cancellation Reason (Optional)" error={fieldErrors.reason?.[0]}>
-                <textarea
-                  id="cancel-reason"
-                  name="cancelReason"
-                  className="form-textarea"
-                  value={cancelReason}
-                  onChange={(event) => setCancelReason(event.target.value)}
-                  placeholder="Add a short reason if you want it included in the cancel request"
-                  disabled={!canCancel || mutationStatus === "loading"}
-                />
-              </FormField>
-
-              {canCancel ? (
-                <Button className="primary-btn full-width danger-btn" onClick={handleCancelOrder} disabled={mutationStatus === "loading"}>
-                  {mutationStatus === "loading" ? "Saving Changes..." : "Cancel Order"}
-                </Button>
+              {isDeliveredCustomerOrder ? (
+                <p className="form-status success">This order has already been fulfilled.</p>
               ) : (
-                <p className="helper-text">Only pending orders can be cancelled from this screen.</p>
+                <>
+                  {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
+                  <form className="auth-form" onSubmit={handleUpdateDestination}>
+                    <FormField id="destination-location" label="Destination Location" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
+                      <select
+                        id="destination-area"
+                        name="destinationArea"
+                        className="form-select"
+                        value={destinationArea}
+                        onChange={(event) => {
+                          setDestinationArea(event.target.value);
+                          setDestinationPlace("");
+                          setDestinationLocationId("");
+                          setDestinationError("");
+                        }}
+                        disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
+                      >
+                        <option value="">Select destination location area</option>
+                        {destinationAreas.map((area) => (
+                          <option key={area} value={area}>{area}</option>
+                        ))}
+                      </select>
+                    </FormField>
+
+                    <FormField id="destination-place" label="Place" error={destinationError || fieldErrors.delivery_location_id?.[0]}>
+                      <input
+                        id="destination-place"
+                        name="destinationPlace"
+                        placeholder="Search for a place..."
+                        value={destinationPlace}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setDestinationPlace(value);
+                          setDestinationError("");
+
+                          const matchedLocation = destinationPlaces.find(
+                            (location) => location.label.toLowerCase() === value.trim().toLowerCase(),
+                          );
+                          setDestinationLocationId(matchedLocation ? String(matchedLocation.id) : "");
+                        }}
+                        list="destination-place-options"
+                        disabled={!canEditDestination || mutationStatus === "loading" || referenceStatus === "loading"}
+                      />
+                      <datalist id="destination-place-options">
+                        {destinationPlaces.map((locationOption) => (
+                          <option key={locationOption.id} value={locationOption.label} />
+                        ))}
+                      </datalist>
+                    </FormField>
+
+                    <Button type="submit" className="secondary-btn full-width" disabled={!canEditDestination || mutationStatus === "loading"}>
+                      {mutationStatus === "loading" ? "Updating Destination..." : "Update Destination"}
+                    </Button>
+                  </form>
+
+                  <FormField id="cancel-reason" label="Cancellation Reason (Optional)" error={fieldErrors.reason?.[0]}>
+                    <textarea
+                      id="cancel-reason"
+                      name="cancelReason"
+                      className="form-textarea"
+                      value={cancelReason}
+                      onChange={(event) => setCancelReason(event.target.value)}
+                      placeholder="Add a short reason if you want it included in the cancel request"
+                      disabled={!canCancel || mutationStatus === "loading"}
+                    />
+                  </FormField>
+
+                  {canCancel ? (
+                    <Button className="primary-btn full-width danger-btn" onClick={handleCancelOrder} disabled={mutationStatus === "loading"}>
+                      {mutationStatus === "loading" ? "Saving Changes..." : "Cancel Order"}
+                    </Button>
+                  ) : (
+                    <p className="helper-text">Only pending orders can be cancelled from this screen.</p>
+                  )}
+                </>
               )}
             </>
           ) : null}

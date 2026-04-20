@@ -78,6 +78,7 @@ export function MapboxMap({
   businessMarkers = [],
   defaultCenter = null,
   defaultZoom = 6,
+  mutedStops = false,
 }) {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
@@ -238,7 +239,7 @@ export function MapboxMap({
 
         if (originCoords) {
           const originMarker = document.createElement("div");
-          originMarker.className = `${styles.mapboxMarker} ${styles.mapboxMarkerOrigin}`;
+          originMarker.className = `${styles.mapboxMarker} ${styles.mapboxMarkerOrigin} ${mutedStops ? styles.mapboxMarkerMuted : ""}`;
           originMarker.innerHTML = `<span class="${styles.markerLabel}">P</span>`;
           new mapboxgl.Marker(originMarker)
             .setLngLat([originCoords.longitude, originCoords.latitude])
@@ -248,7 +249,7 @@ export function MapboxMap({
 
         if (destinationCoords) {
           const destinationMarker = document.createElement("div");
-          destinationMarker.className = `${styles.mapboxMarker} ${styles.mapboxMarkerDestination}`;
+          destinationMarker.className = `${styles.mapboxMarker} ${styles.mapboxMarkerDestination} ${mutedStops ? styles.mapboxMarkerMuted : ""}`;
           destinationMarker.innerHTML = `<span class="${styles.markerLabel}">D</span>`;
           new mapboxgl.Marker(destinationMarker)
             .setLngLat([destinationCoords.longitude, destinationCoords.latitude])
@@ -354,6 +355,7 @@ export function MapboxMap({
     poiFilter,
     routeGeoJson,
     showCountyBoundaries,
+    mutedStops,
   ]);
 
   if (!canRenderMap || mapError) {
