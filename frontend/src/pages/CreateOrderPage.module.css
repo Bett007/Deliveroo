@@ -295,3 +295,24 @@
     width: 100%;
   }
 }
+
+@media (max-width: 1120px) {
+  :global(.create-order-workspace) {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  :global(.create-order-workspace .create-order-grid) {
+    height: auto;
+    overflow: visible;
+  }
+
+  :global(.create-order-workspace .create-order-panel),
+  :global(.create-order-workspace .create-order-aside),
+  :global(.create-order-workspace .order-summary-panel),
+  :global(.create-order-workspace .route-summary-panel) {
+    max-height: none;
+    overflow: visible;
+  }
+}

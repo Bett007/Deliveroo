@@ -12,6 +12,24 @@ import opsSharedStyles from "../pages/OpsShared.module.css";
 
 const PROFILE_PLACEHOLDER_SRC = placeholderProfileAvatar;
 
+function getViewportWidth() {
+  if (typeof window === "undefined") {
+    return 1440;
+  }
+
+  const widths = [
+    window.innerWidth,
+    window.visualViewport?.width,
+    document.documentElement?.clientWidth,
+  ].filter((value) => Number.isFinite(value) && value > 0);
+
+  return widths.length ? Math.min(...widths) : window.innerWidth;
+}
+
+function isMobileShellViewport() {
+  return getViewportWidth() <= 1120;
+}
+
 function NavIcon({ name }) {
   const icons = {
     dashboard: (
@@ -188,21 +206,14 @@ export function AppLayout() {
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") {
-      return true;
-    }
-
-    return window.innerWidth > 1120;
+    return !isMobileShellViewport();
   });
   const [sidebarHover, setSidebarHover] = useState(false);
   const [sidebarLockedClosed, setSidebarLockedClosed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [fitScale, setFitScale] = useState(1);
   const [isMobileViewport, setIsMobileViewport] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    return window.innerWidth <= 1120;
+    return isMobileShellViewport();
   });
   const effectiveSidebarOpen = sidebarOpen || sidebarHover;
   const fitShellRef = useRef(null);
@@ -214,7 +225,7 @@ export function AppLayout() {
   const userFallbackInitial = (user?.first_name?.trim()?.[0] || user?.email?.trim()?.[0] || "U").toUpperCase();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth <= 1120) {
+    if (isMobileShellViewport()) {
       setSidebarOpen(false);
       setMobileMenuOpen(false);
     }
@@ -222,7 +233,7 @@ export function AppLayout() {
 
   useEffect(() => {
     function handleResize() {
-      const isMobile = window.innerWidth <= 1120;
+      const isMobile = isMobileShellViewport();
       setIsMobileViewport(isMobile);
 
       if (!isMobile) {
@@ -233,13 +244,17 @@ export function AppLayout() {
       }
     }
 
+    handleResize();
+
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
+      window.visualViewport?.addEventListener("resize", handleResize);
     }
 
     return () => {
       if (typeof window !== "undefined") {
         window.removeEventListener("resize", handleResize);
+        window.visualViewport?.removeEventListener("resize", handleResize);
       }
     };
   }, []);
@@ -270,6 +285,11 @@ export function AppLayout() {
       const shellEl = fitShellRef.current;
       const contentEl = fitContentRef.current;
       if (!shellEl || !contentEl) {
+        return;
+      }
+
+      if (shellEl.clientWidth <= 1120) {
+        setFitScale(1);
         return;
       }
 
@@ -375,11 +395,12 @@ export function AppLayout() {
           { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ];
+  const shellStateClass = isMobileViewport ? "sidebar-open" : effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed";
 
   return (
     <div className={`${shellStyles.scope} ${opsSharedStyles.scope}`}>
       <div
-        className={`role-shell ops-shell ${effectiveSidebarOpen ? "sidebar-open" : "sidebar-collapsed"} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
+        className={`role-shell ops-shell ${shellStateClass} ${isAdmin ? "admin-shell" : isRider ? "rider-shell" : "customer-shell"}`}
       >
         {!isMobileViewport ? (
           <RoleSidebar

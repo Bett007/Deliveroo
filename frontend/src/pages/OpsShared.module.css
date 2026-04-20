@@ -918,6 +918,14 @@
 }
 
 @media (max-width: 1120px) {
+  :global(.ops-page),
+  :global(.ops-main .workspace-page),
+  :global(.ops-main .dashboard-page) {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
   :global(.ops-dashboard-grid),
   :global(.customer-workspace-grid),
   :global(.rider-workspace-grid),
