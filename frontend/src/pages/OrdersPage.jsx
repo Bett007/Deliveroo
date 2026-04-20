@@ -15,8 +15,7 @@ export function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [mobilePane, setMobilePane] = useState("overview");
-  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== "undefined" ? window.innerWidth <= 900 : false));
+  const [activePane, setActivePane] = useState("overview");
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -25,22 +24,6 @@ export function OrdersPage() {
       dispatch(clearOrderError());
     };
   }, [dispatch]);
-
-  useEffect(() => {
-    function handleResize() {
-      setIsMobileViewport(window.innerWidth <= 900);
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("resize", handleResize);
-      }
-    };
-  }, []);
 
   const totalOrders = useMemo(() => currentOrders.length + orderHistory.length, [currentOrders.length, orderHistory.length]);
   const allOrders = useMemo(() => [...currentOrders, ...orderHistory], [currentOrders, orderHistory]);
@@ -94,58 +77,58 @@ export function OrdersPage() {
 
   return (
     <section className="workspace-page orders-page">
-      {isMobileViewport ? (
-        <section className="workspace-panel panel-toggle-bar">
-          <div className="panel-toggle-actions" role="tablist" aria-label="Orders view navigation">
-            <button type="button" className={`panel-toggle-btn ${mobilePane === "overview" ? "active" : ""}`} onClick={() => setMobilePane("overview")}>Overview</button>
-            <button type="button" className={`panel-toggle-btn ${mobilePane === "search" ? "active" : ""}`} onClick={() => setMobilePane("search")}>Search</button>
-            <button type="button" className={`panel-toggle-btn ${mobilePane === "active" ? "active" : ""}`} onClick={() => setMobilePane("active")}>Current</button>
-            <button type="button" className={`panel-toggle-btn ${mobilePane === "history" ? "active" : ""}`} onClick={() => setMobilePane("history")}>History</button>
-          </div>
-        </section>
-      ) : null}
+      <section className="workspace-panel panel-toggle-bar">
+        <div className="panel-toggle-actions" role="tablist" aria-label="Orders view navigation">
+          <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "search" ? "active" : ""}`} onClick={() => setActivePane("search")}>Search</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
+        </div>
+      </section>
 
-      {!isMobileViewport || mobilePane === "overview" ? (
+      {activePane === "overview" ? (
       <header className="workspace-hero glass-card orders-hero">
         <figure className="orders-hero-banner" aria-hidden="true">
           <img src={onlineShoppingDeliveryIllustration} alt="" loading="eager" />
         </figure>
 
-        <div className="orders-hero-copy">
-          <p className="eyebrow">Customer Orders</p>
-          <h1>Manage your orders</h1>
-          <p className="workspace-copy">
-            Track deliveries, manage orders, and review recent activity in one place.
-          </p>
-          {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
-          {error ? <p className="form-status error">{error}</p> : null}
+        <div className="orders-hero-body">
+          <div className="orders-hero-copy">
+            <p className="eyebrow">Customer Orders</p>
+            <h1>Manage your orders</h1>
+            <p className="workspace-copy">
+              Track deliveries, manage orders, and review recent activity in one place.
+            </p>
+            {location.state?.message ? <p className="form-status success">{location.state.message}</p> : null}
+            {error ? <p className="form-status error">{error}</p> : null}
 
-          <div className="orders-hero-actions">
-            <Link to="/orders/create" className="primary-btn">
-              Create Parcel Order
-            </Link>
-            <span className="mini-badge">{totalOrders} total</span>
+            <div className="orders-hero-actions">
+              <Link to="/orders/create" className="primary-btn">
+                Create Parcel Order
+              </Link>
+              <span className="mini-badge">{totalOrders} total</span>
+            </div>
           </div>
-        </div>
 
-        <div className="orders-hero-metrics" aria-label="Order summary metrics">
-          <article className="orders-metric-card">
-            <span>Active</span>
-            <strong>{currentOrders.length}</strong>
-          </article>
-          <article className="orders-metric-card">
-            <span>Delivered</span>
-            <strong>{deliveredCount}</strong>
-          </article>
-          <article className="orders-metric-card">
-            <span>Cancelled</span>
-            <strong>{cancelledCount}</strong>
-          </article>
+          <div className="orders-hero-metrics" aria-label="Order summary metrics">
+            <article className="orders-metric-card">
+              <span>Active</span>
+              <strong>{currentOrders.length}</strong>
+            </article>
+            <article className="orders-metric-card">
+              <span>Delivered</span>
+              <strong>{deliveredCount}</strong>
+            </article>
+            <article className="orders-metric-card">
+              <span>Cancelled</span>
+              <strong>{cancelledCount}</strong>
+            </article>
+          </div>
         </div>
       </header>
       ) : null}
 
-      {!isMobileViewport || mobilePane === "search" ? (
+      {activePane === "search" ? (
       <SectionCard
         className="orders-panel"
         title="Search, Filter, and Sort"
@@ -184,8 +167,8 @@ export function OrdersPage() {
       </SectionCard>
       ) : null}
 
-      <div className={`workspace-grid ${isMobileViewport ? "mobile-orders-grid" : ""}`}>
-        {!isMobileViewport || mobilePane === "active" ? (
+      <div className="workspace-grid mobile-orders-grid">
+        {activePane === "active" ? (
         <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
           {status === "loading" ? (
             <p className="helper-text">Loading current orders from the backend...</p>
@@ -221,7 +204,7 @@ export function OrdersPage() {
         </SectionCard>
         ) : null}
 
-        {!isMobileViewport || mobilePane === "history" ? (
+        {activePane === "history" ? (
         <SectionCard className="orders-panel" title="Order History" description="Delivered and cancelled orders from your account.">
           {status === "loading" ? (
             <p className="helper-text">Loading order history...</p>

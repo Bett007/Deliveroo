@@ -37,6 +37,9 @@
   color: #ffffff;
   border-color: transparent;
 }
+:global(.single-pane-layout) {
+  grid-template-columns: 1fr !important;
+}
 :global(.dashboard-page) {
   grid-auto-rows: max-content;
   row-gap: 1.25rem;
@@ -73,17 +76,18 @@
 :global(.ops-main .orders-hero) {
   border-radius: 14px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-columns: 1fr;
   align-items: start;
-  gap: 1rem;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
 }
 :global(.orders-hero-banner) {
-  grid-column: 1 / -1;
   margin: 0;
-  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--ops-border);
-  background: #e8f2fb;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 :global(.orders-hero-banner img) {
   width: 100%;
@@ -91,6 +95,12 @@
   object-fit: cover;
   object-position: center;
   display: block;
+}
+:global(.orders-hero-body) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  gap: 1rem;
+  padding: 1rem;
 }
 :global(.orders-hero-copy) {
   display: grid;
@@ -744,7 +754,7 @@
 }
 
 @media (max-width: 980px) {
-  :global(.ops-main .orders-hero) {
+  :global(.orders-hero-body) {
     grid-template-columns: 1fr;
   }
 

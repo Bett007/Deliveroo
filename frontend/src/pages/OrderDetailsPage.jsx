@@ -34,6 +34,7 @@ export function OrderDetailsPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [destinationError, setDestinationError] = useState("");
   const [routePreview, setRoutePreview] = useState(null);
+  const [activePane, setActivePane] = useState("summary");
 
   useEffect(() => {
     dispatch(fetchOrderById(orderId));
@@ -189,7 +190,17 @@ export function OrderDetailsPage() {
         <Link to="/orders" className="secondary-btn">Back to Orders</Link>
       </header>
 
-      <div className="workspace-grid">
+      <section className="workspace-panel panel-toggle-bar">
+        <div className="panel-toggle-actions" role="tablist" aria-label="Order details views">
+          <button type="button" className={`panel-toggle-btn ${activePane === "summary" ? "active" : ""}`} onClick={() => setActivePane("summary")}>Summary</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "manage" ? "active" : ""}`} onClick={() => setActivePane("manage")}>Manage</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "map" ? "active" : ""}`} onClick={() => setActivePane("map")}>Map</button>
+          <button type="button" className={`panel-toggle-btn ${activePane === "tracking" ? "active" : ""}`} onClick={() => setActivePane("tracking")}>Tracking</button>
+        </div>
+      </section>
+
+      {activePane === "summary" ? (
+      <div className="workspace-grid single-pane-layout">
         <SectionCard title="Order Summary" description="Key details for this order.">
           <div className="detail-list">
             <div><strong>Order ID:</strong> {order.id}</div>
@@ -206,7 +217,11 @@ export function OrderDetailsPage() {
             <div><strong>Last Updated:</strong> {formatReadableDate(order.updatedAt)}</div>
           </div>
         </SectionCard>
+      </div>
+      ) : null}
 
+      {activePane === "manage" ? (
+      <div className="workspace-grid single-pane-layout">
         <SectionCard title="Manage Delivery" description="Update the destination or cancel this order when it is still eligible.">
           {!canEditDestination ? <p className="helper-text">Destination changes are disabled once an order is delivered or cancelled.</p> : null}
           <form className="auth-form" onSubmit={handleUpdateDestination}>
@@ -283,8 +298,10 @@ export function OrderDetailsPage() {
           )}
         </SectionCard>
       </div>
+      ) : null}
 
-      <div className="workspace-grid">
+      {activePane === "map" ? (
+      <div className="workspace-grid single-pane-layout">
         <RouteMapCard
           origin={order.pickupLocation}
           destination={order.destination}
@@ -295,7 +312,11 @@ export function OrderDetailsPage() {
           status={order.status}
           onRoutePreviewChange={handleRoutePreviewChange}
         />
+      </div>
+      ) : null}
 
+      {activePane === "tracking" ? (
+      <div className="workspace-grid single-pane-layout">
         <SectionCard title="Tracking Updates" description="Latest route and status updates for this order.">
           {trackingStatus === "loading" ? (
             <p className="helper-text">Loading tracking updates...</p>
@@ -317,6 +338,7 @@ export function OrderDetailsPage() {
           )}
         </SectionCard>
       </div>
+      ) : null}
     </section>
   );
 }
