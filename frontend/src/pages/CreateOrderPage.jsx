@@ -44,6 +44,60 @@ const ORDER_PANEL_MODES = {
   SUMMARY: "order-summary",
 };
 
+function needsLegacyLocationIdPayload(errorPayload) {
+  const errors = errorPayload?.errors || {};
+  return Boolean(errors.pickup_location_id || errors.delivery_location_id);
+}
+
+function toNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function pickLocationId(referenceLocations, locationAddress, locationCoords) {
+  if (!Array.isArray(referenceLocations) || !referenceLocations.length) {
+    return null;
+  }
+
+  const normalizedAddress = String(locationAddress || "").trim().toLowerCase();
+  if (normalizedAddress) {
+    const exactMatch = referenceLocations.find(
+      (location) => String(location.address || "").trim().toLowerCase() === normalizedAddress,
+    );
+    if (exactMatch?.id != null) {
+      return Number(exactMatch.id);
+    }
+
+    const fuzzyMatch = referenceLocations.find((location) => {
+      const candidate = String(location.address || "").trim().toLowerCase();
+      return candidate && (candidate.includes(normalizedAddress) || normalizedAddress.includes(candidate));
+    });
+    if (fuzzyMatch?.id != null) {
+      return Number(fuzzyMatch.id);
+    }
+  }
+
+  const latitude = toNumber(locationCoords?.latitude);
+  const longitude = toNumber(locationCoords?.longitude);
+  if (latitude == null || longitude == null) {
+    return null;
+  }
+
+  let best = null;
+  for (const location of referenceLocations) {
+    const candidateLat = toNumber(location.latitude);
+    const candidateLng = toNumber(location.longitude);
+    if (candidateLat == null || candidateLng == null) continue;
+
+    const distance = Math.hypot(latitude - candidateLat, longitude - candidateLng);
+    if (!best || distance < best.distance) {
+      best = { id: Number(location.id), distance };
+    }
+  }
+
+  return best?.id ?? null;
+}
+
 function normalizeSuggestion(feature) {
   return {
     id: feature.id,
@@ -216,8 +270,8 @@ export function CreateOrderPage() {
       parcelName: fieldErrors.description?.[0] ?? current.parcelName,
       weightKg: fieldErrors.weight?.[0] ?? current.weightKg,
       weightCategoryId: fieldErrors.weight_category_id?.[0] ?? current.weightCategoryId,
-      pickupLocation: fieldErrors.pickup_location?.[0] ?? current.pickupLocation,
-      destinationLocation: fieldErrors.delivery_location?.[0] ?? current.destinationLocation,
+      pickupLocation: fieldErrors.pickup_location?.[0] ?? fieldErrors.pickup_location_id?.[0] ?? current.pickupLocation,
+      destinationLocation: fieldErrors.delivery_location?.[0] ?? fieldErrors.delivery_location_id?.[0] ?? current.destinationLocation,
     }));
   }, [fieldErrors]);
 
@@ -701,13 +755,35 @@ export function CreateOrderPage() {
       },
     };
 
-    const result = await dispatch(createOrder(payload));
+    let result = await dispatch(createOrder(payload));
+
+    if (createOrder.rejected.match(result) && needsLegacyLocationIdPayload(result.payload)) {
+      const pickupLocationId = pickLocationId(referenceData.locations, formData.pickupLocation, pickupData);
+      const deliveryLocationId = pickLocationId(referenceData.locations, formData.destinationLocation, destinationData);
+
+      if (pickupLocationId && deliveryLocationId) {
+        const legacyPayload = {
+          quoted_price: quotedPrice,
+          pickup_location_id: pickupLocationId,
+          delivery_location_id: deliveryLocationId,
+          distance_km: routePreview.distanceKm,
+          estimated_duration_minutes: routePreview.durationMinutes,
+          parcel: payload.parcel,
+        };
+        result = await dispatch(createOrder(legacyPayload));
+      }
+    }
 
     if (createOrder.fulfilled.match(result)) {
       setCreatedOrder(result.payload.order);
       setActivePanelMode(ORDER_PANEL_MODES.SUMMARY);
       setErrors({});
       dispatch(clearOrderError());
+      return;
+    }
+
+    if (createOrder.rejected.match(result) && needsLegacyLocationIdPayload(result.payload)) {
+      setRouteError("Live server validation expects known location IDs. Please choose a known Nairobi area from the dropdowns and try again.");
     }
   }
 
