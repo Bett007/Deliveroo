@@ -61,6 +61,20 @@ function calculatePrice(weightKg, distanceKm) {
   return Number((weightFee + deliveryFee).toFixed(2));
 }
 
+function toUserFacingMapError(error, fallback = "Map preview is unavailable right now. Please continue with location inputs.") {
+  const message = String(error?.message || "").toLowerCase();
+
+  if (message.includes("token") || message.includes("mapbox")) {
+    return "Map preview is unavailable right now. Please continue with location inputs.";
+  }
+
+  if (message.includes("network") || message.includes("failed to fetch")) {
+    return "Map services are temporarily unavailable. Please check your connection and try again.";
+  }
+
+  return error?.message || fallback;
+}
+
 export function CreateOrderPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -229,7 +243,7 @@ export function CreateOrderPage() {
       } catch (previewError) {
         if (!cancelled) {
           setRouteStatus("error");
-          setRouteError(previewError.message || "Unable to preview route.");
+          setRouteError(toUserFacingMapError(previewError, "Unable to preview route."));
           setRouteGeoJson(null);
           setDistance(null);
           setDuration(null);
@@ -539,7 +553,7 @@ export function CreateOrderPage() {
       setDistance(routePreview.distanceKm);
       setDuration(routePreview.durationMinutes);
     } catch (previewError) {
-      setRouteError(previewError.message || "Unable to preview route.");
+      setRouteError(toUserFacingMapError(previewError, "Unable to preview route."));
       return;
     }
 

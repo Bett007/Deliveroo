@@ -42,7 +42,9 @@ Copy `.env.example` to `.env` when you need local frontend variables.
 Current example:
 
 - `VITE_API_BASE_URL` points the frontend to the backend API
-- `VITE_MAPBOX_ACCESS_TOKEN` must be a public Mapbox token (`pk...`) for browser usage
+- `VITE_MAPBOX_ACCESS_TOKEN` (or `VITE_MAPBOX_TOKEN`) must be a public Mapbox token (`pk...`) for browser usage
+
+Important: set this token in `frontend/.env` (not `backend/.env`) and restart `npm run dev` after changing it.
 
 ## Folder Structure
 
