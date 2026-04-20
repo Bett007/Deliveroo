@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
@@ -86,7 +86,7 @@ function toUserFacingMapError(error, fallback = "Map preview is unavailable righ
 export function CreateOrderPage() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const { createStatus, error, fieldErrors, referenceData, referenceStatus } = useSelector((state) => state.orders);
+  const { createStatus, error, fieldErrors, referenceData, referenceStatus, currentOrders, orderHistory } = useSelector((state) => state.orders);
   const didRetryReferenceLoad = useRef(false);
 
   const [formData, setFormData] = useState(initialFormData);
@@ -114,6 +114,71 @@ export function CreateOrderPage() {
   const [isLocatingPickup, setIsLocatingPickup] = useState(false);
   const [activePanelMode, setActivePanelMode] = useState(ORDER_PANEL_MODES.VIEW_MAP);
   const [createdOrder, setCreatedOrder] = useState(null);
+  const [selectedMapOrderId, setSelectedMapOrderId] = useState("");
+  const [selectedMapRouteGeoJson, setSelectedMapRouteGeoJson] = useState(null);
+  const [selectedMapRouteStatus, setSelectedMapRouteStatus] = useState("idle");
+  const [selectedMapRouteError, setSelectedMapRouteError] = useState("");
+
+  const allUserOrders = useMemo(
+    () => [...currentOrders, ...orderHistory].sort((left, right) => {
+      const rightTime = new Date(right.updatedAt || right.createdAt || 0).getTime();
+      const leftTime = new Date(left.updatedAt || left.createdAt || 0).getTime();
+      return rightTime - leftTime;
+    }),
+    [currentOrders, orderHistory],
+  );
+
+  const selectedMapOrder = useMemo(
+    () => allUserOrders.find((order) => String(order.id) === String(selectedMapOrderId)) || null,
+    [allUserOrders, selectedMapOrderId],
+  );
+
+  useEffect(() => {
+    if (!allUserOrders.length) {
+      setSelectedMapOrderId("");
+      return;
+    }
+
+    const hasSelectedOrder = allUserOrders.some((order) => String(order.id) === String(selectedMapOrderId));
+    if (!hasSelectedOrder) {
+      setSelectedMapOrderId(String(allUserOrders[0].id));
+    }
+  }, [allUserOrders, selectedMapOrderId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resolveSelectedOrderRoute() {
+      if (!selectedMapOrder?.pickupCoords || !selectedMapOrder?.destinationCoords) {
+        setSelectedMapRouteGeoJson(null);
+        setSelectedMapRouteStatus("idle");
+        setSelectedMapRouteError("");
+        return;
+      }
+
+      setSelectedMapRouteStatus("loading");
+      setSelectedMapRouteError("");
+
+      try {
+        const preview = await fetchRoutePreview(selectedMapOrder.pickupCoords, selectedMapOrder.destinationCoords);
+        if (!cancelled) {
+          setSelectedMapRouteGeoJson(preview.geometry);
+          setSelectedMapRouteStatus("success");
+        }
+      } catch (previewError) {
+        if (!cancelled) {
+          setSelectedMapRouteGeoJson(null);
+          setSelectedMapRouteStatus("error");
+          setSelectedMapRouteError(toUserFacingMapError(previewError, "Unable to load selected order route."));
+        }
+      }
+    }
+
+    resolveSelectedOrderRoute();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMapOrder]);
 
   useEffect(() => {
     dispatch(clearOrderError());
@@ -613,7 +678,8 @@ export function CreateOrderPage() {
   }
 
   const showManageOrderPanel = activePanelMode === ORDER_PANEL_MODES.MANAGE;
-  const showSummaryPanel = !showManageOrderPanel;
+  const showSummaryPanel = activePanelMode === ORDER_PANEL_MODES.SUMMARY;
+  const showViewMapPanel = activePanelMode === ORDER_PANEL_MODES.VIEW_MAP;
   const hasOrderSummary = Boolean(pickup && destination);
 
   return (
@@ -821,6 +887,47 @@ export function CreateOrderPage() {
           </section>
         ) : null}
 
+        {showViewMapPanel ? (
+          <section className="workspace-panel order-summary-panel">
+            <div className="section-header">
+              <div>
+                <h2>View Existing Order Map</h2>
+                <p>Select one of your orders to load pickup, drop-off, and route preview.</p>
+              </div>
+            </div>
+
+            {allUserOrders.length ? (
+              <div className="order-summary-content">
+                <FormField id="view-map-order-select" label="Select Order">
+                  <select
+                    id="view-map-order-select"
+                    className="form-select"
+                    value={selectedMapOrderId}
+                    onChange={(event) => setSelectedMapOrderId(event.target.value)}
+                  >
+                    {allUserOrders.map((order) => (
+                      <option key={order.id} value={order.id}>
+                        #{order.id} - {order.parcelName} ({order.status.replaceAll("_", " ")})
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+
+                {selectedMapOrder ? (
+                  <div className="order-summary-metadata">
+                    <p><span>Pickup</span><strong>{selectedMapOrder.pickupLocation || "--"}</strong></p>
+                    <p><span>Destination</span><strong>{selectedMapOrder.destination || "--"}</strong></p>
+                    <p><span>Status</span><strong>{selectedMapOrder.status.replaceAll("_", " ")}</strong></p>
+                    <p><span>Price</span><strong>KES {Number(selectedMapOrder.quotedPrice || 0).toFixed(2)}</strong></p>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <p className="helper-text">No previous or current orders found yet. Create one first to preview map history.</p>
+            )}
+          </section>
+        ) : null}
+
         {showSummaryPanel ? (
           <section className="workspace-panel order-summary-panel">
             <div className="section-header">
@@ -889,22 +996,35 @@ export function CreateOrderPage() {
               </div>
             </div>
 
-            {routeStatus === "error" ? <p className="form-status error">{routeError}</p> : null}
+            {!showViewMapPanel && routeStatus === "error" ? <p className="form-status error">{routeError}</p> : null}
+            {showViewMapPanel && selectedMapRouteStatus === "error" ? <p className="form-status error">{selectedMapRouteError}</p> : null}
 
             <div className="route-summary">
               <MapboxMap
-                origin={pickup?.address}
-                destination={destination?.address}
-                originCoords={pickup}
-                destinationCoords={destination}
-                routeGeoJson={routeGeoJson}
+                origin={showViewMapPanel ? selectedMapOrder?.pickupLocation : pickup?.address}
+                destination={showViewMapPanel ? selectedMapOrder?.destination : destination?.address}
+                originCoords={showViewMapPanel ? selectedMapOrder?.pickupCoords : pickup}
+                destinationCoords={showViewMapPanel ? selectedMapOrder?.destinationCoords : destination}
+                routeGeoJson={showViewMapPanel ? selectedMapRouteGeoJson : routeGeoJson}
                 defaultCenter={DEFAULT_NAIROBI_CENTER}
                 defaultZoom={10}
                 clickTarget={activeLocationField}
-                onPickupSelect={handleMapPickupSelect}
-                onDestinationSelect={handleMapDestinationSelect}
+                onPickupSelect={showViewMapPanel ? null : handleMapPickupSelect}
+                onDestinationSelect={showViewMapPanel ? null : handleMapDestinationSelect}
               />
-              {!pickup || !destination ? (
+              {showViewMapPanel && !selectedMapOrder ? (
+                <div className="route-summary empty">
+                  <p className="helper-text">Select an order from the dropdown to load map preview.</p>
+                </div>
+              ) : null}
+
+              {showViewMapPanel && selectedMapOrder && (!selectedMapOrder.pickupCoords || !selectedMapOrder.destinationCoords) ? (
+                <div className="route-summary empty">
+                  <p className="helper-text">Selected order is missing map coordinates for full route preview.</p>
+                </div>
+              ) : null}
+
+              {!showViewMapPanel && (!pickup || !destination) ? (
                 <div className="route-summary empty">
                   <p className="helper-text">Select pickup and destination to draw a route. Nearby places are shown on the Kenya map.</p>
                 </div>
@@ -913,15 +1033,15 @@ export function CreateOrderPage() {
               <div className="route-stats-row single-column">
                 <div>
                   <p className="card-label">Distance</p>
-                  <h3>{distance != null ? `${distance} km` : "--"}</h3>
+                  <h3>{showViewMapPanel ? (selectedMapOrder?.distanceKm != null ? `${selectedMapOrder.distanceKm} km` : "--") : (distance != null ? `${distance} km` : "--")}</h3>
                 </div>
                 <div>
                   <p className="card-label">Estimated Time</p>
-                  <h3>{duration != null ? `${duration} min` : "--"}</h3>
+                  <h3>{showViewMapPanel ? (selectedMapOrder?.durationMinutes != null ? `${selectedMapOrder.durationMinutes} min` : "--") : (duration != null ? `${duration} min` : "--")}</h3>
                 </div>
                 <div>
                   <p className="card-label">Price</p>
-                  <h3>{price != null ? `KES ${price}` : "KES --"}</h3>
+                  <h3>{showViewMapPanel ? (selectedMapOrder ? `KES ${Number(selectedMapOrder.quotedPrice || 0).toFixed(2)}` : "KES --") : (price != null ? `KES ${price}` : "KES --")}</h3>
                 </div>
               </div>
             </div>

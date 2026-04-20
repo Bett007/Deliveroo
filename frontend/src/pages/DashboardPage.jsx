@@ -133,7 +133,7 @@ export function DashboardPage() {
       ) : null}
 
       {activePane === "orders" ? (
-      <div className="ops-dashboard-grid">
+      <div className="ops-dashboard-grid dashboard-orders-pane-grid">
         <SectionCard title="Recent Orders" description="Latest active deliveries for this customer account.">
           {status === "loading" ? (
             <p className="helper-text">Loading orders...</p>

@@ -463,6 +463,9 @@
   min-height: auto;
   overflow: visible;
 }
+:global(.dashboard-orders-pane-grid) {
+  grid-template-columns: 1fr;
+}
 :global(.rider-workspace-grid) {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
