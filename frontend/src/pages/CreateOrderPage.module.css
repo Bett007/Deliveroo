@@ -2,6 +2,25 @@
   display: contents;
 }
 
+:global(.create-order-workspace) {
+  min-height: 0;
+}
+
+:global(.create-order-workspace .create-order-grid) {
+  min-height: 0;
+  height: 100%;
+}
+
+:global(.create-order-workspace .create-order-panel),
+:global(.create-order-workspace .create-order-aside),
+:global(.create-order-workspace .order-summary-panel),
+:global(.create-order-workspace .route-summary-panel) {
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
 
 :global(.mini-route),
 :global(.route-preview) {

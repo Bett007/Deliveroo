@@ -717,7 +717,7 @@ export function CreateOrderPage() {
   const hasOrderSummary = Boolean(pickup && destination);
 
   return (
-    <section className={`workspace-page ops-page ${styles.scope}`}>
+    <section className={`workspace-page ops-page create-order-workspace ${styles.scope}`}>
       <header className="ops-topbar">
         <div>
           <p className="eyebrow">Create Parcel</p>
