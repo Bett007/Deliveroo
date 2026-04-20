@@ -77,16 +77,6 @@ export function OrdersPage() {
 
   return (
     <section className="workspace-page orders-page">
-      <section className="workspace-panel panel-toggle-bar">
-        <div className="panel-toggle-actions" role="tablist" aria-label="Orders view navigation">
-          <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
-          <button type="button" className={`panel-toggle-btn ${activePane === "search" ? "active" : ""}`} onClick={() => setActivePane("search")}>Search</button>
-          <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current</button>
-          <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
-        </div>
-      </section>
-
-      {activePane === "overview" ? (
       <header className="workspace-hero glass-card orders-hero">
         <figure className="orders-hero-banner" aria-hidden="true">
           <img src={onlineShoppingDeliveryIllustration} alt="" loading="eager" />
@@ -126,7 +116,13 @@ export function OrdersPage() {
           </div>
         </div>
       </header>
-      ) : null}
+
+      <div className="orders-pane-switch" role="tablist" aria-label="Orders view navigation">
+        <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "search" ? "active" : ""}`} onClick={() => setActivePane("search")}>Search</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
+      </div>
 
       {activePane === "search" ? (
       <SectionCard

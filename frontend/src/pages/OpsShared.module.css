@@ -37,8 +37,28 @@
   color: #ffffff;
   border-color: transparent;
 }
+:global(.orders-pane-switch) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 0.1rem;
+}
 :global(.single-pane-layout) {
   grid-template-columns: 1fr !important;
+}
+:global(.order-details-split) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  gap: 1rem;
+  min-height: 0;
+  overflow: hidden;
+}
+:global(.order-details-left-pane),
+:global(.order-details-map-pane) {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 :global(.dashboard-page) {
   grid-auto-rows: max-content;
@@ -831,6 +851,7 @@
   :global(.profile-grid),
   :global(.create-order-grid),
   :global(.order-details-grid),
+  :global(.order-details-split),
   :global(.ops-main .workspace-grid) {
     grid-template-columns: 1fr;
   }
