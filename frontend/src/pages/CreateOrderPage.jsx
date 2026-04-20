@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/Button";
 import { FormField } from "../components/ui/FormField";
 import { MapboxMap } from "../components/ui/MapboxMap";
-import { clearOrderError, createOrder, loadOrderReferenceData, updateOrderDestination } from "../features/orders/ordersSlice";
+import { clearOrderError, createOrder, loadOrderReferenceData } from "../features/orders/ordersSlice";
 import { validateCreateOrderForm } from "../features/orders/orderValidators";
 import { autocompleteAddress, fetchNairobiPlaceSuggestions, fetchRoutePreview, geocodeAddress, reverseGeocodeCoordinates } from "../services/mapbox";
 import styles from "./CreateOrderPage.module.css";
@@ -40,13 +40,8 @@ const DEFAULT_NAIROBI_CENTER = [36.8219, -1.2921];
 
 const ORDER_PANEL_MODES = {
   VIEW_MAP: "view-map",
-  MANAGE: "manage-order",
+  CREATE: "create-order",
   SUMMARY: "order-summary",
-};
-
-const ORDER_FORM_MODES = {
-  NEW: "new",
-  EDIT_ACTIVE: "edit-active",
 };
 
 function normalizeSuggestion(feature) {
@@ -94,7 +89,6 @@ export function CreateOrderPage() {
   const token = useSelector((state) => state.auth.token);
   const {
     createStatus,
-    mutationStatus,
     error,
     fieldErrors,
     referenceData,
@@ -127,22 +121,12 @@ export function CreateOrderPage() {
   const [routeError, setRouteError] = useState("");
   const [nairobiSuggestions, setNairobiSuggestions] = useState([]);
   const [isLocatingPickup, setIsLocatingPickup] = useState(false);
-  const [activePanelMode, setActivePanelMode] = useState(ORDER_PANEL_MODES.VIEW_MAP);
+  const [activePanelMode, setActivePanelMode] = useState(ORDER_PANEL_MODES.CREATE);
   const [createdOrder, setCreatedOrder] = useState(null);
-  const [orderFormMode, setOrderFormMode] = useState(ORDER_FORM_MODES.NEW);
-  const [selectedActiveOrderId, setSelectedActiveOrderId] = useState("");
   const [selectedMapOrderId, setSelectedMapOrderId] = useState("");
   const [selectedMapRouteGeoJson, setSelectedMapRouteGeoJson] = useState(null);
   const [selectedMapRouteStatus, setSelectedMapRouteStatus] = useState("idle");
   const [selectedMapRouteError, setSelectedMapRouteError] = useState("");
-  const activeUserOrders = useMemo(
-    () => [...currentOrders].sort((left, right) => {
-      const rightTime = new Date(right.updatedAt || right.createdAt || 0).getTime();
-      const leftTime = new Date(left.updatedAt || left.createdAt || 0).getTime();
-      return rightTime - leftTime;
-    }),
-    [currentOrders],
-  );
 
   const allUserOrders = useMemo(
     () => [...currentOrders, ...orderHistory].sort((left, right) => {
@@ -369,9 +353,7 @@ export function CreateOrderPage() {
     setRouteError("");
   }, []);
 
-  const resetToNewOrderForm = useCallback(() => {
-    setOrderFormMode(ORDER_FORM_MODES.NEW);
-    setSelectedActiveOrderId("");
+  const resetCreateOrderForm = useCallback(() => {
     setFormData(initialFormData);
     setErrors({});
     setPickup(null);
@@ -392,76 +374,9 @@ export function CreateOrderPage() {
   }, [clearRouteState, dispatch]);
 
   useEffect(() => {
-    resetToNewOrderForm();
-  }, [location.key, resetToNewOrderForm]);
-
-  const selectedActiveOrder = useMemo(
-    () => activeUserOrders.find((order) => String(order.id) === String(selectedActiveOrderId)) || null,
-    [activeUserOrders, selectedActiveOrderId],
-  );
-
-  useEffect(() => {
-    if (orderFormMode !== ORDER_FORM_MODES.EDIT_ACTIVE) {
-      return;
-    }
-
-    if (!activeUserOrders.length) {
-      setSelectedActiveOrderId("");
-      return;
-    }
-
-    const exists = activeUserOrders.some((order) => String(order.id) === String(selectedActiveOrderId));
-    if (!exists) {
-      setSelectedActiveOrderId(String(activeUserOrders[0].id));
-    }
-  }, [activeUserOrders, orderFormMode, selectedActiveOrderId]);
-
-  useEffect(() => {
-    if (orderFormMode !== ORDER_FORM_MODES.EDIT_ACTIVE || !selectedActiveOrder) {
-      return;
-    }
-
-    setFormData({
-      parcelName: selectedActiveOrder.parcelName || "",
-      pickupLocation: selectedActiveOrder.pickupLocation || "",
-      destinationLocation: selectedActiveOrder.destination || "",
-      weightCategoryId: selectedActiveOrder.parcel?.weight_category_id != null ? String(selectedActiveOrder.parcel.weight_category_id) : "",
-      weightKg: selectedActiveOrder.parcel?.weight != null ? String(selectedActiveOrder.parcel.weight) : "",
-      description: selectedActiveOrder.parcel?.specialInstructions || selectedActiveOrder.description || "",
-    });
-
-    setPickup(
-      selectedActiveOrder.pickupCoords
-        ? {
-            address: selectedActiveOrder.pickupLocation || "",
-            latitude: selectedActiveOrder.pickupCoords.latitude,
-            longitude: selectedActiveOrder.pickupCoords.longitude,
-          }
-        : null,
-    );
-    setDestination(
-      selectedActiveOrder.destinationCoords
-        ? {
-            address: selectedActiveOrder.destination || "",
-            latitude: selectedActiveOrder.destinationCoords.latitude,
-            longitude: selectedActiveOrder.destinationCoords.longitude,
-          }
-        : null,
-    );
-
-    setPickupAreaName("");
-    setDestinationAreaName("");
-    setErrors({});
-    setRouteError("");
-    setDistance(selectedActiveOrder.distanceKm ?? null);
-    setDuration(selectedActiveOrder.durationMinutes ?? null);
-    setPrice(
-      selectedActiveOrder.quotedPrice != null && selectedActiveOrder.quotedPrice !== ""
-        ? Number(selectedActiveOrder.quotedPrice)
-        : null,
-    );
-    setActiveLocationField("destination");
-  }, [orderFormMode, selectedActiveOrder]);
+    resetCreateOrderForm();
+    setActivePanelMode(ORDER_PANEL_MODES.CREATE);
+  }, [location.key, resetCreateOrderForm]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -764,42 +679,6 @@ export function CreateOrderPage() {
       return;
     }
 
-    if (orderFormMode === ORDER_FORM_MODES.EDIT_ACTIVE && selectedActiveOrder) {
-      const matchingDestination = (referenceData.locations || []).find((locationItem) => {
-        if (destinationData?.latitude != null && destinationData?.longitude != null) {
-          const latDiff = Math.abs(Number(locationItem.latitude || 0) - Number(destinationData.latitude));
-          const lngDiff = Math.abs(Number(locationItem.longitude || 0) - Number(destinationData.longitude));
-          if (latDiff < 0.0002 && lngDiff < 0.0002) {
-            return true;
-          }
-        }
-
-        return String(locationItem.address || "").toLowerCase().trim()
-          === String(formData.destinationLocation || "").toLowerCase().trim();
-      });
-
-      if (!matchingDestination) {
-        setRouteError("To update an active order, pick a destination from known Nairobi locations.");
-        return;
-      }
-
-      const updateResult = await dispatch(
-        updateOrderDestination({
-          orderId: selectedActiveOrder.backendId || selectedActiveOrder.id,
-          deliveryLocationId: matchingDestination.id,
-        }),
-      );
-
-      if (updateOrderDestination.fulfilled.match(updateResult)) {
-        setCreatedOrder(updateResult.payload.order);
-        setActivePanelMode(ORDER_PANEL_MODES.SUMMARY);
-        setErrors({});
-        dispatch(clearOrderError());
-      }
-
-      return;
-    }
-
     const payload = {
       quoted_price: quotedPrice,
       pickup_location: {
@@ -832,7 +711,7 @@ export function CreateOrderPage() {
     }
   }
 
-  const showManageOrderPanel = activePanelMode === ORDER_PANEL_MODES.MANAGE;
+  const showCreateOrderPanel = activePanelMode === ORDER_PANEL_MODES.CREATE;
   const showSummaryPanel = activePanelMode === ORDER_PANEL_MODES.SUMMARY;
   const showViewMapPanel = activePanelMode === ORDER_PANEL_MODES.VIEW_MAP;
   const hasOrderSummary = Boolean(pickup && destination);
@@ -862,11 +741,11 @@ export function CreateOrderPage() {
           <button
             type="button"
             role="tab"
-            aria-selected={activePanelMode === ORDER_PANEL_MODES.MANAGE}
-            className={`panel-toggle-btn ${activePanelMode === ORDER_PANEL_MODES.MANAGE ? "active" : ""}`}
-            onClick={() => setActivePanelMode(ORDER_PANEL_MODES.MANAGE)}
+            aria-selected={activePanelMode === ORDER_PANEL_MODES.CREATE}
+            className={`panel-toggle-btn ${activePanelMode === ORDER_PANEL_MODES.CREATE ? "active" : ""}`}
+            onClick={() => setActivePanelMode(ORDER_PANEL_MODES.CREATE)}
           >
-            Manage Order
+            Create Order
           </button>
           <button
             type="button"
@@ -881,46 +760,14 @@ export function CreateOrderPage() {
       </section>
 
       <div className="create-order-grid">
-        {showManageOrderPanel ? (
+        {showCreateOrderPanel ? (
           <section className="workspace-panel create-order-panel">
             <div className="section-header">
               <div>
-                <h2>Manage Order</h2>
-                <p>Update details, validate route, then create the order.</p>
+                <h2>Create Order</h2>
+                <p>Enter parcel details, validate route, then create the order.</p>
               </div>
             </div>
-
-            <div className="order-edit-mode-row">
-              <button
-                type="button"
-                className={`secondary-btn ${orderFormMode === ORDER_FORM_MODES.NEW ? "active-mode-btn" : ""}`}
-                onClick={resetToNewOrderForm}
-              >
-                New Order
-              </button>
-              <FormField id="active-order-select" label="Existing Active Order">
-                <select
-                  id="active-order-select"
-                  className="form-select"
-                  value={selectedActiveOrderId}
-                  disabled={!activeUserOrders.length}
-                  onChange={(event) => {
-                    setOrderFormMode(ORDER_FORM_MODES.EDIT_ACTIVE);
-                    setSelectedActiveOrderId(event.target.value);
-                  }}
-                >
-                  {!activeUserOrders.length ? <option value="">No active orders</option> : null}
-                  {activeUserOrders.map((order) => (
-                    <option key={order.id} value={order.id}>
-                      #{order.id} - {order.parcelName}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-            </div>
-            {orderFormMode === ORDER_FORM_MODES.EDIT_ACTIVE ? (
-              <p className="helper-text">Editing active order #{selectedActiveOrderId || "--"} with form auto-filled.</p>
-            ) : null}
 
             <form className="auth-form" onSubmit={handleSubmit}>
               {error ? <p className="form-status error">{error}</p> : null}
@@ -1070,11 +917,9 @@ export function CreateOrderPage() {
               <Button
                 type="submit"
                 className="primary-btn full-width"
-                disabled={createStatus === "loading" || mutationStatus === "loading"}
+                disabled={createStatus === "loading"}
               >
-                {orderFormMode === ORDER_FORM_MODES.EDIT_ACTIVE
-                  ? (mutationStatus === "loading" ? "Updating Order..." : "Update Active Order")
-                  : (createStatus === "loading" ? "Creating Order..." : "Create Order")}
+                {createStatus === "loading" ? "Creating Order..." : "Create Order"}
               </Button>
             </form>
           </section>
