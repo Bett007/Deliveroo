@@ -109,8 +109,7 @@
   gap: 1rem;
   align-items: start;
   min-height: 0;
-  overflow: auto;
-  scrollbar-width: thin;
+  overflow: visible;
 }
 :global(.create-order-panel),
 :global(.create-order-aside),
@@ -120,8 +119,7 @@
   gap: 1rem;
   align-content: start;
   min-height: 0;
-  overflow: auto;
-  scrollbar-width: thin;
+  overflow: visible;
 }
 :global(.create-order-panel .auth-form) {
   gap: 0.75rem;
@@ -181,7 +179,7 @@
   margin-bottom: 1rem;
 }
 :global(.route-stats-row.single-column) {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 0;
 }
 :global(.route-stats-row div) {
@@ -255,6 +253,10 @@
 }
 
 @media (max-width: 768px) {
+  :global(.route-stats-row.single-column) {
+    grid-template-columns: 1fr;
+  }
+
   :global(.panel-toggle-actions) {
     display: grid;
     grid-template-columns: 1fr;

@@ -300,6 +300,12 @@
   border: 1px solid var(--ops-border);
   color: var(--ops-ink);
 }
+:global(.ops-main .explore-orders-btn:hover),
+:global(.ops-main .explore-orders-btn:focus-visible) {
+  background: var(--ops-blue);
+  border-color: var(--ops-blue);
+  color: #ffffff;
+}
 :global(.ops-main .primary-btn:hover),
 :global(.ops-main .secondary-btn:hover) {
   transform: none;

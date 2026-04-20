@@ -114,11 +114,10 @@ export function OrdersPage() {
         {activePane === "explore" ? (
           <SectionCard className="orders-panel" title="Explore Orders" description="Open the detailed views you need.">
             <div className="topbar-actions">
-              {featuredCurrentOrder ? <Link to={`/orders/${featuredCurrentOrder.id}`} className="secondary-btn">Open Latest Active Order</Link> : null}
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("active")}>Open Current Summary</button>
-              <button type="button" className="secondary-btn" onClick={() => setActivePane("history")}>Open History Summary</button>
-              <Link to="/orders/history" className="secondary-btn">Open Full History Page</Link>
-              <Link to="/orders/create" className="primary-btn">Open Full Create Order</Link>
+              {featuredCurrentOrder ? <Link to={`/orders/${featuredCurrentOrder.id}`} className="secondary-btn explore-orders-btn">Open Latest Active Order</Link> : null}
+              <button type="button" className="secondary-btn explore-orders-btn" onClick={() => setActivePane("active")}>Open Current Summary</button>
+              <button type="button" className="secondary-btn explore-orders-btn" onClick={() => setActivePane("history")}>Open History Summary</button>
+              <Link to="/orders/history" className="secondary-btn explore-orders-btn">Open Full History Page</Link>
             </div>
           </SectionCard>
         ) : null}
