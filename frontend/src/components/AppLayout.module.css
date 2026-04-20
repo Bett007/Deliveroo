@@ -178,7 +178,7 @@
   box-shadow: inset 12px 0 24px rgba(20, 35, 55, 0.02);
   scrollbar-width: thin;
 }
- :global(.ops-fit-shell) {
+:global(.ops-fit-shell) {
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -187,10 +187,13 @@
 }
 :global(.ops-fit-content) {
   --ops-fit-scale: 1;
+  display: block;
   width: calc(100% / var(--ops-fit-scale));
   min-height: calc(100% / var(--ops-fit-scale));
+  height: max-content;
   transform: scale(var(--ops-fit-scale));
   transform-origin: top left;
+  overflow: visible;
   will-change: transform;
 }
 :global(.ops-mobile-menu-btn) {
