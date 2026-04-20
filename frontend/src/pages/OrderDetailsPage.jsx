@@ -27,12 +27,25 @@ export function OrderDetailsPage() {
     error,
     fieldErrors,
   } = useSelector((state) => state.orders);
+  const { user } = useSelector((state) => state.auth);
   const [destinationArea, setDestinationArea] = useState("");
   const [destinationPlace, setDestinationPlace] = useState("");
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [cancelReason, setCancelReason] = useState("");
   const [destinationError, setDestinationError] = useState("");
   const [activePane, setActivePane] = useState("summary");
+  const isRider = user?.role === "rider";
+
+  const availablePanes = useMemo(
+    () => (isRider ? ["summary"] : ["summary", "manage", "tracking"]),
+    [isRider],
+  );
+
+  useEffect(() => {
+    if (!availablePanes.includes(activePane)) {
+      setActivePane("summary");
+    }
+  }, [activePane, availablePanes]);
 
   useEffect(() => {
     dispatch(fetchOrderById(orderId));
@@ -160,8 +173,8 @@ export function OrderDetailsPage() {
 
       <div className="orders-pane-switch" role="tablist" aria-label="Order details views">
         <button type="button" className={`panel-toggle-btn ${activePane === "summary" ? "active" : ""}`} onClick={() => setActivePane("summary")}>Summary</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "manage" ? "active" : ""}`} onClick={() => setActivePane("manage")}>Manage</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "tracking" ? "active" : ""}`} onClick={() => setActivePane("tracking")}>Tracking</button>
+        {!isRider ? <button type="button" className={`panel-toggle-btn ${activePane === "manage" ? "active" : ""}`} onClick={() => setActivePane("manage")}>Manage</button> : null}
+        {!isRider ? <button type="button" className={`panel-toggle-btn ${activePane === "tracking" ? "active" : ""}`} onClick={() => setActivePane("tracking")}>Tracking</button> : null}
       </div>
 
       <div className="order-details-split">
