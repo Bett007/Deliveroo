@@ -42,6 +42,7 @@ Copy `.env.example` to `.env` when you need local frontend variables.
 Current example:
 
 - `VITE_API_BASE_URL` points the frontend to the backend API
+- `VITE_MAPBOX_ACCESS_TOKEN` must be a public Mapbox token (`pk...`) for browser usage
 
 ## Folder Structure
 

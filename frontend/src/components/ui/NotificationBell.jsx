@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { dismissNotification, markAllNotificationsRead } from "../../features/notifications/notificationsSlice";
 import { formatReadableDate } from "../../utils/formatters/date";
 
-export function NotificationBell({ label = "Notifications", minimumCount = 0 }) {
+export function NotificationBell({ label = "Notifications" }) {
   const dispatch = useDispatch();
   const { items } = useSelector((state) => state.notifications);
   const [open, setOpen] = useState(false);
 
-  const unreadCount = useMemo(() => items.filter((item) => !item.read).length, [items]);
-  const visibleCount = Math.max(minimumCount, unreadCount);
+  const notificationCount = useMemo(() => items.length, [items]);
 
   return (
     <div className="notification-shell">
@@ -26,7 +25,7 @@ export function NotificationBell({ label = "Notifications", minimumCount = 0 }) 
         }}
       >
         <span className="notification-bell" aria-hidden="true">🔔</span>
-        <span className="alert-chip">{visibleCount}</span>
+        {notificationCount > 0 ? <span className="alert-chip">{notificationCount}</span> : null}
       </button>
 
       {open ? (
