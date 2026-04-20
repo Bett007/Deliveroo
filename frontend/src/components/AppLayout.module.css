@@ -184,6 +184,11 @@
   overflow: hidden;
   position: relative;
 }
+:global(.ops-fit-shell.ops-fit-shell-scroll) {
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
 :global(.ops-fit-content) {
   --ops-fit-scale: 1;
   display: block;
@@ -379,7 +384,7 @@
   }
 
   :global(.ops-main) {
-    padding: 4.2rem 0.85rem 0.85rem;
+    padding: 4.2rem 0.85rem 0.85rem 3.7rem;
     border-left: 0;
     box-shadow: none;
     overflow: auto;

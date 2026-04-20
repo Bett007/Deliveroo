@@ -41,7 +41,7 @@ export function DeliveryHistory() {
   const pagedOrders = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
-    <section className="workspace-page">
+    <section className="workspace-page delivery-history-page">
       <header className="workspace-hero glass-card">
         <div>
           <p className="eyebrow">Delivery History</p>
