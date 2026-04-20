@@ -52,7 +52,7 @@ export function OrdersPage() {
             {error ? <p className="form-status error">{error}</p> : null}
 
             <div className="orders-hero-actions">
-              <button type="button" className="primary-btn" onClick={() => setActivePane("active")}>Create Parcel Order</button>
+              <Link to="/orders/create" className="primary-btn">Create Parcel Order</Link>
               <span className="mini-badge">{totalOrders} total</span>
             </div>
           </div>
@@ -77,7 +77,7 @@ export function OrdersPage() {
       <div className="orders-pane-switch" role="tablist" aria-label="Orders view navigation">
         <button type="button" className={`panel-toggle-btn ${activePane === "explore" ? "active" : ""}`} onClick={() => setActivePane("explore")}>Explore Orders</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current Order</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History Summary</button>
       </div>
 
       <div className="workspace-grid mobile-orders-grid single-pane-layout">
@@ -119,7 +119,7 @@ export function OrdersPage() {
 
         {activePane === "history" ? (
           <SectionCard className="orders-panel" title="History Summary" description="Top-level completed and cancelled activity.">
-            <div className="route-stats-row">
+            <div className="route-stats-row history-summary-stats">
               <div>
                 <p className="card-label">Delivered</p>
                 <h3>{deliveredCount}</h3>
