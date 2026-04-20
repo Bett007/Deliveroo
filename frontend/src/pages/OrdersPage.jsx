@@ -15,7 +15,7 @@ export function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [activePane, setActivePane] = useState("overview");
+  const [activePane, setActivePane] = useState("explore");
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -93,9 +93,9 @@ export function OrdersPage() {
             {error ? <p className="form-status error">{error}</p> : null}
 
             <div className="orders-hero-actions">
-              <Link to="/orders/create" className="primary-btn">
+              <button type="button" className="primary-btn" onClick={() => setActivePane("active")}>
                 Create Parcel Order
-              </Link>
+              </button>
               <span className="mini-badge">{totalOrders} total</span>
             </div>
           </div>
@@ -119,15 +119,50 @@ export function OrdersPage() {
 
       <div className="orders-pane-switch" role="tablist" aria-label="Orders view navigation">
         <button type="button" className={`panel-toggle-btn ${activePane === "overview" ? "active" : ""}`} onClick={() => setActivePane("overview")}>Overview</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "search" ? "active" : ""}`} onClick={() => setActivePane("search")}>Search</button>
-        <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "explore" ? "active" : ""}`} onClick={() => setActivePane("explore")}>Explore Orders</button>
+        <button type="button" className={`panel-toggle-btn ${activePane === "active" ? "active" : ""}`} onClick={() => setActivePane("active")}>Current Order</button>
         <button type="button" className={`panel-toggle-btn ${activePane === "history" ? "active" : ""}`} onClick={() => setActivePane("history")}>History</button>
       </div>
 
-      {activePane === "search" ? (
+      {activePane === "overview" ? (
       <SectionCard
         className="orders-panel"
-        title="Search, Filter, and Sort"
+        title="Overview"
+        description="Snapshot of your current delivery workspace."
+      >
+        <div className="route-stats-row">
+          <div>
+            <p className="card-label">Active Orders</p>
+            <h3>{currentOrders.length}</h3>
+          </div>
+          <div>
+            <p className="card-label">Delivered</p>
+            <h3>{deliveredCount}</h3>
+          </div>
+          <div>
+            <p className="card-label">Cancelled</p>
+            <h3>{cancelledCount}</h3>
+          </div>
+          <div>
+            <p className="card-label">Total Orders</p>
+            <h3>{totalOrders}</h3>
+          </div>
+        </div>
+        <div className="topbar-actions">
+          <button type="button" className="primary-btn" onClick={() => setActivePane("active")}>
+            Create Parcel Order
+          </button>
+          <button type="button" className="secondary-btn" onClick={() => setActivePane("explore")}>
+            Explore Orders
+          </button>
+        </div>
+      </SectionCard>
+      ) : null}
+
+      {activePane === "explore" ? (
+      <SectionCard
+        className="orders-panel"
+        title="Explore Orders"
         description="Find orders by ID, parcel, pickup, destination, or status quickly."
       >
         <div className="auth-form">
@@ -163,41 +198,109 @@ export function OrdersPage() {
       </SectionCard>
       ) : null}
 
-      <div className="workspace-grid mobile-orders-grid">
+      <div className={`workspace-grid mobile-orders-grid ${activePane === "active" ? "single-pane-layout" : ""}`}>
         {activePane === "active" ? (
-        <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
-          {status === "loading" ? (
-            <p className="helper-text">Loading current orders from the backend...</p>
-          ) : filteredCurrentOrders.length ? (
-            <div className="order-card-list">
-              {filteredCurrentOrders.map((order) => (
-                <article key={order.id} className="order-card">
-                  <div className="order-card-top">
-                    <div>
-                      <p className="card-label">Order #{order.id}</p>
-                      <h3>{order.parcelName}</h3>
-                    </div>
-                    <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
-                  </div>
-                  <p className="order-route">Pickup {order.pickupLocation} to delivery {order.destination}</p>
-                  <div className="order-meta-row">
-                    <span>Quoted price: KES {Number(order.quotedPrice || 0).toFixed(2)}</span>
-                    <span>Updated {formatReadableDate(order.updatedAt)}</span>
-                  </div>
-                  <div className="order-actions-row">
-                    <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="No active orders"
-              description="No active orders match your current search or filters."
-              action={<Link to="/orders/create" className="primary-btn">Create Order</Link>}
-            />
-          )}
-        </SectionCard>
+          <>
+            <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
+              {status === "loading" ? (
+                <p className="helper-text">Loading current orders from the backend...</p>
+              ) : filteredCurrentOrders.length ? (
+                <div className="order-card-list">
+                  {filteredCurrentOrders.map((order) => (
+                    <article key={order.id} className="order-card">
+                      <div className="order-card-top">
+                        <div>
+                          <p className="card-label">Order #{order.id}</p>
+                          <h3>{order.parcelName}</h3>
+                        </div>
+                        <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
+                      </div>
+                      <p className="order-route">Pickup {order.pickupLocation} to delivery {order.destination}</p>
+                      <div className="order-meta-row">
+                        <span>Quoted price: KES {Number(order.quotedPrice || 0).toFixed(2)}</span>
+                        <span>Updated {formatReadableDate(order.updatedAt)}</span>
+                      </div>
+                      <div className="order-actions-row">
+                        <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No active orders"
+                  description="No active orders match your current search or filters."
+                />
+              )}
+            </SectionCard>
+
+            <SectionCard className="orders-panel" title="Create Order" description="Start new parcel booking from your orders workspace.">
+              <p className="helper-text">Use the full builder to set route, pricing, and parcel details.</p>
+              <div className="topbar-actions">
+                <Link to="/orders/create" className="primary-btn">Open Full Builder</Link>
+                <button type="button" className="secondary-btn" onClick={() => setActivePane("explore")}>Back to Explore</button>
+              </div>
+            </SectionCard>
+          </>
+        ) : null}
+
+        {activePane === "explore" ? (
+          <>
+            <SectionCard className="orders-panel" title="Current Orders" description="Orders still moving through pickup, confirmation, or delivery.">
+              {status === "loading" ? (
+                <p className="helper-text">Loading current orders from the backend...</p>
+              ) : filteredCurrentOrders.length ? (
+                <div className="order-card-list">
+                  {filteredCurrentOrders.slice(0, 5).map((order) => (
+                    <article key={order.id} className="order-card">
+                      <div className="order-card-top">
+                        <div>
+                          <p className="card-label">Order #{order.id}</p>
+                          <h3>{order.parcelName}</h3>
+                        </div>
+                        <StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge>
+                      </div>
+                      <p className="order-route">Pickup {order.pickupLocation} to delivery {order.destination}</p>
+                      <div className="order-actions-row">
+                        <Link to={`/orders/${order.id}`} className="secondary-btn">View Details</Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="helper-text">No active orders match your filters.</p>
+              )}
+            </SectionCard>
+
+            <SectionCard className="orders-panel" title="History Preview" description="Recent delivered and cancelled orders.">
+              {filteredOrderHistory.length ? (
+                <div className="table-wrapper">
+                  <table className="orders-table">
+                    <thead>
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Parcel</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredOrderHistory.slice(0, 5).map((order) => (
+                        <tr key={order.id}>
+                          <td>{order.id}</td>
+                          <td>{order.parcelName}</td>
+                          <td><StatusBadge>{order.status.replaceAll("_", " ")}</StatusBadge></td>
+                          <td>{formatReadableDate(order.updatedAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="helper-text">No delivered or cancelled orders match your filters.</p>
+              )}
+            </SectionCard>
+          </>
         ) : null}
 
         {activePane === "history" ? (
@@ -238,6 +341,7 @@ export function OrdersPage() {
           )}
         </SectionCard>
         ) : null}
+
       </div>
     </section>
   );

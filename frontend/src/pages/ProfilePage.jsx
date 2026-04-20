@@ -89,7 +89,6 @@ export function ProfilePage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPhoto, setIsSavingPhoto] = useState(false);
   const [avatarClientError, setAvatarClientError] = useState("");
-  const [activePane, setActivePane] = useState("profile");
   const isSaving = profileStatus === "loading";
 
   useEffect(() => {
@@ -168,15 +167,7 @@ export function ProfilePage() {
         <span className="user-chip">{user?.role || "user"}</span>
       </header>
 
-      <section className="workspace-panel panel-toggle-bar">
-        <div className="panel-toggle-actions" role="tablist" aria-label="Profile views">
-          <button type="button" className={`panel-toggle-btn ${activePane === "profile" ? "active" : ""}`} onClick={() => setActivePane("profile")}>Profile Form</button>
-          <button type="button" className={`panel-toggle-btn ${activePane === "avatar" ? "active" : ""}`} onClick={() => setActivePane("avatar")}>Avatar</button>
-        </div>
-      </section>
-
-      <div className="profile-grid single-pane-layout">
-        {activePane === "avatar" ? (
+      <div className="profile-grid">
         <section className="profile-card">
           <div className="profile-avatar">
             {avatarDraft ? (
@@ -204,9 +195,7 @@ export function ProfilePage() {
             </Button>
           ) : null}
         </section>
-        ) : null}
 
-        {activePane === "profile" ? (
         <section className="workspace-panel profile-form-panel">
           <form className="auth-form" onSubmit={handleProfileSubmit}>
             <div className="form-grid-two">
@@ -233,7 +222,6 @@ export function ProfilePage() {
             </Button>
           </form>
         </section>
-        ) : null}
       </div>
     </section>
   );

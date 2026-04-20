@@ -9,6 +9,8 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import shellStyles from "./AppLayout.module.css";
 import opsSharedStyles from "../pages/OpsShared.module.css";
 
+const PROFILE_PLACEHOLDER_SRC = "/placeholder_profile_avatar.png";
+
 function NavIcon({ name }) {
   const icons = {
     dashboard: (
@@ -63,11 +65,39 @@ function NavIcon({ name }) {
   return <span className="nav-icon">{icons[name]}</span>;
 }
 
+function ProfileNavAvatar({ avatarUrl, fallbackInitial }) {
+  const [usePlaceholder, setUsePlaceholder] = useState(!avatarUrl);
+  const [showInitial, setShowInitial] = useState(false);
+  const src = usePlaceholder ? PROFILE_PLACEHOLDER_SRC : avatarUrl;
+
+  return (
+    <span className="nav-avatar-icon" aria-hidden="true">
+      {!showInitial ? (
+        <img
+          src={src}
+          alt=""
+          onError={() => {
+            if (!usePlaceholder) {
+              setUsePlaceholder(true);
+              return;
+            }
+            setShowInitial(true);
+          }}
+        />
+      ) : (
+        <span className="nav-avatar-fallback">{fallbackInitial}</span>
+      )}
+    </span>
+  );
+}
+
 function RoleSidebar({
   title,
   subtitle,
   navItems,
   userEmail,
+  userAvatarUrl,
+  userFallbackInitial,
   onLogout,
   shellClass,
   onMouseEnter,
@@ -101,7 +131,11 @@ function RoleSidebar({
             className={({ isActive }) => `ops-nav-link ${isActive ? "active" : ""}`}
             onClick={onNavigate}
           >
-            <NavIcon name={item.icon} />
+            {item.icon === "profile" ? (
+              <ProfileNavAvatar avatarUrl={userAvatarUrl} fallbackInitial={userFallbackInitial} />
+            ) : (
+              <NavIcon name={item.icon} />
+            )}
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -173,6 +207,7 @@ export function AppLayout() {
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
   const isRider = user?.role === "rider";
+  const userFallbackInitial = (user?.first_name?.trim()?.[0] || user?.email?.trim()?.[0] || "U").toUpperCase();
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth <= 1120) {
@@ -245,7 +280,7 @@ export function AppLayout() {
         { label: "Analytics", path: "/admin/analytics", icon: "orders" },
         { label: "Monitoring", path: "/admin/monitoring", icon: "help" },
         { label: "Activity", path: "/admin/activity", icon: "create" },
-        { label: "Profile", path: "/profile", icon: "register" },
+        { label: "Profile", path: "/profile", icon: "profile" },
         { label: "Help", path: "/help", icon: "help" },
       ]
     : isRider
@@ -255,15 +290,14 @@ export function AppLayout() {
           { label: "Active Deliveries", path: "/deliveries/active", icon: "orders" },
           { label: "Delivery History", path: "/deliveries/history", icon: "create" },
           { label: "Route Map", path: "/map", icon: "help" },
-          { label: "Profile", path: "/profile", icon: "register" },
+          { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ]
       : [
           { label: "Dashboard", path: "/dashboard", icon: "dashboard" },
           { label: "Orders", path: "/orders", icon: "orders" },
           { label: "History", path: "/orders/history", icon: "create" },
-          { label: "Create Order", path: "/orders/create", icon: "create" },
-          { label: "Profile", path: "/profile", icon: "register" },
+          { label: "Profile", path: "/profile", icon: "profile" },
           { label: "Help", path: "/help", icon: "help" },
         ];
 
@@ -291,6 +325,8 @@ export function AppLayout() {
             }
             navItems={navItems}
             userEmail={user.email}
+            userAvatarUrl={user?.avatar_url}
+            userFallbackInitial={userFallbackInitial}
             onLogout={handleLogout}
             shellClass={isAdmin ? "admin" : isRider ? "rider" : "customer"}
           />
@@ -350,6 +386,8 @@ export function AppLayout() {
                 }
                 navItems={navItems}
                 userEmail={user.email}
+                userAvatarUrl={user?.avatar_url}
+                userFallbackInitial={userFallbackInitial}
                 onLogout={() => {
                   setMobileMenuOpen(false);
                   handleLogout();
